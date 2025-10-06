@@ -3393,7 +3393,7 @@ select:focus-within {
   font-size: 0.75rem;
   text-align: center;
   padding: 15px 25px;
-  white-space: nowrap;
+  /* white-space: nowrap; */
 }
 
 .table td {
@@ -3403,7 +3403,7 @@ select:focus-within {
   font-weight: 500;
   padding: 15px 25px;
   vertical-align: middle;
-  white-space: nowrap;
+  /* white-space: nowrap; */
 }
 
 .white-space-wrap {

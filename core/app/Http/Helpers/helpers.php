@@ -18,7 +18,7 @@ use Illuminate\Support\Str;
 
 function systemDetails()
 {
-    $system['name'] = 'changalab';
+    $system['name'] = 'Website';
     $system['version'] = '3.2';
     $system['build_version'] = '5.1.6';
 

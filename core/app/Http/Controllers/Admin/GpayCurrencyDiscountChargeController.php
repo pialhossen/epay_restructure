@@ -23,7 +23,7 @@ class GpayCurrencyDiscountChargeController extends Controller
             $query->where('rules_for', $request->rules_for);
         }
 
-        $charges = $query->latest()->paginate(getPaginate());
+        $charges = $query->latest()->paginate(getPaginate($request->itemsPerPage? $request->itemsPerPage: null));
         $currencies = Currency::select('id', 'name', 'cur_sym')->get();
 
         return view('admin.discount-charge.index', compact('pageTitle', 'charges', 'currencies'));

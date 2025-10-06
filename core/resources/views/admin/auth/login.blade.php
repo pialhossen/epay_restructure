@@ -20,12 +20,47 @@
                                     <label>@lang('Username')</label>
                                     <input type="text" class="form-control" value="{{ old('username') }}" name="username" required>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group" style="position: relative;">
                                     <div class="d-flex justify-content-between">
                                         <label>@lang('Password')</label>
                                         <a href="{{ route('admin.password.reset') }}" class="forget-text">@lang('Forgot Password?')</a>
                                     </div>
+                                    <style>
+                                        .eye{
+                                            font-size: 20px;
+                                            position: absolute;
+                                            top: 37px;
+                                            right: 15px;
+                                            padding: 5px;
+                                            border-radius: 50%;
+                                            cursor: pointer;
+                                            width: 35px;
+                                            height: 35px;
+                                            display: flex;
+                                            align-items: center;
+                                            justify-content: center;
+                                            color: white;
+                                        }
+                                        .eye:hover{
+                                            background-color: rgb(235 235 235);
+                                            color: black;
+                                        }
+                                    </style>
+                                    <script>
+                                        function togglePasswordVisibility(element, inputId){
+                                            const passwordField = document.querySelector(inputId)
+                                            if(passwordField.type == "password"){
+                                                passwordField.type = "text"
+                                                element.innerHTML = `<i class="fa-solid fa-eye-slash"></i>`
+                                            }
+                                            else if(passwordField.type == "text"){
+                                                passwordField.type = "password"
+                                                element.innerHTML = `<i class="fa-solid fa-eye"></i>`
+                                            }
+                                        }
+                                    </script>
                                     <input type="password" class="form-control" name="password" required>
+                                    <span onclick="togglePasswordVisibility(this,'#password')" class="eye"><i class="fa-solid fa-eye"></i></span>
                                 </div>
                                 <x-captcha />
                                 <button type="submit" class="btn cmn-btn w-100">@lang('LOGIN')</button>

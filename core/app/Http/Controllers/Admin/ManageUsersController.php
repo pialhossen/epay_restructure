@@ -122,6 +122,7 @@ class ManageUsersController extends Controller
             $users = $users->where('status', Status::USER_ACTIVE)->where('balance','>', 0);
         }
         
+        
     }
     if (isset($request->phone_no) && $request->phone_no) {
         $users = $users->where('mobile', $request->phone_no);
@@ -138,8 +139,15 @@ class ManageUsersController extends Controller
     if (isset($request->last_name) && $request->last_name) {
         $users = $users->where('lastname', 'like', '%' . $request->last_name . '%');
     }
+    if (isset($request->address) && $request->address) {
+        $users = $users->where('address', 'like', '%' . $request->address . '%');
+    }
     $users_data = $users->orderBy('id', 'desc')
-                 ->paginate(getPaginate()); 
+                 ->paginate(getPaginate($request->itemsPerPage? $request->itemsPerPage: null)); 
+
+    $users_data->map(function($user){
+        $user->approved_order_count = Exchange::where('user_id', $user->id)->where('status', Status::EXCHANGE_APPROVED)->count();
+    });
 
     return $users_data;
 }

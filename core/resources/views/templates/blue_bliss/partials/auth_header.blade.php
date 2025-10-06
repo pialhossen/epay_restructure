@@ -78,11 +78,6 @@
                                         @lang('Withdraw Money')
                                     </a>
                                 </li>
-                                <li>
-                                    <a href="{{ route('user.withdraw.history') }}" class="{{ menuActive('user.withdraw.history') }}">
-                                        @lang('Withdraw Log')
-                                    </a>
-                                </li>
                             </ul>
                         </li>
                         <li class="menu-item">

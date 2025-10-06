@@ -52,7 +52,7 @@
     <script src="{{ asset($activeTemplateTrue . 'js/viewport.jquery.js') }}"></script>
     <script src="{{ asset($activeTemplateTrue . 'js/nice-select.js') }}"></script>
     <script src="{{ asset($activeTemplateTrue . 'js/main.js') }}"></script>
-
+    <script src="{{ asset($activeTemplateTrue . 'js/custom.js') }}"></script>
     @stack('script-lib')
 
     @include('partials.notify')

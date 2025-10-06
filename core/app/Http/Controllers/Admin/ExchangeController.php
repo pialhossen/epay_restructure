@@ -55,7 +55,7 @@ class ExchangeController extends Controller
                     date('Y-m-d 23:59:59', strtotime($request->created_to))
                 ]);
             }
-            $exchanges = $exchanges->paginate(getPaginate());
+            $exchanges = $exchanges->paginate(getPaginate($request->itemsPerPage? $request->itemsPerPage: null ));
             $pageTitle = formateScope($scope) . ' Exchange';
         } catch (Exception $ex) {
             $notify[] = ['error', $ex];

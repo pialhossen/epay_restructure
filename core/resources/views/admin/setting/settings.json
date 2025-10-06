@@ -404,6 +404,23 @@
         "icon": "lab la-css3-alt",
         "route_name": "admin.setting.custom.css"
     },
+    "custom_js": {
+        "keyword": [
+            "custom JS",
+            "modify functionality",
+            "frontend",
+            "functionality",
+            "functionality customization",
+            "Javascript settings",
+            "functionality settings",
+            "frontend customization",
+            "customize Javascript"
+        ],
+        "title": "Custom Js",
+        "subtitle": "Write custom Javascript here to modify some functionality of frontend of the system if you need to.",
+        "icon": "lab la-js-square",
+        "route_name": "admin.setting.custom.js"
+    },
     "sitemap": {
         "keyword": [
             "Site map",

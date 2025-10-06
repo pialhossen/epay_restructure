@@ -193,6 +193,26 @@ class GeneralSettingController extends Controller
         return back()->withNotify($notify);
     }
 
+    public function customJs()
+    {
+        $pageTitle = 'Custom JS';
+        $file = activeTemplate(true).'js/custom.js';
+        $fileContent = @file_get_contents($file);
+
+        return view('admin.setting.custom_js', compact('pageTitle', 'fileContent'));
+    }
+    public function customJsSubmit(Request $request)
+    {
+        $file = public_path(activeTemplate(true).'js/custom.js');
+        if (! file_exists($file)) {
+            fopen($file, 'w');
+        }
+        file_put_contents($file, $request->css);
+        $notify[] = ['success', 'Javascript updated successfully'];
+
+        return back()->withNotify($notify);
+    }
+
     public function sitemap()
     {
         $pageTitle = 'Sitemap XML';

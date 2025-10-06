@@ -15,9 +15,37 @@
                                 <label for="email" class="form-label">@lang('Username Or Email')</label>
                                 <input type="text" name="username" value="{{ old('username') }}" class="form-control form--control" required>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group" style="position: relative;">
                                 <label for="password" class="form-label">@lang('Password')</label>
+                                <style>
+                                    .eye{
+                                        font-size: 20px;
+                                        position: absolute;
+                                        top: 43px;
+                                        right: 15px;
+                                        padding: 5px;
+                                        border-radius: 50%;
+                                        cursor: pointer;
+                                    }
+                                    .eye:hover{
+                                        background-color: rgb(243 243 243);
+                                    }
+                                </style>
+                                <script>
+                                    function togglePasswordVisibility(element, inputId){
+                                        const passwordField = document.querySelector(inputId)
+                                        if(passwordField.type == "password"){
+                                            passwordField.type = "text"
+                                            element.innerHTML = `<i class="fa-solid fa-eye-slash"></i>`
+                                        }
+                                        else if(passwordField.type == "text"){
+                                            passwordField.type = "password"
+                                            element.innerHTML = `<i class="fa-solid fa-eye"></i>`
+                                        }
+                                    }
+                                </script>
                                 <input id="password" type="password" class="form-control form--control" name="password" required>
+                                <span onclick="togglePasswordVisibility(this,'#password')" class="eye"><i class="fa-solid fa-eye"></i></span>
                             </div>
                             <x-captcha />
                             <div class="d-flex justify-content-between">

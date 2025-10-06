@@ -490,19 +490,6 @@
                 "title": "Top 10 User",
                 "route_name": "admin.report.exchange.dashboard",
                 "menu_active": "admin.report.exchange.dashboard"
-            },
-            {
-                "keyword": [
-                    "User Exchange Report",
-                    "All Exchange User List",
-                    "Exchange Report",
-                    "Exchange User Activity",
-                    "Top Exchange History",
-                    "Exchange Dashboard"
-                ],
-                "title": "User Exchange Report",
-                "route_name": "admin.report.exchange.report.dashboard",
-                "menu_active": "admin.report.exchange.report.dashboard"
             }
         ]
     },

@@ -16,10 +16,9 @@ use Illuminate\Http\Request;
 
 class CurrencyController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // $currencies = Currency::whereNotIn('name',['A/C BALANCE'])->searchable(['name', 'cur_sym'])->latest()->paginate(getPaginate());
-        $currencies = Currency::latest()->paginate(getPaginate());
+        $currencies = Currency::latest()->paginate(getPaginate(getPaginate($request->itemsPerPage? $request->itemsPerPage: null )));
         $pageTitle = 'Manage Currency';
 
         return view('admin.currency.index', compact('pageTitle', 'currencies'));

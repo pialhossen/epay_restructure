@@ -20,7 +20,7 @@ class GpayHiddenChargeController extends Controller
             $query->where('currency_id', $request->currency_id);
         }
 
-        $hiddenCharges = $query->latest()->paginate(getPaginate());
+        $hiddenCharges = $query->latest()->paginate(getPaginate($request->itemsPerPage? $request->itemsPerPage: null));
         $currencies = Currency::select('id', 'name', 'cur_sym')->get();
 
         return view('admin.hidden-charge.index', compact('pageTitle', 'hiddenCharges', 'currencies'));

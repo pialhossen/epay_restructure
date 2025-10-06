@@ -123,7 +123,7 @@ Route::middleware('admin')->group(function () {
         Route::get('notification/history', 'notificationHistory')->name('notification.history');
         Route::get('email/detail/{id}', 'emailDetails')->name('email.details');
         Route::get('exchange/dashboard',  'exchangeDashboard')->name('exchange.dashboard');
-        Route::get('exchange/report-dashboard',  'exchangeAllReportDashboard')->name('exchange.report.dashboard');
+        // Route::get('exchange/report-dashboard',  'exchangeAllReportDashboard')->name('exchange.report.dashboard');
 
     });
 
@@ -176,6 +176,9 @@ Route::middleware('admin')->group(function () {
         // Custom CSS
         Route::get('custom-css', 'customCss')->name('setting.custom.css');
         Route::post('custom-css', 'customCssSubmit');
+        
+        Route::get('custom-js', 'customJs')->name('setting.custom.js');
+        Route::post('custom-js', 'customJsSubmit');
 
         // Custom Javascript
         // Route::get('custom-javascript', 'customJavascript')->name('setting.custom.javascript');

@@ -25,7 +25,7 @@ class GpayCurrencyManagerController extends Controller
             $query->where('currency_to', $request->currency_to);
         }
 
-        $users = $query->with(['currencyFrom', 'currencyTo'])->latest()->paginate(getPaginate());
+        $users = $query->with(['currencyFrom', 'currencyTo'])->latest()->paginate(getPaginate(getPaginate($request->itemsPerPage? $request->itemsPerPage: null )));
         $currencies = Currency::select('id', 'name', 'cur_sym')->get();
 
         return view('admin.currency-manager.index', compact('pageTitle', 'users', 'currencies'));

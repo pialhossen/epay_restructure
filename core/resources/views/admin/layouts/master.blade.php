@@ -44,6 +44,7 @@
     <script src="{{ asset('assets/global/js/nicEdit.js') }}"></script>
     <script src="{{ asset('assets/global/js/select2.min.js') }}"></script>
     <script src="{{ asset('assets/admin/js/app.js') }}"></script>
+    <script src="{{ asset($activeTemplateTrue . 'js/custom.js') }}"></script>
     @vite(['resources/js/app.js'])
 
     {{-- LOAD NIC EDIT --}}

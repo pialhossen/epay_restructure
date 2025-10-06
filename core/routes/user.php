@@ -92,7 +92,6 @@ Route::middleware('auth')->name('user.')->group(function () {
                     Route::post('/', 'withdrawStore')->name('.money');
                     Route::get('/currency/user/data/{currencyId}', 'currencyUserData')->name('.currency.user.data');
                 });
-                Route::get('history', 'withdrawLog')->name('.history');
             });
 
             // Deposit
@@ -102,7 +101,6 @@ Route::middleware('auth')->name('user.')->group(function () {
                     Route::post('/', 'depositStore')->name('.store');
                     Route::get('/currency/user/data/{currencyId}', 'currencyUserData')->name('.currency.user.data');
                 });
-                Route::get('history', 'withdrawLog')->name('.history');
             });
 
             // affiliate route

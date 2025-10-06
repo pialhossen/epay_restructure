@@ -139,7 +139,7 @@
             @endphp
             @if ($lastCron >= 900)
                 setTimeout(() => {
-                    $('#cronModal').modal('show');
+                    // $('#cronModal').modal('show');
                 }, 1000);
             @endif
 
