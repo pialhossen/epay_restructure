@@ -1,0 +1,24 @@
+
+Options -Indexes
+
+ErrorDocument 403 /404
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Block any request going into the /core folder
+    RewriteRule ^core/ - [F,L]
+
+    # Allow requests for existing files (css, js, images, build, etc.)
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # Redirect everything else to index.php
+    RewriteRule ^ index.php [L]
+</IfModule>
+
+# Deny access to sensitive dotfiles
+<FilesMatch "^(\.env|\.git|composer\.(json|lock)|artisan|server\.php|phpunit\.xml)$">
+    Require all denied
+</FilesMatch>
