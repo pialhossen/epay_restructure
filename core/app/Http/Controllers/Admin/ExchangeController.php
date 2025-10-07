@@ -26,8 +26,9 @@ class ExchangeController extends Controller
 {
     public function index(Request $request, $scope)
     {
+        
         try {
-            $exchanges = Exchange::$scope()->desc()->with('user', 'sendCurrency', 'receivedCurrency');
+            $exchanges = Exchange::$scope()->with('user', 'sendCurrency', 'receivedCurrency');
 
             if($request->exchange_id){
                 $exchanges = $exchanges->where('exchange_id', $request->exchange_id);
@@ -54,6 +55,10 @@ class ExchangeController extends Controller
                     date('Y-m-d 00:00:00', strtotime($request->created_from)),
                     date('Y-m-d 23:59:59', strtotime($request->created_to))
                 ]);
+            }
+            if(request()->query('sort')){
+                [$column, $direction] = explode(':', request()->query('sort'));
+                $exchanges = $exchanges->orderBy($column, $direction); 
             }
             $exchanges = $exchanges->paginate(getPaginate($request->itemsPerPage? $request->itemsPerPage: null ));
             $pageTitle = formateScope($scope) . ' Exchange';

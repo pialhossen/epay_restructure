@@ -21,11 +21,49 @@
 
     <link rel="stylesheet" href="{{ asset('assets/global/css/select2.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/admin/css/app.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 
     @stack('style')
     <script>
         const site_path = document.querySelector('meta[name="site-path"]').getAttribute("content")? document.querySelector('meta[name="site-path"]').getAttribute("content"): '';
         const general_settings = @json(gs())
+
+        function updateQueryParam(key, value) {
+            const url = new URL(window.location);
+            url.searchParams.set(key, value);
+            window.location = url.toString();
+        }
+        function toggleSort(e, column) {
+            const url = new URL(window.location);
+            const currentSort = url.searchParams.get('sort'); // e.g. "amount:asc"
+            let nextSort = '';
+
+            if (currentSort) {
+                const [currentColumn, currentDirection] = currentSort.split(':');
+
+                if (currentColumn === column) {
+                    // Same column clicked → cycle direction
+                    if (currentDirection === 'asc') {
+                        nextSort = `${column}:desc`;
+                    } else if (currentDirection === 'desc') {
+                        // Remove the sort param
+                        url.searchParams.delete('sort');
+                        window.location = url.toString();
+                        return;
+                    }
+                } else {
+                    // Different column clicked → reset to asc
+                    nextSort = `${column}:asc`;
+                }
+            } else {
+                $element = e.currentTarget;
+                nextSort = `${column}:asc`;
+            }
+
+            // Update URL
+            url.searchParams.set('sort', nextSort);
+            window.location = url.toString();
+        }
     </script>
 </head>
 

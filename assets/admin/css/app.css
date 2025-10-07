@@ -3393,7 +3393,19 @@ select:focus-within {
   font-size: 0.75rem;
   text-align: center;
   padding: 15px 25px;
-  /* white-space: nowrap; */
+  white-space: nowrap;
+  /* display: inline-flex; */
+}
+.table th .sortable-header{
+  display: inline-flex;
+  gap: 10px;
+}
+.table th .text{
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
 }
 
 .table td {
@@ -3403,7 +3415,7 @@ select:focus-within {
   font-weight: 500;
   padding: 15px 25px;
   vertical-align: middle;
-  /* white-space: nowrap; */
+  white-space: nowrap;
 }
 
 .white-space-wrap {
@@ -8318,4 +8330,22 @@ label.required:after {
 
 .dropdown-menu__body::-webkit-scrollbar-thumb {
   background-color: rgb(7 18 81 / 40%);
+}
+.sort-indicate{
+  display: inline-flex;
+  width: 13px;
+  flex-direction: column;
+  gap: 3px;
+}
+.sort-indicate .up{
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  color: white;
+}
+.sort-indicate .down{
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  color: white;
 }

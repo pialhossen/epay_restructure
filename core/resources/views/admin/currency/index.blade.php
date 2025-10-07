@@ -1,5 +1,16 @@
 @extends('admin.layouts.app')
 @section('panel')
+<script>
+    let order_array = []
+    function updateOrder(e){
+        e.preventDefault();
+        const form = document.querySelector('#order-form')
+        const inputElement = form.querySelector('#order')
+        inputElement.value = order_array
+        console.log(inputElement)
+        form.submit()
+    }
+</script>
     <div class="row pl-2 pb-2 ml-2">
         <div class="col-lg-12">
             <div class="card">
@@ -28,17 +39,58 @@
                         <table class="table table--light style--two">
                             <thead>
                                 <tr>
-                                    <th>@lang('Currency')</th>
-                                    <th>@lang('Buy At')</th>
-                                    <th>@lang('Sell At')</th>
-                                    <th>@lang('Reserve Amount')</th>
+                                    <th style="cursor: pointer;" onclick="toggleSort(event, 'name')">
+                                        <div class="sortable-header">
+                                            <span class="sort-indicate"> 
+                                                <span class="up" @if(str_contains(request()->query("sort"),'name')) style="visibility: {{ request()->query("sort") == "name:desc"? "visible": "hidden" }};" @endif><i class="fa-solid fa-arrow-up"></i></span> 
+                                                <span class="down" @if(str_contains(request()->query("sort"),'name')) style="visibility: {{ request()->query("sort") == "name:asc"? "visible": "hidden" }};" @endif><i class="fa-solid fa-arrow-down"></i></span> 
+                                            </span> 
+                                            <span class="text">
+                                                @lang('Currency')
+                                            </span>
+                                        </div>
+                                    </th>
+                                    <th style="cursor: pointer;" onclick="toggleSort(event, 'buy_at')">
+                                        <div class="sortable-header">
+                                            <span class="sort-indicate"> 
+                                                <span class="up" @if(str_contains(request()->query("sort"),'buy_at')) style="visibility: {{ request()->query("sort") == "buy_at:desc"? "visible": "hidden" }};" @endif><i class="fa-solid fa-arrow-up"></i></span> 
+                                                <span class="down" @if(str_contains(request()->query("sort"),'buy_at')) style="visibility: {{ request()->query("sort") == "buy_at:asc"? "visible": "hidden" }};" @endif><i class="fa-solid fa-arrow-down"></i></span> 
+                                            </span> 
+                                            <span class="text">
+                                                @lang('Buy At')
+                                            </span>
+                                        </div>
+                                    </th>
+                                    <th style="cursor: pointer;" onclick="toggleSort(event, 'sell_at')">
+                                        <div class="sortable-header">
+                                            <span class="sort-indicate"> 
+                                                <span class="up" @if(str_contains(request()->query("sort"),'sell_at')) style="visibility: {{ request()->query("sort") == "sell_at:desc"? "visible": "hidden" }};" @endif><i class="fa-solid fa-arrow-up"></i></span> 
+                                                <span class="down" @if(str_contains(request()->query("sort"),'sell_at')) style="visibility: {{ request()->query("sort") == "sell_at:asc"? "visible": "hidden" }};" @endif><i class="fa-solid fa-arrow-down"></i></span> 
+                                            </span> 
+                                            <span class="text">
+                                                @lang('Sell At')
+                                            </span>
+                                        </div>
+                                    </th>
+                                    <th style="cursor: pointer;" onclick="toggleSort(event, 'reserve')">
+                                        <div class="sortable-header">
+                                            <span class="sort-indicate"> 
+                                                <span class="up" @if(str_contains(request()->query("sort"),'reserve')) style="visibility: {{ request()->query("sort") == "reserve:desc"? "visible": "hidden" }};" @endif><i class="fa-solid fa-arrow-up"></i></span> 
+                                                <span class="down" @if(str_contains(request()->query("sort"),'reserve')) style="visibility: {{ request()->query("sort") == "reserve:asc"? "visible": "hidden" }};" @endif><i class="fa-solid fa-arrow-down"></i></span> 
+                                            </span> 
+                                            <span class="text">
+                                                @lang('Reserve Amount')
+                                            </span>
+                                        </div>
+                                    </th>
                                     <th>@lang('Status')</th>
                                     <th>@lang('Action')</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="sortable">
                                 @forelse($currencies as $currency)
-                                    <tr>
+                                    <tr data-id="{{ $currency->id }}">
+                                        
                                         <td>
                                             <div class="user">
                                                 <div class="thumb">
@@ -109,11 +161,38 @@
                         </table>
                     </div>
                 </div>
-                @if ($currencies->hasPages())
-                    <div class="card-footer py-4">
+
+                <script>
+                     new Sortable(document.getElementById('sortable'), {
+                        animation: 150,
+                        onEnd: function (evt) {
+                        // When a row is dropped
+                        order_array = Array.from(document.querySelectorAll('#sortable tr')).map(
+                            tr => tr.dataset.id
+                        );
+
+                        const orderSubmit = document.querySelector('.order-submit')
+                        orderSubmit.style.display = "block"
+                        }
+                    });
+                </script>
+                
+                
+                <div class="order-submit py-4" style="display: none;">
+                    <form action="{{ route('admin.currency.saveOrder', request()->query()) }}" id="order-form" method="post">
+                        @csrf
+                        <input type="hidden" name="order" id="order">
+                        <button type="submit" onclick="updateOrder(event)" class="btn btn--primary w-100 h-45" value="add">
+                            @lang('Submit')
+                        </button>
+                    </form>
+                </div>
+
+                <div class="card-footer py-4">
+                    @if ($currencies->hasPages())
                         {{ paginateLinks($currencies) }}
-                    </div>
-                @endif
+                    @endif
+                </div>
             </div>
         </div>
     </div>

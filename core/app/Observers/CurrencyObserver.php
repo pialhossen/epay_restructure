@@ -26,10 +26,10 @@ class CurrencyObserver
             CurrencyReservedLog::updateOrCreate(
                 [
                     'currency_id' => $currency->id,
-                    'currency_name' => $currency->name,
-                    'business_day'    => $business_day, // unique per day per currency
+                    'business_day' => $business_day, // unique per day per currency
                 ],
                 [
+                    'currency_name' => $currency->name,
                     'reserved' => $currency->reserve,
                 ]
             );

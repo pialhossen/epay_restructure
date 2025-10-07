@@ -2,23 +2,31 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Constants\Status;
-use App\Http\Controllers\Controller;
-use App\Lib\FormProcessor;
-use App\Models\Currency;
-use App\Models\dailyprofitlog;
-use App\Models\Gateway;
-use App\Models\GatewayCurrency;
-use App\Models\GpayCurrencyManagerModel;
-use App\Rules\FileTypeValidate;
 use Carbon\Carbon;
+use App\Models\Gateway;
+use App\Models\Currency;
+use App\Constants\Status;
+use App\Lib\FormProcessor;
 use Illuminate\Http\Request;
+use App\Models\dailyprofitlog;
+use App\Models\GatewayCurrency;
+use App\Rules\FileTypeValidate;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use App\Models\GpayCurrencyManagerModel;
 
 class CurrencyController extends Controller
 {
     public function index(Request $request)
     {
-        $currencies = Currency::latest()->paginate(getPaginate(getPaginate($request->itemsPerPage? $request->itemsPerPage: null )));
+        $currencies_query = Currency::query();
+        if(request()->query('sort')){
+            [$column, $direction] = explode(':', request()->query('sort'));
+            $currencies_query = $currencies_query->orderBy($column, $direction); 
+        } else {
+            $currencies_query = $currencies_query->orderBy('order', 'asc'); 
+        }
+        $currencies = $currencies_query->paginate(getPaginate($request->itemsPerPage? $request->itemsPerPage: null ));
         $pageTitle = 'Manage Currency';
 
         return view('admin.currency.index', compact('pageTitle', 'currencies'));
@@ -359,6 +367,29 @@ class CurrencyController extends Controller
         $currencies = Currency::whereIn('id', $availableCurrencyIds)->get();
 
         return response()->json(['currencies' => $currencies]);
+    }
+    public function saveOrder(Request $request){
+        $offset = 0;
+        $itemsPerPage = $request->itemsPerPage ?? gs('paginate_number');
+        $pageNum = $request->page ?? 1;
+        $offset = (int)$itemsPerPage * ((int)$pageNum-1);
+        $currency_id_array = explode(',', $request->order);
+        $currencies = Currency::whereIn('id', $currency_id_array)->orderByRaw('FIELD(id, ' . $request->order . ')')->get();
+        DB::beginTransaction();
+        try {
+            foreach($currencies as $currency){
+                $currency->order = $offset;
+                $offset++;
+                $currency->save();
+            }
+            DB::commit();
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            $notify[] = ['error', $th->getMessage()];
+            return back()->withNotify($notify);
+        }
+        $notify[] = ['success', 'Order updated successfully'];
+        return back()->withNotify($notify);
     }
 
 }

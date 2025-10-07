@@ -82,6 +82,7 @@
 </style>
 
 <!-- ✅ Modal HTML -->
+@if($modalDetails)
 <div id="welcomeModal">
     <div class="modal-content">
         <button class="close" id="closeModalBtn">&times;</button>
@@ -95,6 +96,7 @@
         <button class="modal-btn" id="gotItBtn">{{ $modalDetails->button_name ?? 'Got It!' }}</button>
     </div>
 </div>
+@endif
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {

@@ -77,6 +77,11 @@ class User extends Authenticatable
         return $this->hasMany(Exchange::class);
     }
 
+    public function approvedExchanges()
+    {
+        return $this->hasMany(Exchange::class)->where('status', Status::EXCHANGE_APPROVED);
+    }
+
     public function fullname(): Attribute
     {
         return new Attribute(

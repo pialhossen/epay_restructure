@@ -328,6 +328,7 @@ Route::middleware('admin')->group(function () {
         Route::post('status/{id}', 'status')->name('status');
         Route::post('api-key/update', 'updateApiKey')->name('api.update');
         Route::post('import/conversion-rate', 'conversionRate')->name('import.conversion');
+        Route::post('save-order', 'saveOrder')->name('saveOrder');
     });
 
     // --------------------------- User Block ---------------------------

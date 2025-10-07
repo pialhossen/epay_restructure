@@ -46,6 +46,11 @@ function proPicURL(input) {
     reader.readAsDataURL(input.files[0]);
   }
 }
+
+
+
+
+
 $(".image-upload-input").on('change', function () {
   proPicURL(this);
 });

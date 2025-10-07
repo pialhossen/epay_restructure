@@ -42,7 +42,7 @@
                             @if (isset($charges['sell']['percent']))
                                 @foreach ($charges['sell']['percent'] as $charge)
                                     @php
-                                        $charge_amount =  number_format(( ($charge['charge_percent'] / 100) * $exchange->sending_amount) ?? 0, $exchange->sendCurrency->show_number_after_decimal);
+                                        $charge_amount =  (float)number_format(( ($charge['charge_percent'] / 100) * $exchange->sending_amount) ?? 0, $exchange->sendCurrency->show_number_after_decimal);
                                     @endphp
                                     <li class="list-group-item d-flex justify-content-between flex-wrap flex-column">
                                         <h5 class="{{ $charge_amount > 0? 'text--success': 'text--danger'}}">
@@ -55,7 +55,7 @@
                             @if (isset($charges['sell']['fixed']))
                             @foreach ($charges['sell']['fixed'] as $charge)
                                     @php
-                                        $charge_amount =  number_format($charge['charge_fixed'] ?? 0, $exchange->sendCurrency->show_number_after_decimal);
+                                        $charge_amount =  (float)number_format($charge['charge_fixed'] ?? 0, $exchange->sendCurrency->show_number_after_decimal);
                                     @endphp
                                     <li class="list-group-item d-flex justify-content-between flex-wrap flex-column">
                                         <h5 class="{{ $charge_amount > 0? 'text--success': 'text--danger'}}">
@@ -164,11 +164,11 @@
                             @if (isset($charges['buy']['percent']))
                                 @foreach ($charges['buy']['percent'] as $charge)
                                     @php
-                                        $charge_amount =  number_format(( ($charge['charge_percent'] / 100) * $exchange->receiving_amount) ?? 0, $exchange->receivedCurrency->show_number_after_decimal);
+                                        $charge_amount = (($charge['charge_percent'] / 100) * $exchange->receiving_amount) ?? 0;
                                     @endphp
                                     <li class="list-group-item d-flex justify-content-between flex-wrap flex-column">
                                         <h5 class="{{ $charge_amount > 0? 'text--success': 'text--danger'}}">
-                                            {{ -1 * $charge_amount }} {{ $exchange->receivedCurrency->cur_sym }}
+                                            {{ number_format(-1 * $charge_amount, $exchange->receivedCurrency->show_number_after_decimal) }} {{ $exchange->receivedCurrency->cur_sym }}
                                         </h5>
                                         <small class="text-muted"> @lang($charge['title'])</small>
                                     </li>
@@ -177,11 +177,11 @@
                             @if (isset($charges['buy']['fixed']))
                                 @foreach ($charges['buy']['fixed'] as $charge)
                                     @php
-                                        $charge_amount =  number_format( ($charge['charge_fixed']) ?? 0, $exchange->receivedCurrency->show_number_after_decimal);
+                                        $charge_amount =   ($charge['charge_fixed']) ?? 0;
                                     @endphp
                                     <li class="list-group-item d-flex justify-content-between flex-wrap flex-column">
                                         <h5 class="{{ $charge_amount > 0? 'text--success': 'text--danger'}}">
-                                            {{ -1 * $charge_amount }} {{ $exchange->receivedCurrency->cur_sym }}
+                                            {{ number_format(-1 * $charge_amount, $exchange->receivedCurrency->show_number_after_decimal) }} {{ $exchange->receivedCurrency->cur_sym }}
                                         </h5>
                                         <small class="text-muted"> @lang($charge['title'])</small>
                                     </li>

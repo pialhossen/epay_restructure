@@ -1,6 +1,8 @@
 @extends('admin.layouts.app')
 @section('panel')
-{{--  Search start  --}}
+<script>
+
+</script>
     <div class="row pl-2 pb-2 ml-2">
         <div class="col-lg-12">
             <div class="card">
@@ -99,13 +101,53 @@
                                     <th>@lang('User')</th>
                                     <th>@lang('Transaction Type')</th>
                                     <th>@lang('Send Method')</th>
-                                    <th>@lang('Send Amount')</th>
+                                    <th style="cursor: pointer;" onclick="toggleSort(event, 'sending_amount')"> 
+                                        <div class="sortable-header">
+                                            <span class="sort-indicate"> 
+                                                <span class="up" @if(str_contains(request()->query("sort"),'sending_amount')) style="visibility: {{ request()->query("sort") == "sending_amount:desc"? "visible": "hidden" }};" @endif><i class="fa-solid fa-arrow-up"></i></span> 
+                                                <span class="down" @if(str_contains(request()->query("sort"),'sending_amount')) style="visibility: {{ request()->query("sort") == "sending_amount:asc"? "visible": "hidden" }};" @endif><i class="fa-solid fa-arrow-down"></i></span> 
+                                            </span> 
+                                            <span class="text">
+                                                @lang('Send Amount')
+                                            </span>
+                                        </div>
+                                    </th>
                                     <th>@lang('Received Method')</th>
-                                    <th>@lang('Received Amount')</th>
+                                    <th style="cursor: pointer;" onclick="toggleSort(event, 'receiving_amount')">
+                                        <div class="sortable-header">
+                                            <span class="sort-indicate"> 
+                                                <span class="up" @if(str_contains(request()->query("sort"),'receiving_amount')) style="visibility: {{ request()->query("sort") == "receiving_amount:desc"? "visible": "hidden" }};" @endif><i class="fa-solid fa-arrow-up"></i></span> 
+                                                <span class="down" @if(str_contains(request()->query("sort"),'receiving_amount')) style="visibility: {{ request()->query("sort") == "receiving_amount:asc"? "visible": "hidden" }};" @endif><i class="fa-solid fa-arrow-down"></i></span> 
+                                            </span> 
+                                            <span class="text">
+                                                @lang('Received Amount')
+                                            </span>
+                                        </div>
+                                    </th>
                                     <th>@lang('Status')</th>
-                                    <th>@lang('Updated By')</th>
-                                    <th>@lang('Placed At')</th>
-                                    <th>@lang('Updated At')</th>
+                                    <th >@lang('Updated By')</th>
+                                    <th style="cursor: pointer;" onclick="toggleSort(event, 'created_at')">
+                                        <div class="sortable-header">
+                                            <span class="sort-indicate"> 
+                                                <span class="up" @if(str_contains(request()->query("sort"),'created_at')) style="visibility: {{ request()->query("sort") == "created_at:desc"? "visible": "hidden" }};" @endif><i class="fa-solid fa-arrow-up"></i></span> 
+                                                <span class="down" @if(str_contains(request()->query("sort"),'created_at')) style="visibility: {{ request()->query("sort") == "created_at:asc"? "visible": "hidden" }};" @endif><i class="fa-solid fa-arrow-down"></i></span> 
+                                            </span> 
+                                            <span class="text">
+                                                @lang('Placed At')
+                                            </span>
+                                        </div>                                  
+                                    </th>
+                                    <th style="cursor: pointer;" onclick="toggleSort(event, 'updated_at')">
+                                        <div class="sortable-header">
+                                            <span class="sort-indicate"> 
+                                                <span class="up" @if(str_contains(request()->query("sort"),'updated_at')) style="visibility: {{ request()->query("sort") == "updated_at:desc"? "visible": "hidden" }};" @endif><i class="fa-solid fa-arrow-up"></i></span> 
+                                                <span class="down" @if(str_contains(request()->query("sort"),'updated_at')) style="visibility: {{ request()->query("sort") == "updated_at:asc"? "visible": "hidden" }};" @endif><i class="fa-solid fa-arrow-down"></i></span> 
+                                            </span>
+                                            <span class="text">
+                                                @lang('Updated At')
+                                            </span>
+                                        </div>
+                                    </th>
                                     <th>@lang('Action')</th>
                                 </tr>
                             </thead>

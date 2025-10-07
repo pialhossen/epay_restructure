@@ -100,57 +100,65 @@ class ManageUsersController extends Controller
     }
 
     protected function userData($scope = null)
-{
-    $request = request();
-    if ($scope && method_exists(User::class, $scope)) {
-        $users = User::$scope();
-    } else {
-        $users = User::query();
-        if($scope == 'active'){
-            $users = $users->where('status', Status::USER_ACTIVE)->where('ev', Status::VERIFIED)->where('sv', Status::VERIFIED);
-        } elseif($scope == 'kycUnverified'){
-            $users = $users->where('status', Status::USER_ACTIVE)->where('kv', 0);
-        } elseif($scope == 'banned'){
-            $users = $users->where('status', 0);
-        } elseif($scope == 'emailUnverified'){
-            $users = $users->where('status', Status::USER_ACTIVE)->where('ev', 0);
-        } elseif($scope == 'mobileUnverified'){
-            $users = $users->where('status', Status::USER_ACTIVE)->where('sv', 0);
-        } elseif($scope == 'kycPending'){
-            $users = $users->where('status', Status::USER_ACTIVE)->where('kv', 2);
-        } elseif($scope == 'withBalance'){
-            $users = $users->where('status', Status::USER_ACTIVE)->where('balance','>', 0);
+    {
+        $request = request();
+        if ($scope && method_exists(User::class, $scope)) {
+            $users = User::$scope();
+        } else {
+            $users = User::withCount('approvedExchanges');
+            if($scope == 'active'){
+                $users = $users->where('status', Status::USER_ACTIVE)->where('ev', Status::VERIFIED)->where('sv', Status::VERIFIED);
+            } elseif($scope == 'kycUnverified'){
+                $users = $users->where('status', Status::USER_ACTIVE)->where('kv', 0);
+            } elseif($scope == 'banned'){
+                $users = $users->where('status', 0);
+            } elseif($scope == 'emailUnverified'){
+                $users = $users->where('status', Status::USER_ACTIVE)->where('ev', 0);
+            } elseif($scope == 'mobileUnverified'){
+                $users = $users->where('status', Status::USER_ACTIVE)->where('sv', 0);
+            } elseif($scope == 'kycPending'){
+                $users = $users->where('status', Status::USER_ACTIVE)->where('kv', 2);
+            } elseif($scope == 'withBalance'){
+                $users = $users->where('status', Status::USER_ACTIVE)->where('balance','>', 0);
+            }
+            
+            
         }
-        
-        
-    }
-    if (isset($request->phone_no) && $request->phone_no) {
-        $users = $users->where('mobile', $request->phone_no);
-    }
-    if (isset($request->email) && $request->email) {
-        $users = $users->where('email', $request->email);
-    }
-    if (isset($request->username) && $request->username) {
-        $users = $users->where('username', $request->username);
-    }
-    if (isset($request->first_name) && $request->first_name) {
-        $users = $users->where('firstname', 'like', '%' . $request->first_name . '%');
-    }
-    if (isset($request->last_name) && $request->last_name) {
-        $users = $users->where('lastname', 'like', '%' . $request->last_name . '%');
-    }
-    if (isset($request->address) && $request->address) {
-        $users = $users->where('address', 'like', '%' . $request->address . '%');
-    }
-    $users_data = $users->orderBy('id', 'desc')
-                 ->paginate(getPaginate($request->itemsPerPage? $request->itemsPerPage: null)); 
+        if (isset($request->phone_no) && $request->phone_no) {
+            $users = $users->where('mobile', $request->phone_no);
+        }
+        if (isset($request->email) && $request->email) {
+            $users = $users->where('email', $request->email);
+        }
+        if (isset($request->username) && $request->username) {
+            $users = $users->where('username', $request->username);
+        }
+        if (isset($request->first_name) && $request->first_name) {
+            $users = $users->where('firstname', 'like', '%' . $request->first_name . '%');
+        }
+        if (isset($request->last_name) && $request->last_name) {
+            $users = $users->where('lastname', 'like', '%' . $request->last_name . '%');
+        }
+        if (isset($request->address) && $request->address) {
+            $users = $users->where('address', 'like', '%' . $request->address . '%');
+        }
+        if(request()->query('sort')){
+            [$column, $direction] = explode(':', request()->query('sort'));
+            if(str_contains(request()->query("sort"),'completed_orders')){
+                if($direction == "asc"){
+                    $users = $users->orderBy('approved_exchanges_count', 'asc');
+                } else {
+                    $users = $users->orderBy('approved_exchanges_count', 'desc');
+                }
+            } else {
+                $users = $users->orderBy($column, $direction); 
+            }
+        }
+        $users_data = $users->orderBy('id', 'desc')
+                    ->paginate(getPaginate($request->itemsPerPage? $request->itemsPerPage: null));
 
-    $users_data->map(function($user){
-        $user->approved_order_count = Exchange::where('user_id', $user->id)->where('status', Status::EXCHANGE_APPROVED)->count();
-    });
-
-    return $users_data;
-}
+        return $users_data;
+    }
 
 
 

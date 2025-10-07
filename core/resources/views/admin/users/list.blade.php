@@ -70,9 +70,39 @@
                 <th>Email / Mobile</th>
                 <th>Country</th>
                 <th>Address</th>
-                <th>Joined At</th>
-                <th>Balance</th>
-                <th>Completed Orders</th>
+                <th style="cursor: pointer;" onclick="toggleSort(event, 'created_at')">
+                    <div class="sortable-header">
+                        <span class="sort-indicate"> 
+                            <span class="up" @if(str_contains(request()->query("sort"),'created_at')) style="visibility: {{ request()->query("sort") == "created_at:desc"? "visible": "hidden" }};" @endif><i class="fa-solid fa-arrow-up"></i></span> 
+                            <span class="down" @if(str_contains(request()->query("sort"),'created_at')) style="visibility: {{ request()->query("sort") == "created_at:asc"? "visible": "hidden" }};" @endif><i class="fa-solid fa-arrow-down"></i></span> 
+                        </span> 
+                        <span class="text">
+                            @lang('Joined At')
+                        </span>
+                    </div>
+                </th>
+                <th style="cursor: pointer;" onclick="toggleSort(event, 'balance')">
+                    <div class="sortable-header">
+                        <span class="sort-indicate"> 
+                            <span class="up" @if(str_contains(request()->query("sort"),'balance')) style="visibility: {{ request()->query("sort") == "balance:desc"? "visible": "hidden" }};" @endif><i class="fa-solid fa-arrow-up"></i></span> 
+                            <span class="down" @if(str_contains(request()->query("sort"),'balance')) style="visibility: {{ request()->query("sort") == "balance:asc"? "visible": "hidden" }};" @endif><i class="fa-solid fa-arrow-down"></i></span> 
+                        </span> 
+                        <span class="text">
+                            @lang('Balance')
+                        </span>
+                    </div>
+                </th>
+                <th style="cursor: pointer;" onclick="toggleSort(event, 'completed_orders')">
+                    <div class="sortable-header">
+                        <span class="sort-indicate"> 
+                            <span class="up" @if(str_contains(request()->query("sort"),'completed_orders')) style="visibility: {{ request()->query("sort") == "completed_orders:desc"? "visible": "hidden" }};" @endif><i class="fa-solid fa-arrow-up"></i></span> 
+                            <span class="down" @if(str_contains(request()->query("sort"),'completed_orders')) style="visibility: {{ request()->query("sort") == "completed_orders:asc"? "visible": "hidden" }};" @endif><i class="fa-solid fa-arrow-down"></i></span> 
+                        </span> 
+                        <span class="text">
+                            @lang('Completed Orders')
+                        </span>
+                    </div>
+                </th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -102,7 +132,7 @@
                         <span class="fw-bold">{{ showAmount($user->balance) }}</span>
                     </td>
                     <td>
-                        <span class="fw-bold">{{ $user->approved_order_count }}</span>
+                        <span class="fw-bold">{{ $user->approved_exchanges_count }}</span>
                     </td>
                     <td>
                         <div class="button--group">

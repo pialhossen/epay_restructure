@@ -187,7 +187,7 @@
                         </div>
                         <span
                             class="fw-bold @if($charge['charge_percent'] > 0) text--success-dim @else text--danger @endif">
-                            {{ -1 * number_format(getPercentValue($charge['charge_percent'], $exchange->receiving_amount), $exchange->receivedCurrency->show_number_after_decimal) }}
+                            {{ number_format(-1 * getPercentValue($charge['charge_percent'], $exchange->receiving_amount), $exchange->receivedCurrency->show_number_after_decimal) }}
                             {{ __(ucfirst(@$exchange->receivedCurrency->cur_sym)) }}
                         </span>
                     </li>
@@ -204,7 +204,7 @@
                         </div>
                         <span
                             class="fw-bold @if($charge['charge_fixed'] > 0) text--success-dim @else text--danger @endif">
-                            {{ -1 * number_format($charge['charge_fixed'], $exchange->receivedCurrency->show_number_after_decimal) }}
+                            {{ number_format(-1 *$charge['charge_fixed'], $exchange->receivedCurrency->show_number_after_decimal) }}
                             {{ __(ucfirst(@$exchange->receivedCurrency->cur_sym)) }}
                         </span>
                     </li>
@@ -226,7 +226,7 @@
                     </span>
                     @else
                     <span class="fw-bold @if(isset($charge) && $charge['charge_percent'] > 0) text--success-dim @else text--danger @endif">
-                        {{ -1 * number_format(@$exchange->receiving_charge, $exchange->receivedCurrency->show_number_after_decimal) }}
+                        {{ number_format( -1 *@$exchange->receiving_charge, $exchange->receivedCurrency->show_number_after_decimal) }}
                         {{ __(ucfirst(@$exchange->receivedCurrency->cur_sym)) }}
                     </span>
                     @endif
