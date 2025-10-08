@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use Exception;
 use Carbon\Carbon;
+use App\Models\Form;
 use App\Models\User;
 use App\Models\Currency;
 use App\Models\Exchange;
@@ -171,13 +172,27 @@ class ExchangeController extends Controller
             ->orderBy('id', 'desc')
             ->get();
 
+        $kyc_form = Form::where('act', 'kyc')->first();
+        $user = $exchange->user;
+        $user_kyc_data = [];
+        foreach($user->kyc_data as $kyc_data){
+            $user_kyc_data[$kyc_data->name] = $kyc_data;
+        }
+        // foreach($kyc_form->form_data as $form_data){
+        //     if($user_kyc_data[$form_data->name]->value){
+        //         dump('has the kyc');
+        //     } else {
+        //         dump('does not have the kyc');
+        //     }
+        // }
+        // dd($user->kyc_data);
         $userDetails = UsersModel::find($exchange->user_id);
         $charges = json_decode($exchange->charge, true);
 
         $userBlocked = $this->checkBlockMatch($exchange, $userDetails);
 
 
-        return view('admin.exchange.details', compact('pageTitle', 'exchange', 'exchangeLog', 'userBlocked', 'charges'));
+        return view('admin.exchange.details', compact('pageTitle', 'exchange', 'exchangeLog', 'userBlocked', 'charges', 'user_kyc_data'));
     }
 
     // User Block List

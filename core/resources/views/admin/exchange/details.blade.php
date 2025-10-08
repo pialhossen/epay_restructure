@@ -211,7 +211,7 @@
         <div class="col-xl-8 col-sm-12">
             @if ($exchange->user_data != null)
                 <div class="card b-radius--10 overflow-hidden box--shadow1 mt-3 {{ $userBlocked ? 'blocked-user' : '' }}">
-                    <div class="card-header text-center">
+                    <div class="card-header">
                         <h5>@lang('Sending Details')</h5>
                     </div>
                     <div class="card-body">
@@ -228,6 +228,18 @@
                     </div>
                     <div class="card-body">
                         <x-view-form-data :data="$exchange->transaction_proof_data" />
+                    </div>
+                </div>
+                <div class="card b-radius--10 overflow-hidden box--shadow1 mt-3 {{ $userBlocked ? 'blocked-user' : '' }}">
+                    <div class="card-header">
+                        <h5>@lang('KYC Verification')</h5>
+                    </div>
+                    <div class="card-body">
+                        @foreach ($user_kyc_data as $data)
+                            <div class="kyc-row">
+                                <div>{{ $data->name }}: </div> <div class="kyc-value {{ $data->value? "true": "false" }}">{{ $data->value? "True" : "False" }}</div>
+                            </div>
+                        @endforeach
                     </div>
                 </div>
 
@@ -580,6 +592,30 @@
 
         .blocked-user {
             border: 5px solid red !important;
+        }
+        .kyc-row{
+            display: flex;
+            gap: 20px;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .kyc-row .kyc-value{
+            border-radius: 8px;
+            width: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .kyc-row .false{
+            border: 1px solid red;
+            color: red;
+            padding: 5px;
+        }
+        .kyc-row .true{
+            border: 1px solid green;
+            color: green;
+            padding: 5px;
         }
     </style>
 @endpush

@@ -266,6 +266,7 @@ function notify($user, $templateName, $shortCodes = null, $sendVia = null, $crea
     $notify->createLog = $createLog;
     $notify->pushImage = $pushImage;
     $notify->userColumn = isset($user->id) ? $user->getForeignKey() : 'user_id';
+    sleep(5);
     $notify->send();
 }
 
