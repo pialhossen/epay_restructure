@@ -62,6 +62,7 @@ Route::controller('SiteController')->group(function () {
 
     Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews.index');
     Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+    Route::get('/reviews/all', [ReviewController::class, 'allReviews'])->name('reviews.list');
     Route::get('/review/auth-user/', [ReviewController::class, 'getAuthUserReview'])->name('getAuthUserReview');
 });
 

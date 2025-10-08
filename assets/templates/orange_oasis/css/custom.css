@@ -1,5 +1,0 @@
-label.required:after {
-  content: "*";
-  color: #dc3545 !important;
-  margin-left: 2px;
-}

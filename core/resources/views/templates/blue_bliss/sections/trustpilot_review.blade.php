@@ -1,4 +1,5 @@
 @php
+    use \Illuminate\Support\Str;
     $trustpilotReviewContent = getContent('trustpilot_review.content', true);
 @endphp
 
@@ -58,6 +59,7 @@
                 box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
                 margin: 10px;
                 font-family: 'Inter', sans-serif;
+                height: 300px;
             }
             .review-header {
                 display: flex;
@@ -172,6 +174,30 @@
             .btn-submit:hover {
                 background-color: #1d4ed8;
             }
+            .review-content button{
+                border: none;
+                color: #1d4ed8;
+                background-color: transparent;
+            }
+            .review-content button:hover{
+                text-decoration: underline;
+            }
+            .review-button-container{
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+            }
+            .review-button-container .all-review{
+                padding: 5px; 
+                border-radius: 5px; 
+                cursor: pointer;
+                border: 2px solid #1d4ed8; 
+                color: #1d4ed8;
+            }
+            .review-button-container .all-review:hover{ 
+                color: #1d4ed8; 
+            }
 
             @keyframes scaleUp {
                 from {
@@ -199,7 +225,7 @@
             }
         </style>
     @endpush
-
+    
     <div class="how-section padding-top padding-bottom">
         <div class="container">
             <div class="row justify-content-center">
@@ -237,16 +263,26 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <button onclick="openModal()" class="leave-review-btn">Leave a review</button>
+                                    <div class="review-button-container">
+                                        <button onclick="openModal()" class="leave-review-btn">Leave a review</button>
+                                        <a class="all-review" href="{{ route('reviews.list') }}">All Reviews</a>
+                                    </div>
                                 </div>
 
                                 <!-- Swiper Slider -->
                                 <div class="swiper mySwiper">
                                     <div class="swiper-wrapper">
                                         @foreach($reviews as $review)
+                                    
                                             <div class="swiper-slide review-slide"> <!-- 👈 This class is required -->
                                                 <div class="review-header">
-                                                    <div class="avatar">{{ strtoupper(substr($review->name, 0, 2)) }}</div>
+                                                    <div class="avatar">
+                                                    @if($review->user->image)
+                                                    <img id="preview" style="border-radius: 50%; width: 50px; height: 50px;" src="{{ (APP_PUBLIC_FOLDER ? "/".APP_PUBLIC_FOLDER."/": '').$review->user->image}}" alt="" draggable="false">
+                                                    @else
+                                                    {{ strtoupper(substr($review->name, 0, 2)) }}
+                                                    @endif
+                                                    </div>
 
                                                     <div class="review-info">
                                                         <div>
@@ -267,7 +303,20 @@
                                                     </div>
                                                 </div>
 
-                                                <p class="review-content">{{ \Illuminate\Support\Str::limit($review->content, 250, '...') }}</p>
+                                                <p class="review-content">
+                                                    <span class="short">
+                                                        @if(Str::length($review->content) > 250)
+                                                            {{ Str::limit($review->content, 250, '...') }}
+                                                            <button onclick="showLong()">Show More</button>
+                                                            @else
+                                                            {{ $review->content }}
+                                                            @endif
+                                                    </span>
+                                                    <span class="long" style="display: none;">
+                                                            {{ $review->content }}
+                                                        <button onclick="showShort()">Show Less</button>
+                                                    </span>
+                                                </p>
                                             </div>
                                         @endforeach
                                     </div>
@@ -305,13 +354,12 @@
                     class="w-100 mb-4 p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-400 focus:outline-none">
                     <option value="">Select Rating</option>
                     @for($i = 5; $i >= 1; $i--)
-                        <option value="{{ $i }}">{{ $i }} Star{{ $i > 1 ? 's' : '' }}</option>
+                        <option value="{{ $i }}" @selected($current_review && $current_review->rating == $i) >{{ $i }} Star{{ $i > 1 ? 's' : '' }}</option>
                     @endfor
                 </select>
                 <div class="text-red-500 text-sm mb-1" id="error-rating"></div>
-
                 <textarea name="content" id="content" required placeholder="Your review..."
-                    class="w-100 mb-4 p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-400 focus:outline-none" rows="4"></textarea>
+                    class="w-100 mb-4 p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-400 focus:outline-none" rows="4">{{ $current_review? $current_review->content: '' }}</textarea>
                 <div class="text-red-500 text-sm mb-1" id="error-content"></div>
 
                 <div class="button-group">
@@ -330,7 +378,16 @@
     @push('script')
         <!-- Swiper JS -->
         <script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
-
+        <script>
+            function showLong(){
+                document.querySelector(".review-content .short").style.display = "none";
+                document.querySelector(".review-content .long").style.display = "block";
+            }
+            function showShort(){
+                document.querySelector(".review-content .short").style.display = "block";
+                document.querySelector(".review-content .long").style.display = "none";
+            }
+        </script>
         <script>
             "use strict";
             (function($) {

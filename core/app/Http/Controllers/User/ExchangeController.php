@@ -25,7 +25,7 @@ use App\Models\GpayCurrencyDiscountChargeModel;
 class ExchangeController extends Controller
 {
     public function exchange(Request $request)
-    {
+    {   
         $currencyExchanger = new CurrencyExchanger;
         $message = $currencyExchanger->currencyExchanger($request);
         if ($message['status'] == 'error') {
@@ -226,7 +226,28 @@ class ExchangeController extends Controller
     public function list($scope = 'list')
     {
         try {
-            $exchanges = Exchange::$scope()->where('user_id', auth()->id())->with(['sendCurrency', 'receivedCurrency'])->desc()->paginate(getPaginate());
+            $exchanges = Exchange::query();
+            if($scope == "initiated"){
+                $exchanges = $exchanges->where('status', Status::EXCHANGE_INITIAL);
+            }
+            else if($scope == "approved"){
+                $exchanges = $exchanges->where('status', Status::EXCHANGE_APPROVED);
+            }
+            else if($scope == "pending"){
+                $exchanges = $exchanges->where('status', Status::EXCHANGE_PENDING);
+            }
+            else if($scope == "refunded"){
+                $exchanges = $exchanges->where('status', Status::EXCHANGE_REFUND);
+            }
+            else if($scope == "canceled"){
+                $exchanges = $exchanges->where('status', Status::EXCHANGE_CANCEL);
+            }
+
+            if(request()->query('sort')){
+                [$column, $direction] = explode(':', request()->query('sort'));
+                $exchanges = $exchanges->orderBy($column, $direction); 
+            }
+            $exchanges = $exchanges->$scope()->where('user_id', auth()->id())->with(['sendCurrency', 'receivedCurrency'])->paginate(getPaginate(request()->itemsPerPage));
             $pageTitle = formateScope($scope).' Exchange';
         } catch (Exception $ex) {
             $notify[] = ['error', 'Invalid URL.'];

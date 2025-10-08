@@ -1,5 +1,39 @@
 @extends($activeTemplate . 'layouts.master')
 @section('content')
+<style>
+    .user-profile-image-container{
+        margin-bottom: 20px;
+        width: 200px;
+        height: 200px;
+    }
+    .user-profile-image-container img{
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        object-fit: cover;
+        outline: 5px solid #3755BB;
+        cursor: pointer;
+    }
+    .user-profile-image-container label{
+        position: relative;
+    }
+    .user-profile-image-container label:hover::before{
+        content: 'Change Image';
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        top: 0;
+        left: 0;
+        position: absolute;
+        border-radius: 50%;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        color: white;
+        text-decoration: underline;
+        background-color: rgba(0 0 0 / 0.3);
+    }
+</style>
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-10">
@@ -85,6 +119,21 @@
                                         </div>
                                         <div class="col-lg-12">
                                             <div class="form-group">
+                                                <label class="form-label">@lang('Photo')</label>
+                                                <input type="file" class="form-control form--control"
+                                                    name="photo" style="display: none;" id="imageInput">
+                                                </div>
+                                                
+                                        </div>
+                                        <div class="user-profile-image-container">
+                                            <label class="form-label" for="imageInput">
+                                                <img id="preview" src="{{ 
+                                                    $user->image? (APP_PUBLIC_FOLDER ? "/".APP_PUBLIC_FOLDER."/": '').$user->image: (APP_PUBLIC_FOLDER? "/".APP_PUBLIC_FOLDER: '')."/assets/images/default.png" 
+                                                }}" alt="" draggable="false">
+                                            </label>
+                                        </div>
+                                        <div class="col-lg-12">
+                                            <div class="form-group">
                                                 <label class="form-label">@lang('Facebook Link')</label>
                                                 <input type="text" class="form-control form--control"
                                                     name="facebook_link" value="{{ @$user->fb_link }}"
@@ -102,4 +151,14 @@
             </div>
         </div>
     </div>
+    <script>
+        document.getElementById('imageInput').addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const imageUrl = URL.createObjectURL(file);
+                document.getElementById('preview').src = imageUrl;
+                console.log('Preview URL:', imageUrl);
+            }
+        });
+    </script>
 @endsection

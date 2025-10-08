@@ -74,4 +74,12 @@ class ReviewController extends Controller
         $review = CustomerReview::where('email', $email)->firstOrFail();
         return response()->json($review);
     }
+    public function allReviews(){
+        $pageTitle = "All Reviews";
+        $reviews = CustomerReview::with('user')->where('status', 1)->latest()->get();
+        $current_review = CustomerReview::with('user')->where('status', 1)->where('user_id', auth()->id())->first();
+        $average = CustomerReview::where('status', 1)->avg('rating');
+        $count = CustomerReview::where('status', 1)->count();
+        return view("Template::reviews", compact('pageTitle','reviews','current_review','average','count'));
+    }
 }

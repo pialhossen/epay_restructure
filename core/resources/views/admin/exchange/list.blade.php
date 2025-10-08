@@ -1,8 +1,31 @@
 @extends('admin.layouts.app')
 @section('panel')
-<script>
+<style>
+    .table-container {
+        overflow-x: auto;
+        position: relative;
+    }
 
-</script>
+    .data-table {
+        border-collapse: collapse;
+    }
+
+    .data-table th,
+    .data-table td {
+        white-space: nowrap;
+    }
+
+    .sticky-col {
+        position: sticky;
+        right: 0;
+        z-index: 2; /* higher than other cells */
+    }
+    .data-table th {
+        position: sticky;
+        top: 0;
+        z-index: 3;
+    }
+</style>
     <div class="row pl-2 pb-2 ml-2">
         <div class="col-lg-12">
             <div class="card">
@@ -93,8 +116,8 @@
         <div class="col-lg-12">
             <div class="card b-radius--10 ">
                 <div class="card-body p-0">
-                    <div class="table-responsive--md  table-responsive">
-                        <table class="table table--light style--two">
+                    <div class="table-responsive--md  table-responsive table-container">
+                        <table class="table table--light style--two data-table">
                             <thead>
                                 <tr>
                                     <th>@lang('Exchange ID')</th>
@@ -148,7 +171,7 @@
                                             </span>
                                         </div>
                                     </th>
-                                    <th>@lang('Action')</th>
+                                    <th class="sticky-col">@lang('Action')</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -223,7 +246,7 @@
                                         <td> {{ $user? $user->name: "" }} </td>
                                         <td> {{ $exchange->created_at->diffForhumans() }} </td>
                                         <td> {{ $exchange->updated_at->diffForhumans() }} </td>
-                                        <td>
+                                        <td class="sticky-col" style="background: white;">
                                             <a href="{{ route('admin.exchange.details', $exchange->id) }}"
                                                class="btn btn-sm btn-outline--primary">
                                                 <i class="las la-desktop"></i>@lang('Details')

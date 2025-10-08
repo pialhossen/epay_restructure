@@ -29,6 +29,19 @@ class ProfileController extends Controller
 
         $user = auth()->user();
 
+        if($request->hasFile('photo')){
+            $photo = $user->image;
+            $complete_profile_image_path = public_path($photo);
+            if(file_exists($complete_profile_image_path)){
+                try {
+                    unlink($complete_profile_image_path);
+                } catch (\Throwable $th) {
+                    //throw $th;
+                }
+            }
+            $user->image = $request->file('photo')->store('assets/images/user_images','public');
+        }
+
         $user->firstname = $request->firstname;
         $user->lastname = $request->lastname;
         $user->address = $request->address;

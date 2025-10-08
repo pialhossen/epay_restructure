@@ -115,6 +115,38 @@
                 });
             });
         })(jQuery);
+
+        function toggleSort(e, column) {
+            const url = new URL(window.location);
+            const currentSort = url.searchParams.get('sort'); // e.g. "amount:asc"
+            let nextSort = '';
+
+            if (currentSort) {
+                const [currentColumn, currentDirection] = currentSort.split(':');
+
+                if (currentColumn === column) {
+                    // Same column clicked → cycle direction
+                    if (currentDirection === 'asc') {
+                        nextSort = `${column}:desc`;
+                    } else if (currentDirection === 'desc') {
+                        // Remove the sort param
+                        url.searchParams.delete('sort');
+                        window.location = url.toString();
+                        return;
+                    }
+                } else {
+                    // Different column clicked → reset to asc
+                    nextSort = `${column}:asc`;
+                }
+            } else {
+                $element = e.currentTarget;
+                nextSort = `${column}:asc`;
+            }
+
+            // Update URL
+            url.searchParams.set('sort', nextSort);
+            window.location = url.toString();
+        }
     </script>
 </body>
 

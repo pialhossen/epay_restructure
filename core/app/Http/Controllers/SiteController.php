@@ -41,14 +41,15 @@ class SiteController extends Controller
         $modalDetails = EpayHomePageModalModel::where('status', 1)->orderBy('id', 'desc')->first();
 
 
-        $reviews = CustomerReview::where('status', 1)->latest()->get();
+        $reviews = CustomerReview::with('user')->where('status', 1)->latest()->get();
+        $current_review = CustomerReview::with('user')->where('status', 1)->where('user_id', auth()->id())->first();
         $average = CustomerReview::where('status', 1)->avg('rating');
         $count = CustomerReview::where('status', 1)->count();
 
         return view('Template::home', compact(
             'pageTitle', 'sections', 'seoContents',
             'seoImage', 'sellCurrencies', 'buyCurrencies',
-            'modalDetails', 'reviews', 'average', 'count'
+            'modalDetails', 'reviews', 'average', 'count', 'current_review'
         ));
     }
 
