@@ -417,4 +417,27 @@ Route::middleware('admin')->group(function () {
         Route::get('/final-profit', 'getFinalProfit')->name('final_profit');
         Route::get('/daily-profit', 'getdailyProfit')->name('daily_profit');
     });
+    Route::name('employee.')->group(function(){
+        Route::controller('StaffController')->prefix('staffs')->name('staffs.')->group(function(){
+            Route::get('/','index')->name('index');
+            Route::get('/create','create')->name('create');
+            Route::post('/store','store')->name('store');
+            Route::get('/edit/{user}','edit')->name('edit');
+            Route::post('/update/{user}','store')->name('update');
+            Route::post('/password/{user}','password')->name('password');
+        });
+        Route::controller('RoleController')->prefix('roles')->name('roles.')->group(function(){
+            Route::get('/','index')->name('index');
+            Route::post('/store','store')->name('store');
+            Route::get('/edit/{role}','edit')->name('edit');
+            Route::post('/update/{role}','update')->name('update');
+            Route::post('/delete/{role}','delete')->name('delete');
+        });
+        Route::controller('PermissionController')->prefix('permissions')->name('permissions.')->group(function(){
+            Route::get('/','index')->name('index');
+            Route::post('/store','store')->name('store');
+            Route::post('/update/{permission}','store')->name('update');
+            Route::post('/delete/{permission}','delete')->name('delete');
+        });
+    });
 });

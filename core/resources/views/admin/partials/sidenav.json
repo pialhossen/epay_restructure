@@ -345,6 +345,37 @@
             }
         ]
     },
+    "manage_employee": {
+        "title": "Manage Employees",
+        "icon": "las la-users-cog",
+        "menu_active": "admin.employee*",
+        "submenu": [
+            {
+                "keyword": [
+                    "Manage Staffs"
+                ],
+                "title": "Manage Staffs",
+                "route_name": "admin.employee.staffs.index",
+                "menu_active": "admin.employee.staffs*"
+            },
+            {
+                "keyword": [
+                    "Manage Roles"
+                ],
+                "title": "Manage Roles",
+                "route_name": "admin.employee.roles.index",
+                "menu_active": "admin.employee.roles*"
+            },
+            {
+                "keyword": [
+                    "Manage Permissions"
+                ],
+                "title": "Manage Permissions",
+                "route_name": "admin.employee.permissions.index",
+                "menu_active": "admin.employee.permissions*"
+            }
+        ]
+    },
     "support_ticket": {
         "title": "Support Ticket",
         "icon": "la la-ticket",
