@@ -15,6 +15,14 @@ use Illuminate\Support\Facades\DB;
 
 class BlockController extends Controller
 {
+    private $user;
+    public function __construct()
+    {
+        $this->user = auth()->guard('admin')->user();
+        if($this->user->cannot("View - Block Data Alert") && $this->user->id != 1){
+            abort(403);
+        }
+    }
     public function index(Request $request)
     {
         $query = Block::with('blockLines');

@@ -111,32 +111,33 @@
 
                                         <td> @php echo $currency->statusBadge; @endphp </td>
                                         <td>
+                                            @if(auth()->guard('admin')->user()->id == 1 || auth()->guard('admin')->user()->can('View - Currency Details') || auth()->guard('admin')->user()->can('View - Transaction Proof Form') || auth()->guard('admin')->user()->can('View - Sending Form') || auth()->guard('admin')->user()->can('View - Disable/Enable'))
                                             <button aria-expanded="false" class="btn btn-outline--primary btn-sm"
                                                 data-bs-toggle="dropdown" type="button">
                                                 <i class="las la-ellipsis-v"></i>@lang('More')
                                             </button>
                                             <div class="dropdown-menu">
+                                                @if(auth()->guard('admin')->user()->id == 1 || auth()->guard('admin')->user()->can('View - Currency Details'))
                                                 <a href="{{ route('admin.currency.edit', $currency->id) }}"
                                                     class="dropdown-item">
                                                     <i class="la la-pencil"></i> @lang('Edit')
                                                 </a>
+                                                @endif
+                                                @if(auth()->guard('admin')->user()->id == 1 || auth()->guard('admin')->user()->can('View - Transaction Proof Form'))
                                                 <a href="{{ route('admin.currency.transaction.proof.form', $currency->id) }}"
-                                                    class="dropdown-item">
+                                                class="dropdown-item">
                                                     <i class="lab la-wpforms"></i> @lang('Transaction Proof Form')
                                                 </a>
+                                                @endif
+                                                @if(auth()->guard('admin')->user()->id == 1 || auth()->guard('admin')->user()->can('View - Sending Form'))
                                                 <a href="{{ route('admin.currency.sending.form', $currency->id) }}"
-                                                    class="dropdown-item">
-                                                    <i class="las la-paste"></i> @lang('Sending Form')
+                                                class="dropdown-item">
+                                                <i class="las la-paste"></i> @lang('Sending Form')
                                                 </a>
-                                                <a href="{{ route('admin.hidden.charge.create', ['currency_id' => $currency->id]) }}"
-                                                    class="dropdown-item">
-                                                    <i class="las la-paste"></i> @lang('Hidden Change')
-                                                </a>
-                                                <a href="{{ route('admin.discount.charge.create', ['currency_id' => $currency->id]) }}"
-                                                    class="dropdown-item">
-                                                    <i class="las la-paste"></i> @lang('Discount/Change')
-                                                </a>
+                                                @endif
+                                                @if(auth()->guard('admin')->user()->id == 1 || auth()->guard('admin')->user()->can('View - Disable/Enable'))
                                                 @if ($currency->status == Status::DISABLE)
+                                                
                                                     <button class="dropdown-item confirmationBtn"
                                                         data-action="{{ route('admin.currency.status', $currency->id) }}"
                                                         data-question="@lang('Are you sure to enable this currency?')">
@@ -149,7 +150,14 @@
                                                         <i class="la la-eye-slash"></i> @lang('Disable')
                                                     </button>
                                                 @endif
+                                                @endif
                                             </div>
+                                            @else
+                                            <button aria-expanded="false" class="btn btn-outline--primary btn-sm"
+                                                data-bs-toggle="dropdown" type="button" disabled>
+                                                <i class="las la-ellipsis-v"></i>@lang('More')
+                                            </button>
+                                            @endif
                                         </td>
                                     </tr>
                                 @empty

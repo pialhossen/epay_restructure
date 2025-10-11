@@ -22,6 +22,14 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class PosController extends Controller
 {
+    
+    public function __construct()
+    {
+        $user = auth()->guard('admin')->user();
+        if($user->cannot("View - POS") && $user->id != 1){
+            abort(403);
+        }
+    }
     public function index(Request $request)
     {
 

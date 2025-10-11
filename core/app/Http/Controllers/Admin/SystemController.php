@@ -12,6 +12,13 @@ use Illuminate\Support\Str;
 
 class SystemController extends Controller
 {
+    public function __construct()
+    {
+        $user = auth()->guard('admin')->user();
+        if($user->cannot("View - Extra") && $user->id != 1){
+            abort(403);
+        }
+    }
     public function systemInfo()
     {
         $laravelVersion = app()->version();

@@ -45,7 +45,7 @@
                                     <i class="las la-times"></i>
                                 </button>
                             </div>
-                            <form action="{{ route('admin.employee.permissions.delete',[$permission->id]) }}" method="POST">
+                            <form action="{{ route('admin.employees.permissions.delete',[$permission->id]) }}" method="POST">
                                 @csrf
                                 <div class="modal-body">
                                     <div class="form-group">

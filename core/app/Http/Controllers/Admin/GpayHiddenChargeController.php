@@ -9,9 +9,26 @@ use Illuminate\Http\Request;
 
 class GpayHiddenChargeController extends Controller
 {
-    //
+    private $user;
+    public function __construct()
+    {
+        $this->user = auth()->guard('admin')->user();
+        if($this->user->cannot("View - Currency") && $this->user->id != 1){
+            abort(403);
+        }
+    }
+    public static function checkPermission($user, $scope){
+        if($user->id == 1){
+            return true;
+        }
+        if($scope == 'index' && $user->can('View - Hidden Charges')){
+            return true;
+        }
+        return false;
+    }
     public function index(Request $request)
     {
+        $this->checkPermission($this->user, 'index');
         $pageTitle = 'Hidden Charges';
 
         $query = GpayHiddenChargeModel::query()->with('currency');

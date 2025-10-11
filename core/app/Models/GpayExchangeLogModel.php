@@ -14,6 +14,6 @@ class GpayExchangeLogModel extends Model
 
     public function adminUser()
     {
-        return $this->belongsTo(AdminUserModel::class, 'updated_by');
+        return $this->belongsTo(Admin::class, 'updated_by');
     }
 }

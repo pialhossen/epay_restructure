@@ -25,6 +25,7 @@
             </div>
 
             <div class="d-flex flex-wrap gap-3 mt-4">
+                @if(checkSpecificPermission('Update - addSubBalance'))
                 <div class="flex-fill">
                     <button data-bs-toggle="modal" data-bs-target="#addSubModal"
                         class="btn btn--success btn--shadow w-100 btn-lg bal-btn" data-act="add">
@@ -38,6 +39,7 @@
                         <i class="las la-minus-circle"></i> @lang('Balance')
                     </button>
                 </div>
+                @endif
                 <div class="flex-fill">
                     <a href="{{ route('admin.report.login.history') }}?search={{ $user->username }}"
                         class="btn btn--primary btn--shadow w-100 btn-lg">
@@ -254,7 +256,7 @@
                                 </div>
                             </div>
                             <div class="col-md-12">
-                                <button type="submit" class="btn btn--primary w-100 h-45">@lang('Submit')
+                                <button type="submit" class="btn btn--primary w-100 h-45" @if(!checkSpecificPermission('Update - Users')) disabled @endif>@lang('Submit')
                                 </button>
                             </div>
                         </div>

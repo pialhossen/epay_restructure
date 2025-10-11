@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
@@ -26,7 +27,7 @@ class LoginController extends Controller
      *
      * @var string
      */
-    public $redirectTo = 'admin';
+    public $redirectTo = 'admin/dashboard';
 
     /**
      * Show the application's login form.
@@ -36,6 +37,7 @@ class LoginController extends Controller
     public function showLoginForm()
     {
         $pageTitle = 'Admin Login';
+        
 
         return view('admin.auth.login', compact('pageTitle'));
     }
@@ -92,6 +94,8 @@ class LoginController extends Controller
 
         return $this->sendFailedLoginResponse($request);
     }
+
+    
 
     public function logout(Request $request)
     {

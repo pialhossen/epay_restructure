@@ -350,7 +350,11 @@
         </div>
         </div>
         <div class="col-12 my-4">
-            <button type="submit" class="btn btn--primary w-100 h-45">@lang('Submit')</button>
+            @if(isset($currency))
+            <button type="submit" class="btn btn--primary w-100 h-45" @if(auth()->guard('admin')->user()->id != 1 && auth()->guard('admin')->user()->cannot('Update - Currency')) disabled @endif>@lang('Submit')</button>
+            @else
+            <button type="submit" class="btn btn--primary w-100 h-45" @if(auth()->guard('admin')->user()->id != 1 && auth()->guard('admin')->user()->cannot('Create - Currency')) disabled @endif>@lang('Submit')</button>
+            @endif
         </div>
     </form>
 @endsection

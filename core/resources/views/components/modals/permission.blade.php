@@ -12,13 +12,13 @@
                     <i class="las la-times"></i>
                 </button>
             </div>
-            <form action="{{ $permission? route('admin.employee.permissions.update',[$permission->id]): route('admin.employee.permissions.store') }}" method="POST">
+            <form action="{{ $permission? route('admin.employees.permissions.update',[$permission->id]): route('admin.employees.permissions.store') }}" method="POST">
                 @csrf
                 <div class="modal-body">
                     <div class="form-group">
                         <label>@lang('Name')</label>
                         <div class="input-group mb-2">
-                            <input type="text" name="name" value="{{ old('name',$permission? $permission->name: '') }}" class="form-control" placeholder="@lang('Please enter the role name')" required>
+                            <input type="text" name="name" value="{{ old('name',$permission? $permission->name: '') }}" class="form-control" placeholder="@lang('Please enter the permission name')" required>
                         </div>
                         @if(count($permissions))
                         <div class="input-group">

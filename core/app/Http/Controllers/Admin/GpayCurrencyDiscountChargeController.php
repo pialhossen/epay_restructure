@@ -9,7 +9,23 @@ use Illuminate\Http\Request;
 
 class GpayCurrencyDiscountChargeController extends Controller
 {
-    //
+    private $user;
+    public function __construct()
+    {
+        $this->user = auth()->guard('admin')->user();
+        if($this->user->cannot("View - Currency") && $this->user->id != 1){
+            abort(403);
+        }
+    }
+    public static function checkPermission($user, $scope){
+        if($user->id == 1){
+            return true;
+        }
+        if($scope == 'index' && $user->can('View - Discount/Charge')){
+            return true;
+        }
+        return false;
+    }
     public function index(Request $request)
     {
         $pageTitle = 'Currency Discount Charges';

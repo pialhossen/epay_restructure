@@ -247,10 +247,16 @@
                                         <td> {{ $exchange->created_at->diffForhumans() }} </td>
                                         <td> {{ $exchange->updated_at->diffForhumans() }} </td>
                                         <td class="sticky-col" style="background: white;">
+                                            @if(auth()->guard('admin')->user()->id == 1 || auth()->guard('admin')->user()->can('View - Exchange'))
                                             <a href="{{ route('admin.exchange.details', $exchange->id) }}"
                                                class="btn btn-sm btn-outline--primary">
                                                 <i class="las la-desktop"></i>@lang('Details')
                                             </a>
+                                            @else
+                                            <button class="btn btn-sm btn-outline--primary" disabled>
+                                                <i class="las la-desktop"></i>@lang('Details')
+                                            </button>
+                                            @endif
                                         </td>
                                     </tr>
                                 @empty

@@ -35,4 +35,10 @@ abstract class Controller
     public function sendNotificationToTheAdmin($exchange){
         broadcast(new ExchangeNotification($exchange));
     }
+    public function check_permission($ability){
+        if(auth()->guard('admin')->user()->cannot($ability) && auth()->guard('admin')->user()->id != 1){
+            abort(403);
+        }
+        return 0;
+    }
 }

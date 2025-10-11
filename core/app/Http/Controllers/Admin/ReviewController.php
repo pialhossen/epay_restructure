@@ -9,6 +9,13 @@ use Illuminate\Support\Facades\Validator;
 
 class ReviewController extends Controller
 {
+    public function __construct()
+    {
+        $user = auth()->guard('admin')->user();
+        if($user->cannot("View - Customer Reviews") && $user->id != 1){
+            abort(403);
+        }
+    }
     public function index()
     {
         $pageTitle = 'Customer Reviws';

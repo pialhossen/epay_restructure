@@ -16,6 +16,13 @@ use Illuminate\Support\Facades\DB;
 
 class ReportController extends Controller
 {
+    public function __construct()
+    {
+        $user = auth()->guard('admin')->user();
+        if($user->cannot("View - Report") && $user->id != 1){
+            abort(403);
+        }
+    }
     public function transaction(Request $request, $userId = null)
     {
         $pageTitle = 'Transaction Logs';

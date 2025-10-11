@@ -249,6 +249,7 @@
                 <div class="card-header d-flex flex-wrap justify-content-between align-items-center">
                     <h5 class="card-title">@lang('Exchange Information')</h5>
                     {{-- @if ($exchange->status == Status::EXCHANGE_PENDING) --}}
+                    @if(auth()->guard('admin')->user()->id == 1 || auth()->guard('admin')->user()->can('Update - Exchange'))
                     <div class="d-flex flex-wrap justify-content-end mb-3 gap-2">
                         {{-- @if ($exchange->status != Status::EXCHANGE_APPROVED) --}}
                         <button class="btn btn-outline--warning btn-pending flex-grow-1" type="button">
@@ -277,7 +278,7 @@
                             @lang('Refund')
                         </button>
                     </div>
-                    {{-- @endif --}}
+                    @endif
                 </div>
                 <div class="card-body">
                     <ul class="list-group list-group-flush">

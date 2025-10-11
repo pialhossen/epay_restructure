@@ -1,11 +1,15 @@
 <?php
 
 use App\Constants\Status;
+use App\Http\Controllers\Admin\CurrencyController;
+use App\Http\Controllers\Admin\ExchangeController;
+use App\Http\Controllers\Admin\ManageUsersController;
 use App\Lib\Captcha;
 use App\Lib\ClientInfo;
 use App\Lib\CurlRequest;
 use App\Lib\FileManager;
 use App\Lib\GoogleAuthenticator;
+use App\Models\Exchange;
 use App\Models\Extension;
 use App\Models\Frontend;
 use App\Models\GeneralSetting;
@@ -267,7 +271,9 @@ function notify($user, $templateName, $shortCodes = null, $sendVia = null, $crea
     $notify->pushImage = $pushImage;
     $notify->userColumn = isset($user->id) ? $user->getForeignKey() : 'user_id';
     sleep(5);
-    $notify->send();
+    if(env('APP_ENV') != 'local'){
+        $notify->send();
+    }
 }
 
 function getPaginate($paginate = null)
@@ -644,4 +650,75 @@ function setEnvValue($key, $value)
         file_put_contents($path, $env);
     }
 }
-
+function checkPermission($menu_name){
+    $user = auth()->guard('admin')->user();
+    if($user->id == 1){
+        return 1;
+    }
+    if($menu_name == "Dashboard"){
+        return true;
+    }
+    if($menu_name == "Exchange List" && $user->can('View - Exchange Menu')){
+        return true;
+    }
+    if($menu_name == "Currency" && $user->can('View - Currency')){
+        return true;
+    }
+    if($menu_name == "Manage Users" && $user->can('View - Manage Users')){
+        return true;
+    }
+    if($menu_name == "Manage Employees" && $user->can('View - Manage Employees')){
+        return true;
+    }
+    if($menu_name == "Support Ticket" && $user->can('View - Support Ticket')){
+        return true;
+    }
+    if($menu_name == "Report" && $user->can('View - Report')){
+        return true;
+    }
+    if($menu_name == "POS" && $user->can('View - POS')){
+        return true;
+    }
+    if($menu_name == "Subscribers" && $user->can('View - Subscribers')){
+        return true;
+    }
+    if($menu_name == "IP Blocking" && $user->can('View - IP Blocking')){
+        return true;
+    }
+    if($menu_name == "Customer Reviews" && $user->can('View - Customer Reviews')){
+        return true;
+    }
+    if($menu_name == "System Setting" && $user->can('View - System Setting')){
+        return true;
+    }
+    if($menu_name == "Extra" && $user->can('View - Extra')){
+        return true;
+    }
+    if($menu_name == "Home Modal" && $user->can('View - Home Modal')){
+        return true;
+    }
+    // return true;
+    return false;
+}
+function checkPermissionForSubMenu($parent_manu, $scope){
+    $user = auth()->guard('admin')->user();
+    if($user->id == 1){
+        return 1;
+    }
+    if($parent_manu == 'Exchange List'){
+        return ExchangeController::checkPermission($user,$scope);
+    } 
+    if($parent_manu == 'Currency'){
+        return CurrencyController::checkPermission($user,$scope);
+    }
+    if($parent_manu == 'Manage Users'){
+        return ManageUsersController::checkPermission($user,$scope);
+    }
+    return false;
+}
+function checkSpecificPermission($ability){
+    if(auth()->guard('admin')->user()->can($ability) || auth()->guard('admin')->user()->id == 1){
+        return true;
+    }
+    return false;
+}

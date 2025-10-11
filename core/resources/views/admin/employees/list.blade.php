@@ -1,6 +1,6 @@
 @extends('admin.layouts.app')
 @push('breadcrumb-plugins')
-    <a href="{{ route('admin.employee.staffs.create') }}" type="button" class="btn  btn-outline--primary h-45">
+    <a href="{{ route('admin.employees.create') }}" type="button" class="btn  btn-outline--primary h-45">
         <i class="las la-plus-circle"></i> @lang('Add New Staff')
     </a>
 @endpush
@@ -16,19 +16,6 @@
                 <th>User</th>
                 <th>Email</th>
                 <th>Roles</th>
-                
-                <!-- <th style="cursor: pointer;" onclick="toggleSort(event, 'completed_orders')">
-                    <div class="sortable-header">
-                        <span class="sort-indicate"> 
-                            <span class="up" @if(str_contains(request()->query("sort"),'completed_orders')) style="visibility: {{ request()->query("sort") == "completed_orders:desc"? "visible": "hidden" }};" @endif><i class="fa-solid fa-arrow-up"></i></span> 
-                            <span class="down" @if(str_contains(request()->query("sort"),'completed_orders')) style="visibility: {{ request()->query("sort") == "completed_orders:asc"? "visible": "hidden" }};" @endif><i class="fa-solid fa-arrow-down"></i></span> 
-                        </span> 
-                        <span class="text">
-                            @lang('Completed Orders')
-                        </span>
-                    </div>
-                </th> -->
-
                 <th>Action</th>
             </tr>
         </thead>
@@ -39,7 +26,7 @@
                         <span class="fw-bold">{{$staff->name}}</span>
                         <br>
                         <span class="small">
-                            <a href="{{ route('admin.employee.staffs.edit', $staff->id) }}"><span>@</span>{{ $staff->username }}</a>
+                            <a href="{{ route('admin.employees.edit', $staff->id) }}"><span>@</span>{{ $staff->username }}</a>
                         </span>
                     </td>
                     <td class="custom-email-mobile">
@@ -50,7 +37,7 @@
                     </td>
                     <td>
                         <div class="button--group">
-                            <a href="{{ route('admin.employee.staffs.edit', $staff->id) }}" class="btn btn-sm btn-outline--primary">
+                            <a href="{{ route('admin.employees.edit', $staff->id) }}" class="btn btn-sm btn-outline--primary">
                                 <i class="las la-desktop"></i> @lang('Details')
                             </a>
                         </div>

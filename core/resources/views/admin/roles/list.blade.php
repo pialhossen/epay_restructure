@@ -29,7 +29,7 @@
                     </td>
                     <td>
                         <div class="button--group">
-                            <a href="{{ route('admin.employee.roles.edit', $role->id) }}" class="btn btn-sm btn-outline--primary">
+                            <a href="{{ route('admin.employees.roles.edit', $role->id) }}" class="btn btn-sm btn-outline--primary">
                                 <i class="las la-desktop"></i> @lang('Details')
                             </a>
                         </div>

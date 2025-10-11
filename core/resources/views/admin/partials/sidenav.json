@@ -45,6 +45,7 @@
                 "route_name": "admin.exchange.list",
                 "menu_active": "admin.exchange.list",
                 "counter": "pendingExchangeCount",
+                "scope": "pending",
                 "params": {
                     "scope": "pending"
                 }
@@ -60,6 +61,7 @@
                 "route_name": "admin.exchange.list",
                 "menu_active": "admin.exchange.list",
                 "counter": "holdExchangeCount",
+                "scope": "hold",
                 "params": {
                     "scope": "hold"
                 }
@@ -75,6 +77,7 @@
                 "route_name": "admin.exchange.list",
                 "menu_active": "admin.exchange.list",
                 "counter": "processingExchangeCount",
+                "scope": "processing",
                 "params": {
                     "scope": "processing"
                 }
@@ -90,6 +93,7 @@
                 "route_name": "admin.exchange.list",
                 "menu_active": "admin.exchange.list",
                 "counter": "approvedExchangeCount",
+                "scope": "approved",
                 "params": {
                     "scope": "approved"
                 }
@@ -105,6 +109,7 @@
                 "route_name": "admin.exchange.list",
                 "menu_active": "admin.exchange.list",
                 "counter": "canceledExchangeCount",
+                "scope": "canceled",
                 "params": {
                     "scope": "canceled"
                 }
@@ -120,6 +125,7 @@
                 "route_name": "admin.exchange.list",
                 "menu_active": "admin.exchange.list",
                 "counter": "refundedExchangeCount",
+                "scope": "refunded",
                 "params": {
                     "scope": "refunded"
                 }
@@ -136,6 +142,7 @@
                 "route_name": "admin.exchange.list",
                 "menu_active": "admin.exchange.list",
                 "counter": "allExchangeCount",
+                "scope": "list",
                 "params": {
                     "scope": "list"
                 }
@@ -352,27 +359,30 @@
         "submenu": [
             {
                 "keyword": [
-                    "Manage Staffs"
+                    "Manage Employees"
                 ],
-                "title": "Manage Staffs",
-                "route_name": "admin.employee.staffs.index",
-                "menu_active": "admin.employee.staffs*"
+                "title": "Manage Employees",
+                "route_name": "admin.employees.index",
+                "menu_active": "admin.employees.index*",
+                "scope": "employees"
             },
             {
                 "keyword": [
                     "Manage Roles"
                 ],
                 "title": "Manage Roles",
-                "route_name": "admin.employee.roles.index",
-                "menu_active": "admin.employee.roles*"
+                "route_name": "admin.employees.roles.index",
+                "menu_active": "admin.employees.roles*",
+                "scope": "roles"
             },
             {
                 "keyword": [
                     "Manage Permissions"
                 ],
                 "title": "Manage Permissions",
-                "route_name": "admin.employee.permissions.index",
-                "menu_active": "admin.employee.permissions*"
+                "route_name": "admin.employees.permissions.index",
+                "menu_active": "admin.employees.permissions*",
+                "scope": "permissions"
             }
         ]
     },
@@ -718,21 +728,6 @@
                 "counter": "updateAvailable"
             }
         ]
-    },
-    "user_controll": {
-        "keyword": [
-            "admin user control",
-            "admin users",
-            "admin user manage",
-            "manage admin users",
-            "admin user list",
-            "admin user settings"
-        ],
-        "title": "Admin User Control",
-        "icon": "las la-user-shield",
-        "class": "super-admin",
-        "route_name": "admin.auth.users.index",
-        "menu_active": "admin.auth.users.index"
     },
     "home_modal": {
         "keyword": [

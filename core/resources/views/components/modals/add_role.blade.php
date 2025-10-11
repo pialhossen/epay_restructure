@@ -7,7 +7,7 @@
                     <i class="las la-times"></i>
                 </button>
             </div>
-            <form action="{{ route('admin.employee.roles.store') }}" method="POST">
+            <form action="{{ route('admin.employees.roles.store') }}" method="POST">
                 @csrf
                 <div class="modal-body">
                     <div class="form-group">

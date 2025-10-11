@@ -19,8 +19,58 @@ use Illuminate\Support\Facades\Log;
 
 class ManageUsersController extends Controller
 {
+    private $user;
+    public function __construct()
+    {
+        $this->user = auth()->guard('admin')->user();
+        if($this->user->cannot("View - Manage Users") && $this->user->id != 1){
+            abort(403);
+        }
+    }
+
+    public static function checkPermission($user, $scope){
+        if($user->id == 1){
+            return true;
+        }
+        if(($scope == 'index' || $scope == 'Manage Currencies') && $user->can('View - All Users')){
+            return true;
+        }
+        if(($scope == 'active' || $scope == 'Active Users') && $user->can('View - Active Users')){
+            return true;
+        }
+        if(($scope == 'banned' || $scope == 'Banned Users') && $user->can('View - Banned Users')){
+            return true;
+        }
+        if(($scope == 'emailUnverified' || $scope == 'Email Unverified') && $user->can('View - Email Unverified')){
+            return true;
+        }
+        if(($scope == 'mobileUnverified' || $scope == 'Mobile Unverified') && $user->can('View - Mobile Unverified')){
+            return true;
+        }
+        if(($scope == 'kycUnverified' || $scope == 'KYC Unverified') && $user->can('View - KYC Unverified')){
+            return true;
+        }
+        if(($scope == 'kycPending' || $scope == 'KYC Pending') && $user->can('View - KYC Pending')){
+            return true;
+        }
+        if(($scope == 'withBalance' || $scope == 'With Balance') && $user->can('View - With Balance')){
+            return true;
+        }
+        if(($scope == 'showNotification' || $scope == 'Send Notification') && $user->can('View - Send Notification')){
+            return true;
+        }
+        if($scope == 'Block Data Alert' && $user->can('View - Block Data Alert')){
+            return true;
+        }
+       
+        return false;
+    }
+
     public function allUsers()
     {
+        if(!$this->checkPermission($this->user, 'index')){
+            abort(403);
+        }
         $pageTitle = 'All Users';
         $users = $this->userData();
 
@@ -29,22 +79,31 @@ class ManageUsersController extends Controller
 
     public function activeUsers()
     {
+        if(!$this->checkPermission($this->user, 'active')){
+            abort(403);
+        }
         $pageTitle = 'Active Users';
         $users = $this->userData('active');
-
+        
         return view('admin.users.list', compact('pageTitle', 'users'));
     }
-
+    
     public function bannedUsers()
     {
+        if(!$this->checkPermission($this->user, 'banned')){
+            abort(403);
+        }
         $pageTitle = 'Banned Users';
         $users = $this->userData('banned');
-
+        
         return view('admin.users.list', compact('pageTitle', 'users'));
     }
-
+    
     public function emailUnverifiedUsers()
     {
+        if(!$this->checkPermission($this->user, 'emailUnverified')){
+            abort(403);
+        }
         $pageTitle = 'Email Unverified Users';
         $users = $this->userData('emailUnverified');
 
@@ -53,20 +112,26 @@ class ManageUsersController extends Controller
 
     public function kycUnverifiedUsers()
     {
+        if(!$this->checkPermission($this->user, 'kycUnverified')){
+            abort(403);
+        }
         $pageTitle = 'KYC Unverified Users';
         $users = $this->userData('kycUnverified');
-
+        
         return view('admin.users.list', compact('pageTitle', 'users'));
     }
-
+    
     public function kycPendingUsers()
     {
+        if(!$this->checkPermission($this->user, 'kycPending')){
+            abort(403);
+        }
         $pageTitle = 'KYC Pending Users';
         $users = $this->userData('kycPending');
-
+        
         return view('admin.users.list', compact('pageTitle', 'users'));
     }
-
+    
     public function emailVerifiedUsers()
     {
         $pageTitle = 'Email Verified Users';
@@ -93,6 +158,9 @@ class ManageUsersController extends Controller
 
     public function usersWithBalance()
     {
+        if(!$this->checkPermission($this->user, 'withBalance')){
+            abort(403);
+        }
         $pageTitle = 'Users with Balance';
         $users = $this->userData('withBalance');
 
@@ -169,6 +237,7 @@ class ManageUsersController extends Controller
 
     public function detail($id)
     {
+        $this->check_permission('View - Users Details');
         $user = User::findOrFail($id);
         $pageTitle = 'User Detail - ' . $user->username;
 
@@ -223,6 +292,8 @@ class ManageUsersController extends Controller
 
     public function update(Request $request, $id)
     {
+        $this->check_permission('Update - Users');
+
         $user = User::findOrFail($id);
         $countryData = json_decode(file_get_contents(resource_path('views/partials/country.json')));
         $countryArray = (array) $countryData;
@@ -290,6 +361,7 @@ class ManageUsersController extends Controller
 
     public function addSubBalance(Request $request, $id)
     {
+        $this->check_permission('Update - addSubBalance');
         $request->validate([
             'amount' => 'required|numeric|gt:0',
             'act' => 'required|in:add,sub',
@@ -385,6 +457,7 @@ class ManageUsersController extends Controller
 
     public function showNotificationSingleForm($id)
     {
+        
         $user = User::findOrFail($id);
         if (!gs('en') && !gs('sn') && !gs('pn')) {
             $notify[] = ['warning', 'Notification options are disabled currently'];
@@ -416,6 +489,9 @@ class ManageUsersController extends Controller
 
     public function showNotificationAllForm()
     {
+        if(!$this->checkPermission($this->user, 'showNotification')){
+            abort(403);
+        }
         if (!gs('en') && !gs('sn') && !gs('pn')) {
             $notify[] = ['warning', 'Notification options are disabled currently'];
 

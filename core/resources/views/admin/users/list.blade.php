@@ -136,9 +136,15 @@
                     </td>
                     <td>
                         <div class="button--group">
+                            @if(checkSpecificPermission('View - Users Details'))
                             <a href="{{ route('admin.users.detail', $user->id) }}" class="btn btn-sm btn-outline--primary">
                                 <i class="las la-desktop"></i> @lang('Details')
                             </a>
+                            @else
+                            <button class="btn btn-sm btn-outline--primary" disabled>
+                                <i class="las la-desktop"></i> @lang('Details')
+                            </button>
+                            @endif
                             @if (request()->routeIs('admin.users.kyc.pending'))
                                 <a href="{{ route('admin.users.kyc.details', $user->id) }}" target="_blank"
                                     class="btn btn-sm btn-outline--dark">

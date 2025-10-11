@@ -14,80 +14,83 @@
         <div class="sidebar__menu-wrapper">
             <ul class="sidebar__menu">
                 @foreach ($sideBarLinks as $key => $data)
-                    @if (@$data->header)
-                        <li class="sidebar__menu-header">{{ __($data->header) }}</li>
-                    @endif
+                    @if(checkPermission($data->title))
+                        @if (@$data->header)
+                            <li class="sidebar__menu-header">{{ __($data->header) }}</li>
+                        @endif
 
-                    @if (@$data->submenu)
-                        <li class="sidebar-menu-item sidebar-dropdown">
-                            <a href="javascript:void(0)"
-                                class="{{ menuActive(@$data->menu_active, 3) }} {{ @$data->class ?? '' }}">
-                                <i class="menu-icon {{ @$data->icon }}"></i>
-                                <span class="menu-title" @if(in_array(@$data->title, ["Report ", "Withdrawals"]))
-                                style="display:none;" @endif>
-                                    {{ __(@$data->title) }}
-                                </span>
-                                @foreach (@$data->counters ?? [] as $counter)
-                                    @if ($$counter > 0)
-                                        <span class="menu-badge menu-badge-level-one bg--warning ms-auto">
-                                            <i class="fas fa-exclamation"></i>
-                                        </span>
-                                        @break
-                                    @endif
-                                @endforeach
-                            </a>
-
-                            <div class="sidebar-submenu {{ menuActive(@$data->menu_active, 2) }}">
-                                <ul>
-                                    @foreach ($data->submenu as $menu)
-                                        @php
-                                            $submenuParams = null;
-                                            if (@$menu->params) {
-                                                foreach ($menu->params as $submenuParamVal) {
-                                                    $submenuParams[] = array_values((array) $submenuParamVal)[0];
-                                                }
-                                            }
-                                        @endphp
-                                        <li class="sidebar-menu-item {{ menuActive(@$menu->menu_active, param: @$submenuParams) }}">
-                                            <a href="{{ route(@$menu->route_name, $submenuParams) }}"
-                                                class="nav-link {{ @$menu->class ?? '' }}">
-                                                <i class="menu-icon las la-dot-circle"></i>
-                                                <span class="menu-title">{{ __($menu->title) }}</span>
-                                                @php 
-                                                    $counter = @$menu->counter; 
-                                                    // dump(@$counter);
-                                                    // dump(@$$counter);
-                                                @endphp
-                                                @if (@$$counter)
-                                                    <span class="menu-badge bg--info ms-auto">{{ @$$counter }}</span>
-                                                @endif
-                                            </a>
-                                        </li>
+                        @if (@$data->submenu)
+                            <li class="sidebar-menu-item sidebar-dropdown">
+                                <a href="javascript:void(0)"
+                                    class="{{ menuActive(@$data->menu_active, 3) }} {{ @$data->class ?? '' }}">
+                                    <i class="menu-icon {{ @$data->icon }}"></i>
+                                    <span class="menu-title" @if(in_array(@$data->title, ["Report ", "Withdrawals"]))
+                                    style="display:none;" @endif>
+                                        {{ __(@$data->title) }}
+                                    </span>
+                                    @foreach (@$data->counters ?? [] as $counter)
+                                        @if ($$counter > 0)
+                                            <span class="menu-badge menu-badge-level-one bg--warning ms-auto">
+                                                <i class="fas fa-exclamation"></i>
+                                            </span>
+                                            @break
+                                        @endif
                                     @endforeach
-                                </ul>
-                            </div>
-                        </li>
-                    @else
-                        @php
-                            $mainParams = null;
-                            if (@$data->params) {
-                                foreach ($data->params as $paramVal) {
-                                    $mainParams[] = array_values((array) $paramVal)[0];
+                                </a>
+                                <div class="sidebar-submenu {{ menuActive(@$data->menu_active, 2) }}">
+                                    <ul>
+                                        @foreach ($data->submenu as $menu)
+                                            @if(checkPermissionForSubMenu($data->title,$menu->title))
+                                                @php
+                                                    $submenuParams = null;
+                                                    if (@$menu->params) {
+                                                        foreach ($menu->params as $submenuParamVal) {
+                                                            $submenuParams[] = array_values((array) $submenuParamVal)[0];
+                                                        }
+                                                    }
+                                                @endphp
+                                                <li class="sidebar-menu-item {{ menuActive(@$menu->menu_active, param: @$submenuParams) }}">
+                                                    <a href="{{ route(@$menu->route_name, $submenuParams) }}"
+                                                        class="nav-link {{ @$menu->class ?? '' }}">
+                                                        <i class="menu-icon las la-dot-circle"></i>
+                                                        <span class="menu-title">{{ __($menu->title) }}</span>
+                                                        @php 
+                                                            $counter = @$menu->counter; 
+                                                            // dump(@$counter);
+                                                            // dump(@$$counter);
+                                                        @endphp
+                                                        @if (@$$counter)
+                                                            <span class="menu-badge bg--info ms-auto">{{ @$$counter }}</span>
+                                                        @endif
+                                                    </a>
+                                                </li>
+                                            @endif
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            </li>
+                        @else
+                            @php
+                                $mainParams = null;
+                                if (@$data->params) {
+                                    foreach ($data->params as $paramVal) {
+                                        $mainParams[] = array_values((array) $paramVal)[0];
+                                    }
                                 }
-                            }
-                        @endphp
-                        <li class="sidebar-menu-item {{ menuActive(@$data->menu_active) }}">
-                            <a href="{{ route(@$data->route_name, $mainParams) }}" class="nav-link {{ @$data->class ?? '' }}">
-                                <i class="menu-icon {{ $data->icon }}"></i>
-                                <span class="menu-title">{{ __(@$data->title) }}</span>
-                                @php 
-                                    $counter = @$data->counter; 
-                                @endphp
-                                @if (@$counter)
-                                    <span class="menu-badge bg--info ms-auto">{{ @$counter }}</span>
-                                @endif
-                            </a>
-                        </li>
+                            @endphp
+                            <li class="sidebar-menu-item {{ menuActive(@$data->menu_active) }}">
+                                <a href="{{ route(@$data->route_name, $mainParams) }}" class="nav-link {{ @$data->class ?? '' }}">
+                                    <i class="menu-icon {{ $data->icon }}"></i>
+                                    <span class="menu-title">{{ __(@$data->title) }}</span>
+                                    @php 
+                                        $counter = @$data->counter; 
+                                    @endphp
+                                    @if (@$counter)
+                                        <span class="menu-badge bg--info ms-auto">{{ @$counter }}</span>
+                                    @endif
+                                </a>
+                            </li>
+                        @endif
                     @endif
                 @endforeach
             </ul>

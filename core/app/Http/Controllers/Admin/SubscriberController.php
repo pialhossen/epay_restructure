@@ -8,6 +8,13 @@ use Illuminate\Http\Request;
 
 class SubscriberController extends Controller
 {
+    public function __construct()
+    {
+        $user = auth()->guard('admin')->user();
+        if($user->cannot("View - Subscribers") && $user->id != 1){
+            abort(403);
+        }
+    }
     public function index()
     {
         $pageTitle = 'Subscribers';

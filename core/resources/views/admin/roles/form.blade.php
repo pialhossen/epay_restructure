@@ -11,7 +11,7 @@ $role_permissions =  $role->permissions()->pluck('id')->toArray();
                     <h5 class="card-title mb-0">@lang('Information of') {{ $role->name }} Role</h5>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('admin.employee.roles.update', $role->id) }}" method="POST"
+                    <form action="{{ route('admin.employees.roles.update', $role->id) }}" method="POST"
                         enctype="multipart/form-data" class="disableSubmission">
                         @csrf
                         <div class="row">
@@ -27,15 +27,15 @@ $role_permissions =  $role->permissions()->pluck('id')->toArray();
                             <div class="form-group">
                                 <label class="form-control-label">@lang($permission->name)</label>
                                 <input type="checkbox" data-width="100%" data-height="50" data-onstyle="-success"
-                                data-offstyle="-danger" data-bs-toggle="toggle" data-on="@lang('True')"
-                                data-off="@lang('False')" name="permissions[{{ $permission->id }}]" class="parent-permission" @if(in_array($permission->id, $role_permissions))checked @endif>
+                                data-offstyle="-danger" data-bs-toggle="toggle" data-on="@lang('Allowed')"
+                                data-off="@lang('Not Allowed')" name="permissions[{{ $permission->id }}]" class="parent-permission" @if(in_array($permission->id, $role_permissions))checked @endif>
 
                                 @foreach ($permission->childs as $child)
                                 <div style="margin-left: 10%;">
                                     <label class="form-control-label">@lang($child->name)</label>
                                     <input type="checkbox" data-width="100%" data-height="50" data-onstyle="-success"
-                                    data-offstyle="-danger" data-bs-toggle="toggle" data-on="@lang('True')"
-                                    data-off="@lang('False')" name="permissions[{{ $child->id }}]" class="child-permission" @if(in_array($child->id, $role_permissions))checked @endif>
+                                    data-offstyle="-danger" data-bs-toggle="toggle" data-on="@lang('Allowed')"
+                                    data-off="@lang('Not Allowed')" name="permissions[{{ $child->id }}]" class="child-permission" @if(in_array($child->id, $role_permissions))checked @endif>
                                 </div>
                                 @endforeach
                             </div>
@@ -46,8 +46,8 @@ $role_permissions =  $role->permissions()->pluck('id')->toArray();
                             </div>
                         </div>
                     </form>
-                    <div class="mt-3" >
-                        <button type="submit" class="btn btn--danger h-45 w-100" data-bs-toggle="modal" data-bs-target="#delete_role">@lang('Delete')</button>
+                    <div class="mt-5" >
+                        <button type="submit" class="btn btn--danger h-45 w-10" data-bs-toggle="modal" data-bs-target="#delete_role">@lang('Delete')</button>
                     </div>
                 </div>
             </div>
@@ -64,7 +64,7 @@ $role_permissions =  $role->permissions()->pluck('id')->toArray();
                     <i class="las la-times"></i>
                 </button>
             </div>
-            <form action="{{ route('admin.employee.roles.delete', $role->id) }}" method="POST">
+            <form action="{{ route('admin.employees.roles.delete', $role->id) }}" method="POST">
                 @csrf
                 <div class="modal-body">
                     <div class="form-group">

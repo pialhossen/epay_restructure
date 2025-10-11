@@ -8,7 +8,7 @@
                     <h5 class="card-title mb-0">@lang('Change of') Role</h5>
                 </div>
                 <div class="card-body">
-                    <form action="{{ isset($user)? route('admin.employee.staffs.update', [$user->id]): route('admin.employee.staffs.store') }}" method="POST"
+                    <form action="{{ isset($user)? route('admin.employees.update', [$user->id]): route('admin.employees.store') }}" method="POST"
                         enctype="multipart/form-data" class="disableSubmission">
                         @csrf
                         <div class="row">
@@ -92,7 +92,7 @@
                     <h5 class="card-title mb-0">@lang('Change Staff Password')</h5>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('admin.employee.staffs.password', [$user->id]) }}" method="POST"
+                    <form action="{{ route('admin.employees.password', [$user->id]) }}" method="POST"
                         enctype="multipart/form-data" class="disableSubmission">
                         @csrf
                         <div class="row">
@@ -151,9 +151,9 @@
 <x-modals.permission />
 @endsection
 @push('breadcrumb-plugins')
-    <button data-bs-toggle="modal" data-bs-target="#addPermission" class="btn btn-sm btn-outline--primary">
+    <!-- <button data-bs-toggle="modal" data-bs-target="#addPermission" class="btn btn-sm btn-outline--primary">
         <i class="las la-plus-circle"></i>@lang('Create New Permission')
-    </button>
+    </button> -->
 @endpush
 
 @push('script')

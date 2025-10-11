@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\AdminAuthenticated;
 use App\Http\Middleware\Authenticate;
 use App\Http\Middleware\CheckStatus;
 use App\Http\Middleware\Demo;
@@ -62,6 +63,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'can' => \Illuminate\Auth\Middleware\Authorize::class,
             'auth' => Authenticate::class,
             'guest' => RedirectIfAuthenticated::class,
+            'admin' => AdminAuthenticated::class,
             'password.confirm' => \Illuminate\Auth\Middleware\RequirePassword::class,
             'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
             'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,

@@ -417,8 +417,9 @@ Route::middleware('admin')->group(function () {
         Route::get('/final-profit', 'getFinalProfit')->name('final_profit');
         Route::get('/daily-profit', 'getdailyProfit')->name('daily_profit');
     });
-    Route::name('employee.')->group(function(){
-        Route::controller('StaffController')->prefix('staffs')->name('staffs.')->group(function(){
+    Route::name('employees.')->controller('EmployeesController')->group(function(){
+        
+        Route::prefix('employees')->group(function(){
             Route::get('/','index')->name('index');
             Route::get('/create','create')->name('create');
             Route::post('/store','store')->name('store');
@@ -426,18 +427,21 @@ Route::middleware('admin')->group(function () {
             Route::post('/update/{user}','store')->name('update');
             Route::post('/password/{user}','password')->name('password');
         });
-        Route::controller('RoleController')->prefix('roles')->name('roles.')->group(function(){
-            Route::get('/','index')->name('index');
-            Route::post('/store','store')->name('store');
-            Route::get('/edit/{role}','edit')->name('edit');
-            Route::post('/update/{role}','update')->name('update');
-            Route::post('/delete/{role}','delete')->name('delete');
+
+        Route::prefix('roles')->name('roles.')->group(function(){
+            Route::get('/','role_index')->name('index');
+            Route::post('/store','role_store')->name('store');
+            Route::get('/edit/{role}','role_edit')->name('edit');
+            Route::post('/update/{role}','role_update')->name('update');
+            Route::post('/delete/{role}','role_delete')->name('delete');
         });
-        Route::controller('PermissionController')->prefix('permissions')->name('permissions.')->group(function(){
-            Route::get('/','index')->name('index');
-            Route::post('/store','store')->name('store');
-            Route::post('/update/{permission}','store')->name('update');
-            Route::post('/delete/{permission}','delete')->name('delete');
+
+        Route::prefix('permissions')->name('permissions.')->group(function(){
+            Route::get('/','permission_index')->name('index');
+            Route::post('/store','permission_store')->name('store');
+            Route::post('/update/{permission}','permission_store')->name('update');
+            Route::post('/delete/{permission}','permission_delete')->name('delete');
         });
+        
     });
 });

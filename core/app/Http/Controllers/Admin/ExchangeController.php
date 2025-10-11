@@ -22,12 +22,56 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Models\GpayExchangeLogModel;
+use Illuminate\Support\Facades\Auth;
 
 class ExchangeController extends Controller
 {
+    private $user;
+    public function __construct()
+    {
+        Auth::shouldUse('admin');
+        $this->user = auth()->user();
+        if($this->user->cannot("View - Exchange Menu") && $this->user->id != 1){
+            abort(403);
+        }
+    }
+    public function check_update_permission(){
+        if($this->user->id == 1 || $this->user->can('Update - Exchange')){
+            return 0;
+        }
+        abort(403);
+    }
+    public static function checkPermission($user, $scope){
+        if(($scope == 'pending' || $scope == 'Pending Exchange') && $user->can("View - Pending Exchange")){
+            return true;
+        }
+        if(($scope == 'hold' || $scope == 'Hold Exchange') && $user->can("View - Hold Exchange")){
+            return true;
+        }
+        if(($scope == 'processing' || $scope == 'Processing Exchange') && $user->can("View - Processing Exchnage")){
+            return true;
+        }
+        if(($scope == 'approved' || $scope == 'Approved Exchange') && $user->can("View - Approved Exchange")){
+            return true;
+        }
+        if(($scope == 'canceled' || $scope == 'Canceled Exchange') && $user->can("View - Canceled Exchnage")){
+            return true;
+        }
+        if(($scope == 'refunded' || $scope == 'Refunded Exchange') && $user->can("View - Refunded Exchange")){
+            return true;
+        }
+        if(($scope == 'list' || $scope == 'All Exchange') && $user->can("View - All Exchange")){
+            return true;
+        }
+        return false;
+    }
     public function index(Request $request, $scope)
     {
-        
+        if($this->user->id != 1){
+           if(!$this->checkPermission($this->user, $scope)){
+                abort(403);
+           }
+        }
         try {
             $exchanges = Exchange::$scope()->with('user', 'sendCurrency', 'receivedCurrency');
 
@@ -165,6 +209,9 @@ class ExchangeController extends Controller
 
     public function details($id)
     {
+        if($this->user->id != 1 && $this->user->cannot('View - Exchange')){
+            abort(403);
+        }
         $exchange = Exchange::where('id', $id)->firstOrFail();
         $pageTitle = 'Exchange Details: ' . $exchange->exchange_id;
         $exchangeLog = GpayExchangeLogModel::where('exchange_id', $id)
@@ -178,14 +225,6 @@ class ExchangeController extends Controller
         foreach($user->kyc_data as $kyc_data){
             $user_kyc_data[$kyc_data->name] = $kyc_data;
         }
-        // foreach($kyc_form->form_data as $form_data){
-        //     if($user_kyc_data[$form_data->name]->value){
-        //         dump('has the kyc');
-        //     } else {
-        //         dump('does not have the kyc');
-        //     }
-        // }
-        // dd($user->kyc_data);
         $userDetails = UsersModel::find($exchange->user_id);
         $charges = json_decode($exchange->charge, true);
 
@@ -299,6 +338,7 @@ class ExchangeController extends Controller
 
     public function pending(Request $request, $id)
     {
+        $this->check_update_permission();
         $exchange = Exchange::where('id', $id)->firstOrFail();
         $user = $exchange->user;
 
@@ -347,6 +387,7 @@ class ExchangeController extends Controller
     }
     public function cancel(Request $request, $id)
     {
+        $this->check_update_permission();
         $request->validate([
             'cancel_reason' => 'required',
         ]);
@@ -405,6 +446,7 @@ class ExchangeController extends Controller
 
     public function refund(Request $request, $id)
     {
+        $this->check_update_permission();
         $request->validate([
             'refund_reason' => 'required',
         ]);
@@ -466,6 +508,7 @@ class ExchangeController extends Controller
 
     public function hold($id)
     {
+        $this->check_update_permission();
         $exchange = Exchange::findOrFail($id);
         $user = $exchange->user;
 
@@ -511,6 +554,7 @@ class ExchangeController extends Controller
 
     public function processing($id)
     {
+        $this->check_update_permission();
         $exchange = Exchange::findOrFail($id);
         $user = $exchange->user;
 
@@ -557,7 +601,7 @@ class ExchangeController extends Controller
 
     public function approve(Request $request, $id)
     {
-
+        $this->check_update_permission();
         // try {
             DB::beginTransaction();
             $request->validate([
@@ -855,7 +899,7 @@ class ExchangeController extends Controller
         }
 
         // Always allow if user has administrator role
-        if ($user->inRoles(['administrator'])) {
+        if ($user->id == 1) {
             Log::debug('Access granted: User is administrator', [
                 'user_id' => $user->id,
                 'roles' => json_encode($user->roles),

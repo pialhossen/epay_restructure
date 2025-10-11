@@ -17,6 +17,10 @@ class SupportTicketController extends Controller
         $this->userType = 'admin';
         $this->column = 'admin_id';
         $this->user = auth()->guard('admin')->user();
+        $user = auth()->guard('admin')->user();
+        if($user->cannot("View - Support Ticket") && $user->id != 1){
+            abort(403);
+        }
     }
 
     public function tickets()
