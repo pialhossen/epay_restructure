@@ -565,7 +565,7 @@
                     "daily Profit / Loss",
                     "System"
                 ],
-                "title": "daily Profit / Loss",
+                "title": "Daily Profit / Loss",
                 "route_name": "admin.pos.daily_profit",
                 "menu_active": "admin.pos.daily_profit"
             }

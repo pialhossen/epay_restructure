@@ -142,9 +142,13 @@ class ExchangeController extends Controller
         
         $exchange->save();
         
-        // if ($exchange->sendCurrency->gateway_id != 0) {
-        //     return $this->createDeposit($exchange);
-        // }
+        if ($exchange->sendCurrency->gateway_id != 0) {
+            $exchange->transaction_type = 'EXCHANGE';
+            $exchange->save();
+            $currencyExchanger = new CurrencyExchanger;
+            $currencyExchanger->createOrUpdateExchange($exchange->id, true);
+            return $this->createDeposit($exchange);
+        }
         
         return redirect()->route('user.exchange.manual');
     }
@@ -348,7 +352,6 @@ class ExchangeController extends Controller
 
     private function createDeposit($exchange)
     {
-        
         $curSymbol = $exchange->sendCurrency->cur_sym;
         $code = $exchange->sendCurrency->gatewayCurrency->code;
         $gateway = GatewayCurrency::where('method_code', $code)->where('currency', $curSymbol)->first();
@@ -380,7 +383,6 @@ class ExchangeController extends Controller
 
         session()->put('Track', $deposit->trx);
         
-        dd('create Deposit');
         return redirect()->route('user.deposit.confirm');
     }
 

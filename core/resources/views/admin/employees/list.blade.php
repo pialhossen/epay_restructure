@@ -1,8 +1,14 @@
 @extends('admin.layouts.app')
 @push('breadcrumb-plugins')
+    @if(checkSpecificPermission('Create - Employees'))
     <a href="{{ route('admin.employees.create') }}" type="button" class="btn  btn-outline--primary h-45">
         <i class="las la-plus-circle"></i> @lang('Add New Staff')
     </a>
+    @else
+    <button type="button" class="btn  btn-outline--primary h-45" disabled>
+        <i class="las la-plus-circle"></i> @lang('Add New Staff')
+    </button>
+    @endif
 @endpush
 @section('panel')
 <style>
@@ -20,26 +26,32 @@
             </tr>
         </thead>
         <tbody id="customTableBody">
-            @forelse($staffs as $staff)
+            @forelse($employees as $employee)
                 <tr class="custom-row">
                     <td class="custom-fullname">
-                        <span class="fw-bold">{{$staff->name}}</span>
+                        <span class="fw-bold">{{$employee->name}}</span>
                         <br>
                         <span class="small">
-                            <a href="{{ route('admin.employees.edit', $staff->id) }}"><span>@</span>{{ $staff->username }}</a>
+                            <a href="{{ route('admin.employees.edit', $employee->id) }}"><span>@</span>{{ $employee->username }}</a>
                         </span>
                     </td>
                     <td class="custom-email-mobile">
-                        {{ $staff->email }}<br>
+                        {{ $employee->email }}<br>
                     </td>
                     <td>
                         address
                     </td>
                     <td>
                         <div class="button--group">
-                            <a href="{{ route('admin.employees.edit', $staff->id) }}" class="btn btn-sm btn-outline--primary">
+                            @if(checkSpecificPermission('Update - Employees'))
+                            <a href="{{ route('admin.employees.edit', $employee->id) }}" class="btn btn-sm btn-outline--primary">
                                 <i class="las la-desktop"></i> @lang('Details')
                             </a>
+                            @else
+                            <button class="btn btn-sm btn-outline--primary" disabled>
+                                <i class="las la-desktop"></i> @lang('Details')
+                            </button>
+                            @endif
                         </div>
                     </td>
                 </tr>
@@ -50,9 +62,9 @@
             @endforelse
         </tbody>
     </table>
-    {{-- @if ($staffs->hasPages())
+    @if ($employees->hasPages())
         <div class="card-footer py-4">
-            {{ paginateLinks($staffs) }}
+            {{ paginateLinks($employees) }}
         </div>
-    @endif --}} 
+    @endif
 @endsection

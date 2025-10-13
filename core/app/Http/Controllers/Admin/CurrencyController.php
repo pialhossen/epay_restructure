@@ -21,9 +21,7 @@ class CurrencyController extends Controller
     public function __construct()
     {
         $this->user = auth()->guard('admin')->user();
-        if($this->user->cannot("View - Currency") && $this->user->id != 1){
-            abort(403);
-        }
+        $this->check_permission('View - Currency');
     }
     public static function checkPermission($user, $scope){
         if($user->id == 1){
@@ -69,9 +67,7 @@ class CurrencyController extends Controller
 
     public function edit($id)
     {
-        if($this->user->cannot("View - Currency Details") && $this->user->id != 1){
-            abort(403);
-        }
+        $this->check_permission('View - Currency Details');
         $gateways = Gateway::automatic()->active()->latest()->get();
         $pageTitle = 'Edit Currency';
         $currency = Currency::where('id', $id)->with('userDetailsData', 'transactionProvedData')->firstOrFail();
@@ -82,13 +78,9 @@ class CurrencyController extends Controller
     public function save(Request $request, $id = 0)
     {
         if($id){
-            if($this->user->cannot("Update - Currency") && $this->user->id != 1){
-                abort(403);
-            }
+            $this->check_permission('Update - Currency');
         } else {
-            if($this->user->cannot("Create - Currency") && $this->user->id != 1){
-                abort(403);
-            }
+            $this->check_permission('Create - Currency');
         }
         $this->validation($request, $id);
         $currencySymbol = strtoupper($request->currency);
@@ -269,10 +261,8 @@ class CurrencyController extends Controller
 
     public function status($id)
     {
-        if($this->user->id == 1 || $this->user->can('View - Disable/Enable')){
-            return Currency::changeStatus($id);
-        }
-        abort(403);
+        $this->check_permission('View - Disable/Enable');
+        return Currency::changeStatus($id);
     }
 
     protected function validation($request, $id)
@@ -324,9 +314,7 @@ class CurrencyController extends Controller
 
     public function transactionProofForm($id)
     {
-        if($this->user->id != 1 || $this->user->cannot('View - Transaction Proof Form')){
-            abort(403);
-        }
+        $this->check_permission('View - Transaction Proof Form');
         $pageTitle = 'Transaction Proof Form';
         $currency = Currency::where('id', $id)->with('transactionProvedData')->firstOrFail();
         // dd($currency->transactionProvedData);
@@ -338,9 +326,7 @@ class CurrencyController extends Controller
 
     public function sendingForm($id)
     {
-        if($this->user->id != 1 || $this->user->cannot('View - Sending Form')){
-            abort(403);
-        }
+        $this->check_permission('View - Sending Form');
         $pageTitle = 'Sending Form';
         $currency = Currency::where('id', $id)->with('userDetailsData')->firstOrFail();
         $type = 'sending';

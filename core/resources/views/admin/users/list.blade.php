@@ -34,28 +34,7 @@
         <a href="{{ route('admin.users.active') }}" class="btn btn-sm btn-info">Reset</a>
     </form>
 
-    <div class="row pl-2 pb-2 ml-2">
-        <div class="col-lg-12">
-            <div class="">
-                <div class="p-0">
-                    @php
-                        $lastSegment = request()->segment(count(request()->segments()));
-                    @endphp
-                    <form class="m-2" action="{{ url()->full() }}" method="GET">
-                        <div class="row pb-2">
-                            <div class="col-1">
-                                <label for="exchange_id">Items Per Page</label>
-                                <input
-                                    value="{{ getPaginate(isset(request()->query()['itemsPerPage']) ? request()->query()['itemsPerPage'] : null) }}"
-                                    type="text" name="itemsPerPage" class="form-control">
-                                <button type="Submit" class="btn btn-sm btn-primary mt-2">Apply</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+    <x-item-per-page/>
 
 <style>
     td{

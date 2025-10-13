@@ -46,9 +46,11 @@ $role_permissions =  $role->permissions()->pluck('id')->toArray();
                             </div>
                         </div>
                     </form>
+                    @if(checkSpecificPermission('Delete - Roles')) 
                     <div class="mt-5" >
                         <button type="submit" class="btn btn--danger h-45 w-10" data-bs-toggle="modal" data-bs-target="#delete_role">@lang('Delete')</button>
                     </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -83,9 +85,15 @@ $role_permissions =  $role->permissions()->pluck('id')->toArray();
 <x-modals.permission />
 @endsection
 @push('breadcrumb-plugins')
+    @if(checkSpecificPermission('Create - Permissions')) 
     <button data-bs-toggle="modal" data-bs-target="#addPermission" class="btn btn-sm btn-outline--primary">
         <i class="las la-plus-circle"></i>@lang('Create New Permission')
     </button>
+    @else
+    <button class="btn btn-sm btn-outline--primary" disabled>
+        <i class="las la-plus-circle"></i>@lang('Create New Permission')
+    </button>
+    @endif
 @endpush
 
 @push('script')

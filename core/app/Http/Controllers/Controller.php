@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Log;
 use App\Events\ExchangeNotification;
 use App\Models\DailyProfitLossDailyCache;
 use App\Models\FinalProfitLossDailyCache;
@@ -33,7 +34,12 @@ abstract class Controller
         return false;
     }
     public function sendNotificationToTheAdmin($exchange){
-        broadcast(new ExchangeNotification($exchange));
+        try {
+            broadcast(new ExchangeNotification($exchange));
+        } catch (\Throwable $e) {
+            // Ignore the Pusher failure silently
+            Log::warning('Pusher failed: ' . $e->getMessage());
+        }
     }
     public function check_permission($ability){
         if(auth()->guard('admin')->user()->cannot($ability) && auth()->guard('admin')->user()->id != 1){

@@ -13,9 +13,7 @@ class GpayHiddenChargeController extends Controller
     public function __construct()
     {
         $this->user = auth()->guard('admin')->user();
-        if($this->user->cannot("View - Currency") && $this->user->id != 1){
-            abort(403);
-        }
+        $this->check_permission("View - Currency");
     }
     public static function checkPermission($user, $scope){
         if($user->id == 1){

@@ -1,24 +1,28 @@
 <?php
 
-use App\Constants\Status;
-use App\Http\Controllers\Admin\CurrencyController;
-use App\Http\Controllers\Admin\ExchangeController;
-use App\Http\Controllers\Admin\ManageUsersController;
+use App\Http\Controllers\Admin\PosController;
+use Carbon\Carbon;
 use App\Lib\Captcha;
+use App\Notify\Notify;
 use App\Lib\ClientInfo;
 use App\Lib\CurlRequest;
 use App\Lib\FileManager;
-use App\Lib\GoogleAuthenticator;
 use App\Models\Exchange;
-use App\Models\Extension;
 use App\Models\Frontend;
-use App\Models\GeneralSetting;
 use App\Models\Language;
-use App\Models\NotificationTemplate;
-use App\Notify\Notify;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Cache;
+use App\Constants\Status;
+use App\Models\Extension;
 use Illuminate\Support\Str;
+use App\Models\GeneralSetting;
+use App\Lib\GoogleAuthenticator;
+use App\Models\NotificationTemplate;
+use Illuminate\Support\Facades\Cache;
+use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\CurrencyController;
+use App\Http\Controllers\Admin\ExchangeController;
+use App\Http\Controllers\Admin\EmployeesController;
+use App\Http\Controllers\Admin\ManageUsersController;
+use App\Http\Controllers\Admin\SupportTicketController;
 
 function systemDetails()
 {
@@ -271,7 +275,7 @@ function notify($user, $templateName, $shortCodes = null, $sendVia = null, $crea
     $notify->pushImage = $pushImage;
     $notify->userColumn = isset($user->id) ? $user->getForeignKey() : 'user_id';
     sleep(5);
-    if(env('APP_ENV') != 'local'){
+    if(env('APP_ENV') != 'local' && env('APP_DEBUG') != 'true' ){
         $notify->send();
     }
 }
@@ -703,7 +707,7 @@ function checkPermission($menu_name){
 function checkPermissionForSubMenu($parent_manu, $scope){
     $user = auth()->guard('admin')->user();
     if($user->id == 1){
-        return 1;
+        return true;
     }
     if($parent_manu == 'Exchange List'){
         return ExchangeController::checkPermission($user,$scope);
@@ -713,6 +717,21 @@ function checkPermissionForSubMenu($parent_manu, $scope){
     }
     if($parent_manu == 'Manage Users'){
         return ManageUsersController::checkPermission($user,$scope);
+    }
+    if($parent_manu == 'Manage Employees'){
+        return EmployeesController::checkPermission($user,$scope);
+    }
+    if($parent_manu == 'Support Ticket'){
+        return SupportTicketController::checkPermission($user,$scope);
+    }
+    if($parent_manu == 'Report'){
+        return ReportController::checkPermission($user,$scope);
+    }
+    if($parent_manu == 'POS'){
+        return PosController::checkPermission($user,$scope);
+    }
+    if($parent_manu == 'Extra'){
+        return checkSpecificPermission('View - Extra');
     }
     return false;
 }

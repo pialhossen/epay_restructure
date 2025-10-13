@@ -16,15 +16,33 @@ use Illuminate\Support\Facades\DB;
 
 class ReportController extends Controller
 {
+    private $user;
     public function __construct()
     {
-        $user = auth()->guard('admin')->user();
-        if($user->cannot("View - Report") && $user->id != 1){
-            abort(403);
+        $this->user = auth()->guard('admin')->user();
+        $this->check_permission("View - Report");
+    }
+    public static function checkPermission($user, $scope){
+        if($scope == 'Transaction History' && $user->can("View - Transaction History")){
+            return true;
         }
+        if($scope == 'Referral Commission' && $user->can("View - Referral Commission")){
+            return true;
+        }
+        if($scope == 'Login History' && $user->can("View - Login History")){
+            return true;
+        }
+        if($scope == 'Notification History' && $user->can("View - Notification History")){
+            return true;
+        }
+        if($scope == 'Top 10 User' && $user->can("View - Top 10 User")){
+            return true;
+        }
+        return false;
     }
     public function transaction(Request $request, $userId = null)
     {
+        $this->checkPermission($this->user, 'Transaction History');
         $pageTitle = 'Transaction Logs';
 
         $remarks = Transaction::distinct('remark')->orderBy('remark')->get('remark');
@@ -40,6 +58,7 @@ class ReportController extends Controller
 
     public function exchangeDashboard(Request $request)
     {
+
         $pageTitle = 'Top 10 User';
 
         $currencies = Currency::all();
@@ -105,6 +124,7 @@ class ReportController extends Controller
 
     public function loginHistory(Request $request)
     {
+        $this->checkPermission($this->user, 'Login History');
         $pageTitle = 'User Login History';
         $loginLogs = UserLogin::orderBy('id', 'desc')->searchable(['user:username'])->dateFilter()->with('user')->paginate(getPaginate());
 
@@ -113,6 +133,7 @@ class ReportController extends Controller
 
     public function loginIpHistory($ip)
     {
+        $this->checkPermission($this->user, 'Login History');
         $pageTitle = 'Login by - ' . $ip;
         $loginLogs = UserLogin::where('user_ip', $ip)->orderBy('id', 'desc')->with('user')->paginate(getPaginate());
 
@@ -121,6 +142,7 @@ class ReportController extends Controller
 
     public function notificationHistory(Request $request)
     {
+        $this->checkPermission($this->user, 'Notification History');
         $pageTitle = 'Notification History';
         $logs = NotificationLog::orderBy('id', 'desc')->searchable(['user:username'])->dateFilter()->with('user')->paginate(getPaginate());
 
@@ -137,6 +159,7 @@ class ReportController extends Controller
 
     public function referralCommission()
     {
+        $this->checkPermission($this->user, 'Referral Commission');
         $pageTitle = 'Referral Commissions';
         $commissions = CommissionLog::orderBy('id', 'desc')->with('userTo', 'userFrom')->searchable(['userTo:username'])->paginate(getPaginate());
 

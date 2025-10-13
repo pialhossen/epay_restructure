@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers\User;
 
+use App\Models\Deposit;
 use App\Models\Currency;
 use App\Models\Exchange;
 use App\Constants\Status;
 use App\Lib\FormProcessor;
 use App\Models\Withdrawal;
 use Illuminate\Http\Request;
+use App\Lib\CurrencyExchanger;
+use App\Models\GatewayCurrency;
 use App\Traits\TransactionTrait;
 use App\Models\AdminNotification;
 use App\Http\Controllers\Controller;
@@ -144,6 +147,10 @@ class DepositController extends Controller
         $deposit->transaction_proof_data = $formValue;
         $deposit->save();
 
+        if ($deposit->sendCurrency->gateway_id != 0) {
+            return $this->createDeposit($deposit);
+        }
+
         $adminNotification = new AdminNotification;
         $adminNotification->user_id = $user->id;
         $adminNotification->title = 'New deposit request from '.$user->username;
@@ -155,6 +162,41 @@ class DepositController extends Controller
         $this->sendNotificationToTheAdmin($deposit);
 
         return redirect()->back()->withNotify($notify);
+    }
+    private function createDeposit($exchange)
+    {
+        $curSymbol = $exchange->sendCurrency->cur_sym;
+        $code = $exchange->sendCurrency->gatewayCurrency->code;
+        $gateway = GatewayCurrency::where('method_code', $code)->where('currency', $curSymbol)->first();
+
+        if (! $gateway) {
+            $notify[] = ['error', 'Something went the wrong with exchange processing'];
+
+            return back()->withNotify($notify);
+        }
+        $amount = $exchange->sending_amount + $exchange->sending_charge;
+
+        $deposit = new Deposit;
+        $deposit->user_id = auth()->id();
+        $deposit->method_code = $code;
+        $deposit->method_currency = strtoupper($curSymbol);
+        $deposit->amount = $amount;
+        $deposit->charge = $exchange->sending_charge;
+        $deposit->rate = $exchange->buy_rate;
+        $deposit->final_amount = $amount;
+        $deposit->btc_amount = 0;
+        $deposit->btc_wallet = '';
+        $deposit->trx = $exchange->exchange_id;
+        $deposit->try = 0;
+        $deposit->success_url = urlPath('user.exchange.list');
+        $deposit->failed_url = urlPath('user.exchange.list');
+        $deposit->status = 0;
+        $deposit->exchange_id = $exchange->id;
+        $deposit->save();
+
+        session()->put('Track', $deposit->trx);
+        
+        return redirect()->route('user.deposit.confirm');
     }
 
     public function currencyUserData($id)

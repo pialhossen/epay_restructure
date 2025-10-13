@@ -2,32 +2,37 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Exports\DailyProfitExport;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Controllers\Controller;
-use App\Models\FinalProfitLossDailyCache;
-use App\Schedules\DailyProfitLossCache;
+use App\Models\CurrencyReservedLog;
+use App\Exports\FinalProfitExport;
+use App\Exports\DailyProfitExport;
+use App\Exports\ProfitExport;
 use Illuminate\Http\Request;
+use App\Models\FinalProfit;
 use App\Models\Currency;
 use App\Models\Exchange;
 use App\Models\User;
-use App\Models\dailyprofitlog;
 use Carbon\Carbon;
 use Exception;
-use App\Exports\FinalProfitExport;
-use App\Exports\ProfitExport;
-use App\Models\CurrencyReservedLog;
-use App\Models\FinalProfit;
-use App\Models\GeneralSetting;
-use Maatwebsite\Excel\Facades\Excel;
 
 class PosController extends Controller
 {
-    
+    private $user;   
     public function __construct()
     {
-        $user = auth()->guard('admin')->user();
-        if($user->cannot("View - POS") && $user->id != 1){
-            abort(403);
+        $this->user = auth()->guard('admin')->user();
+        $this->check_permission("View - POS");
+    }
+    public static function checkPermission($user, $scope){
+        if($scope == 'Average Profit / Loss' && $user->can("View - Average Profit / Loss")){
+            return true;
+        }
+        if($scope == 'Final Profit / Loss' && $user->can("View - Final Profit / Loss")){
+            return true;
+        }
+        if($scope == 'Daily Profit / Loss' && $user->can("View - daily Profit / Loss")){
+            return true;
         }
     }
     public function index(Request $request)
@@ -46,6 +51,7 @@ class PosController extends Controller
                 $lastDay = Carbon::parse($request->created_from)->subDay()->format('Ymd');
 
                 if ($request->submit_button == 'DOWNLOAD') {
+                    $this->check_permission('Download - Pos Report');
                     $title = Carbon::now()->format('Ymd') . '_profit_report.xlsx';
                     return Excel::download(new ProfitExport($request), $title);
                 }
@@ -208,6 +214,7 @@ class PosController extends Controller
             }
 
             if ($request->submit_button == 'DOWNLOAD') {
+                $this->check_permission('Download - Pos Report');
                 $title = Carbon::now()->format('Ymd') . '_final_profit_report.xlsx';
                 return Excel::download(new FinalProfitExport($request), $title);
             }
@@ -369,6 +376,7 @@ class PosController extends Controller
             }
 
             if ($request->submit_button == 'DOWNLOAD') {
+                $this->check_permission('Download - Pos Report');
                 $title = Carbon::now()->format('Ymd') . '_final_profit_report.xlsx';
                 return Excel::download(new DailyProfitExport($request), $title);
             }

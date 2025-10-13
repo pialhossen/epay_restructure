@@ -27,7 +27,7 @@
                                            data-action="{{ route('admin.subscriber.remove',$subscriber->id) }}"
                                         >
                                             <i class="las la-trash"></i> @lang('Remove')
-                                    </button>
+                                        </button>
                                     </td>
                                 </tr>
                             @empty

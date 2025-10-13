@@ -35,15 +35,7 @@
                             <div class="card-header p-1 d-flex justify-content-end">
                                 <a href="{{ route('user.exchange.download_report', $scope) }}" class="btn btn-sm btn-success">Download</a>
                             </div>
-                            <div class="row" style="width: 100%;">
-                                <form class="m-2" action="{{ url()->full() }}" method="GET">
-                                    <div class="col-2">
-                                        <label for="exchange_id">Items Per Page</label>
-                                        <input value="{{ getPaginate( isset(request()->query()['itemsPerPage'])? request()->query()['itemsPerPage']: null ) }}" type="text" name="itemsPerPage" class="form-control mb-2">
-                                        <button type="Submit" class="btn btn-sm btn-primary">Apply</button>
-                                    </div>
-                                </form>
-                            </div>
+                            <x-item-per-page/>
                             <table class="table custom--table table-responsive--md data-table">
                                 <thead>
                                     <tr>

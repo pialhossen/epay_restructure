@@ -1,8 +1,14 @@
 @extends('admin.layouts.app')
 @push('breadcrumb-plugins')
+    @if(checkSpecificPermission('Create - Roles')) 
     <button data-bs-toggle="modal" data-bs-target="#addRole" type="button" class="btn  btn-outline--primary h-45">
         <i class="las la-plus-circle"></i> @lang('Add New Role')
     </button>
+    @else
+    <button type="button" class="btn  btn-outline--primary h-45" disabled>
+        <i class="las la-plus-circle"></i> @lang('Add New Role')
+    </button>
+    @endif
 @endpush
 @section('panel')
 <style>
@@ -29,10 +35,16 @@
                     </td>
                     <td>
                         <div class="button--group">
+                            @if(checkSpecificPermission('Update - Roles')) 
                             <a href="{{ route('admin.employees.roles.edit', $role->id) }}" class="btn btn-sm btn-outline--primary">
                                 <i class="las la-desktop"></i> @lang('Details')
                             </a>
-                        </div>
+                            @else
+                            <button class="btn btn-sm btn-outline--primary" disabled>
+                                <i class="las la-desktop"></i> @lang('Details')
+                            </button>
+                            @endif
+                        </>
                     </td>
                 </tr>
             @empty

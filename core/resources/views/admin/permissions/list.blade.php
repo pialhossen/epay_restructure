@@ -1,8 +1,14 @@
 @extends('admin.layouts.app')
 @push('breadcrumb-plugins')
-    <button data-bs-toggle="modal" data-bs-target="#addRole" type="button" class="btn  btn-outline--primary h-45">
+    @if(checkSpecificPermission('Create - Permissions')) 
+    <button data-bs-toggle="modal" data-bs-target="#addPermission" type="button" class="btn  btn-outline--primary h-45">
         <i class="las la-plus-circle"></i> @lang('Add New Permission')
     </button>
+    @else
+    <button type="button" class="btn  btn-outline--primary h-45" disabled>
+        <i class="las la-plus-circle"></i> @lang('Add New Permission')
+    </button>
+    @endif
 @endpush
 @section('panel')
 <style>
@@ -25,12 +31,25 @@
                     </td>
                     <td>
                         <div class="button--group">
+                            @if(checkSpecificPermission('Update - Permissions'))
                             <button data-bs-toggle="modal" data-bs-target="#edit_parmission_{{ $permission->id }}" class="btn btn-sm btn-outline--primary">
                                 <i class="las la-edit"></i> @lang('Edit')
                             </button>
+                            @else
+                            <button class="btn btn-sm btn-outline--primary" disabled>
+                                <i class="las la-edit"></i> @lang('Edit')
+                            </button>
+                            @endif
+
+                            @if(checkSpecificPermission('Delete - Permissions'))
                             <button data-bs-toggle="modal" data-bs-target="#delete_parmission_{{ $permission->id }}" class="btn btn-sm btn-outline--danger">
                                 <i class="las la-trash-alt"></i> @lang('Delete')
                             </button>
+                            @else
+                            <button class="btn btn-sm btn-outline--danger" disabled>
+                                <i class="las la-trash-alt"></i> @lang('Delete')
+                            </button>
+                            @endif
                         </div>
                     </td>
                 </tr>

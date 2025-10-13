@@ -3,7 +3,7 @@
     use App\Models\Permission;
     $permissions = Permission::with('childs')->whereNull('parent_id')->get();
 @endphp
-<div id="{{ $permission? "edit_parmission_".$permission->id: "addRole" }}" class="modal fade" tabindex="-1" role="dialog">
+<div id="{{ $permission? "edit_parmission_".$permission->id: "addPermission" }}" class="modal fade" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">

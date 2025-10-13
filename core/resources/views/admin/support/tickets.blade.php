@@ -37,10 +37,16 @@
                                         <td> @php echo $item->priorityBadge; @endphp </td>
                                         <td>{{ diffForHumans($item->last_reply) }}</td>
                                         <td>
+                                            @if(checkSpecificPermission('View - Ticket Details'))
                                             <a href="{{ route('admin.ticket.view', $item->id) }}"
                                                 class="btn btn-sm btn-outline--primary ms-1">
                                                 <i class="las la-desktop"></i> @lang('Details')
                                             </a>
+                                            @else
+                                            <button class="btn btn-sm btn-outline--primary ms-1" disabled>
+                                                <i class="las la-desktop"></i> @lang('Details')
+                                            </button>
+                                            @endif
                                         </td>
                                     </tr>
                                 @empty

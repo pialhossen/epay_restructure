@@ -425,6 +425,7 @@ Route::middleware('admin')->group(function () {
             Route::post('/store','store')->name('store');
             Route::get('/edit/{user}','edit')->name('edit');
             Route::post('/update/{user}','store')->name('update');
+            Route::post('/delete/{user}','delete')->name('delete');
             Route::post('/password/{user}','password')->name('password');
         });
 

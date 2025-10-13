@@ -118,12 +118,28 @@
                     </form>
                 </div>
             </div>
+            @if(checkSpecificPermission('Delete - Employees')) 
+            <div class="card mt-30">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">@lang('Delete This User')</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <button data-bs-toggle="modal" data-bs-target="#delete_employee" type="submit" class="btn btn--danger w-100 h-45">@lang('Delete User')
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
             @endif
         </div>
     </div>
+    
 
-
-<div id="delete_role" class="modal fade" tabindex="-1" role="dialog">
+@if(isset($user))
+<div id="delete_employee" class="modal fade" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -132,7 +148,7 @@
                     <i class="las la-times"></i>
                 </button>
             </div>
-            <form action="" method="POST">
+            <form action="{{ route('admin.employees.delete', [$user->id]) }}" method="POST" enctype="multipart/form-data" class="disableSubmission">
                 @csrf
                 <div class="modal-body">
                     <div class="form-group">
@@ -147,8 +163,8 @@
         </div>
     </div>
 </div>
+@endif
 
-<x-modals.permission />
 @endsection
 @push('breadcrumb-plugins')
     <!-- <button data-bs-toggle="modal" data-bs-target="#addPermission" class="btn btn-sm btn-outline--primary">

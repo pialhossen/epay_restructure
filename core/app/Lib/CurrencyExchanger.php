@@ -186,7 +186,6 @@ class CurrencyExchanger
         $receivingCharge = 0;
         $buy_charge_percent = 0;
         $buy_charge_fixed = 0;
-
         foreach ($buyCharges as $buyCharge) {
             $from = (float) $buyCharge->from;
             $to = (float) $buyCharge->to;

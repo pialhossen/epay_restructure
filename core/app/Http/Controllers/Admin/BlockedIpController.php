@@ -8,12 +8,11 @@ use Illuminate\Http\Request;
 
 class BlockedIpController extends Controller
 {
+    private $user;
     public function __construct()
     {
-        $user = auth()->guard('admin')->user();
-        if($user->cannot("View - IP Blocking") && $user->id != 1){
-            abort(403);
-        }
+        $this->user = auth()->guard('admin')->user();
+        $this->check_permission('View - IP Blocking');
     }
     public function blockedIpList()
     {

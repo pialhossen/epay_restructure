@@ -11,9 +11,7 @@ class SubscriberController extends Controller
     public function __construct()
     {
         $user = auth()->guard('admin')->user();
-        if($user->cannot("View - Subscribers") && $user->id != 1){
-            abort(403);
-        }
+        $this->check_permission('View - Subscribers');
     }
     public function index()
     {

@@ -13,12 +13,11 @@ use Illuminate\Support\Facades\Storage;
 
 class GeneralSettingController extends Controller
 {
+    private $user;
     public function __construct()
     {
-        $user = auth()->guard('admin')->user();
-        if($user->cannot("View - System Setting") && $user->id != 1){
-            abort(403);
-        }
+        $this->user = auth()->guard('admin')->user();
+        $this->check_permission("View - System Setting");
     }
     public function systemSetting()
     {

@@ -11,26 +11,7 @@
         form.submit()
     }
 </script>
-    <div class="row pl-2 pb-2 ml-2">
-        <div class="col-lg-12">
-            <div class="card">
-                <div class="card-body p-0">
-                    @php
-                    $lastSegment = request()->segment(count(request()->segments()));
-                    @endphp
-                    <form class="m-2" action="{{ url()->full() }}" method="GET">
-                        <div class="row pb-2">
-                            <div class="col-1">
-                                <label for="exchange_id">Items Per Page</label>
-                                <input value="{{ getPaginate( isset(request()->query()['itemsPerPage'])? request()->query()['itemsPerPage']: null ) }}" type="text" name="itemsPerPage" class="form-control">
-                                <button type="Submit" class="btn btn-sm btn-primary mt-2">Apply</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+    <x-item-per-page/>
     <div class="row">
         <div class="col-lg-12">
             <div class="card b-radius--10 ">
@@ -111,31 +92,31 @@
 
                                         <td> @php echo $currency->statusBadge; @endphp </td>
                                         <td>
-                                            @if(auth()->guard('admin')->user()->id == 1 || auth()->guard('admin')->user()->can('View - Currency Details') || auth()->guard('admin')->user()->can('View - Transaction Proof Form') || auth()->guard('admin')->user()->can('View - Sending Form') || auth()->guard('admin')->user()->can('View - Disable/Enable'))
+                                            @if(checkSpecificPermission('View - Currency Details') || checkSpecificPermission('View - Transaction Proof Form') || checkSpecificPermission('View - Sending Form') || checkSpecificPermission('View - Disable/Enable'))
                                             <button aria-expanded="false" class="btn btn-outline--primary btn-sm"
                                                 data-bs-toggle="dropdown" type="button">
                                                 <i class="las la-ellipsis-v"></i>@lang('More')
                                             </button>
                                             <div class="dropdown-menu">
-                                                @if(auth()->guard('admin')->user()->id == 1 || auth()->guard('admin')->user()->can('View - Currency Details'))
+                                                @if(checkSpecificPermission('View - Currency Details'))
                                                 <a href="{{ route('admin.currency.edit', $currency->id) }}"
                                                     class="dropdown-item">
                                                     <i class="la la-pencil"></i> @lang('Edit')
                                                 </a>
                                                 @endif
-                                                @if(auth()->guard('admin')->user()->id == 1 || auth()->guard('admin')->user()->can('View - Transaction Proof Form'))
+                                                @if(checkSpecificPermission('View - Transaction Proof Form'))
                                                 <a href="{{ route('admin.currency.transaction.proof.form', $currency->id) }}"
                                                 class="dropdown-item">
                                                     <i class="lab la-wpforms"></i> @lang('Transaction Proof Form')
                                                 </a>
                                                 @endif
-                                                @if(auth()->guard('admin')->user()->id == 1 || auth()->guard('admin')->user()->can('View - Sending Form'))
+                                                @if(checkSpecificPermission('View - Sending Form'))
                                                 <a href="{{ route('admin.currency.sending.form', $currency->id) }}"
                                                 class="dropdown-item">
                                                 <i class="las la-paste"></i> @lang('Sending Form')
                                                 </a>
                                                 @endif
-                                                @if(auth()->guard('admin')->user()->id == 1 || auth()->guard('admin')->user()->can('View - Disable/Enable'))
+                                                @if(checkSpecificPermission('View - Disable/Enable'))
                                                 @if ($currency->status == Status::DISABLE)
                                                 
                                                     <button class="dropdown-item confirmationBtn"

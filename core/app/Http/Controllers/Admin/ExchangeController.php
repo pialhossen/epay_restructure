@@ -31,9 +31,7 @@ class ExchangeController extends Controller
     {
         Auth::shouldUse('admin');
         $this->user = auth()->user();
-        if($this->user->cannot("View - Exchange Menu") && $this->user->id != 1){
-            abort(403);
-        }
+        $this->check_permission("View - Exchange Menu");
     }
     public function check_update_permission(){
         if($this->user->id == 1 || $this->user->can('Update - Exchange')){
@@ -104,6 +102,8 @@ class ExchangeController extends Controller
             if(request()->query('sort')){
                 [$column, $direction] = explode(':', request()->query('sort'));
                 $exchanges = $exchanges->orderBy($column, $direction); 
+            } else {
+                $exchanges = $exchanges->orderBy('created_at', 'desc'); 
             }
             $exchanges = $exchanges->paginate(getPaginate($request->itemsPerPage? $request->itemsPerPage: null ));
             $pageTitle = formateScope($scope) . ' Exchange';
@@ -209,9 +209,7 @@ class ExchangeController extends Controller
 
     public function details($id)
     {
-        if($this->user->id != 1 && $this->user->cannot('View - Exchange')){
-            abort(403);
-        }
+        $this->check_permission('View - Exchange');
         $exchange = Exchange::where('id', $id)->firstOrFail();
         $pageTitle = 'Exchange Details: ' . $exchange->exchange_id;
         $exchangeLog = GpayExchangeLogModel::where('exchange_id', $id)

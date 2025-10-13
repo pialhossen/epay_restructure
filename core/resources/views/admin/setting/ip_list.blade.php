@@ -96,7 +96,6 @@
 
 @push('breadcrumb-plugins')
     <x-search-form placeholder="IP Address" dateSearch='yes' />
-
     <button type="button" class="btn btn-sm btn-outline--primary float-end openForm h-45">
         <i class="la la-fw la-plus"></i>
         @lang('Add New')

@@ -23,9 +23,7 @@ class ManageUsersController extends Controller
     public function __construct()
     {
         $this->user = auth()->guard('admin')->user();
-        if($this->user->cannot("View - Manage Users") && $this->user->id != 1){
-            abort(403);
-        }
+        $this->check_permission('View - Manage Users');
     }
 
     public static function checkPermission($user, $scope){

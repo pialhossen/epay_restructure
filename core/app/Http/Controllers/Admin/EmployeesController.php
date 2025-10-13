@@ -16,29 +16,46 @@ class EmployeesController extends Controller
     public function __construct()
     {
         $user = auth()->guard('admin')->user();
-        if($user->cannot("View - Manage Employees") && $user->id != 1){
-            abort(403);
+        $this->check_permission("View - Manage Employees");
+    }
+    public static function checkPermission($user, $scope){
+        if($scope == 'Manage Employees' && $user->can("View - Employees List")){
+            return true;
+        }
+        if($scope == 'Manage Roles' && $user->can("View - Manage Roles")){
+            return true;
+        }
+        if($scope == 'Manage Permissions' && $user->can("View - Manage Permissions")){
+            return true;
         }
     }
     public function index(){
-        $pageTitle = 'All Staff';
-        $staffs = Admin::where('id', '!=','1')->get();
-        return view('admin.employees.list', compact('pageTitle','staffs'));
+        $this->check_permission('View - Employees List');
+        $pageTitle = 'All Employee';
+        $employees = Admin::where('id', '!=','1')->paginate(getPaginate());
+        return view('admin.employees.list', compact('pageTitle','employees'));
     }
     public function create(){
-        $pageTitle = 'Staff - Create';
+        $this->check_permission('Create - Employees');
+        $pageTitle = 'Employee - Create';
         $roles = Role::all();
         $currentRolesId = [];
         return view('admin.employees.form', compact('pageTitle', 'roles','currentRolesId'));
     }
     public function edit(Admin $user){
-        $pageTitle = 'Staff - Edit';
+        $this->check_permission('Update - Employees');
+        $pageTitle = 'Employee - Edit';
         $roles = Role::all();
         $currentRolesId = $user->roles->pluck('id')->toArray();
         return view('admin.employees.form', compact('pageTitle', 'user', 'roles','currentRolesId'));
     }
     public function store(Request $request, Admin $user = null)
     {
+        if($user){
+            $this->check_permission('Update - Employees');
+        } else {
+            $this->check_permission('Create - Employees');
+        }
         $routeName = $request->route()->getName();
         $validation_rules  = [
             'name' => ['required'],
@@ -78,13 +95,23 @@ class EmployeesController extends Controller
         $user->email = $request->email;
         $user->is_active = $request->is_active == '1'? 1: 0;
         $user->save();
-        $notify[] = ['success', 'Staff updated successfully'];
-
+        
         if($user_creating){
-            return redirect()->route('admin.employees.edit', $user->id)->withNotify($notify);
+            $notify[] = ['success', 'Employee created successfully'];
+            if(checkSpecificPermission('Update - Employees')){
+                return redirect()->route('admin.employees.edit', $user->id)->withNotify($notify);
+            }
+            return redirect()->route('admin.employees.index')->withNotify($notify);
         } else {
+            $notify[] = ['success', 'Employee updated successfully'];
             return back()->withNotify($notify);
         }
+    }
+    public function delete(Admin $user){
+        $this->check_permission('Delete - Employees');
+        $user->delete();
+        $notify[] = ['success', 'Employee updated successfully'];
+        return redirect()->route('admin.employees.index')->withNotify($notify);
     }
     public function password(Request $request, Admin $user){
         $request->validate([
@@ -93,17 +120,23 @@ class EmployeesController extends Controller
 
         $user->password = Hash::make($request->password);
         $user->save();
-        $notify[] = ['success', 'Staff password updated successfully'];
+        $notify[] = ['success', 'Employee password updated successfully'];
 
         return back()->withNotify($notify);
     }
     
     public function permission_index(){
+        $this->check_permission('View - Manage Permissions');
         $pageTitle = "All Permissions";
         $permissions = Permission::paginate(getPaginate());
         return view('admin.permissions.list', compact('permissions','pageTitle'));
     }
     public function permission_store(Request $request, Permission $permission = null){
+        if($permission){
+            $this->check_permission('Update - Permissions');
+        } else {
+            $this->check_permission('Create - Permissions');
+        }
         $request->validate([
             "name" => "required",
             "parent_id" => ["nullable","sometimes","exists:permissions,id"]
@@ -131,22 +164,26 @@ class EmployeesController extends Controller
         }
     }
     public function permission_delete(Permission $permission){
+        $this->check_permission('Delete - Permissions');
         $permission->delete();
         $notify[] = ['success', 'Permission Delete'];
         return redirect()->back()->withNotify($notify); 
     }
 
     public function role_index(){
+        $this->check_permission('View - Manage Roles');
         $pageTitle = 'All Roles';
         $roles = Role::all();
         return view('admin.roles.list', compact('pageTitle','roles'));
     }
     public function role_edit(Role $role){
+        $this->check_permission('Update - Roles');
         $pageTitle = "Edit - $role->name - Role";
         $permissions = Permission::with('childs')->whereNull('parent_id')->get();
         return view('admin.roles.form', compact('pageTitle','role','permissions'));
     }
     public function role_store(Request $request){
+        $this->check_permission('Create - Roles');
         $request->validate([
             "name" => "required"
         ]);
@@ -158,6 +195,7 @@ class EmployeesController extends Controller
         return redirect()->back()->withNotify($notify);    
     }
     public function role_update(Role $role,Request $request){
+        $this->check_permission('Update - Roles');
         $request->validate([
             "name" => "required"
         ]);
@@ -170,6 +208,7 @@ class EmployeesController extends Controller
         return redirect()->back()->withNotify($notify);
     }
     public function role_delete(Role $role){
+        $this->check_permission('Delete - Roles');
         $role->delete();
         $notify[] = ['success', 'Role Deleted'];
         return redirect()->route('admin.employees.roles.index')->withNotify($notify);

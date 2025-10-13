@@ -65,7 +65,9 @@
                             </div>
                         </div>
                         <button type="Submit" class="btn btn-sm btn-primary">Submit to View Profit</button>
+                        @if(checkSpecificPermission('Download - Pos Report'))
                         <button type="Submit" name="submit_button" class="btn btn-sm btn-success" value="DOWNLOAD">Download</button>
+                        @endif
                         <a href="{{ route('admin.pos.index') }}" class="btn btn-sm btn-info">Reset</a>
                     </form>
                 </div>
