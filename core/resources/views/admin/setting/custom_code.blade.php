@@ -4,7 +4,7 @@
       <div class="col-md-12 mb-30">
             <div class="card bl--5 border--primary">
                 <div class="card-body">
-                    <p class="text--primary">@lang('From this page, you can add/update Javascript for the user interface. Changing content on this page required programming knowledge.')</p>
+                    <p class="text--primary">@lang('From this page, you can add/update any vaid html code for the user interface to the header. Changing content on this page required programming knowledge.')</p>
                     <p class="text--warning">@lang('Please do not change/edit/add anything without having proper knowledge of it. The website may misbehave due to any mistake you have made.')</p>
                 </div>
             </div>
@@ -12,13 +12,13 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-header">
-                    <h6>@lang('Write Custom Javascript')</h6>
+                    <h6>@lang('Write Custom Code')</h6>
                 </div>
                 <form method="post" class="disableSubmission">
                     @csrf
                     <div class="card-body">
-                        <div class="form-group custom-css">
-                            <textarea class="form-control customJs" rows="10" name="css">{{ $fileContent }}</textarea>
+                        <div class="form-group custom-code">
+                            <textarea class="form-control customCode" rows="10" name="raw_code">{{ $fileContent }}</textarea>
                         </div>
                     </div>
                     <div class="card-footer">
@@ -40,7 +40,7 @@
     .CodeMirror-linenumbers{
       padding: 0 8px;
     }
-    .custom-css p, .custom-css li, .custom-css span{
+    .custom-code p, .custom-code li, .custom-code span{
       color: white;
     }
   </style>
@@ -57,7 +57,7 @@
 @push('script')
 <script>
     "use strict";
-    var editor = CodeMirror.fromTextArea(document.getElementsByClassName("customJs")[0], {
+    var editor = CodeMirror.fromTextArea(document.getElementsByClassName("customCode")[0], {
       lineNumbers: true,
       mode: "text/javascript",
       theme: "monokai",

@@ -404,9 +404,9 @@
         "icon": "lab la-css3-alt",
         "route_name": "admin.setting.custom.css"
     },
-    "custom_js": {
+    "custom_code": {
         "keyword": [
-            "custom JS",
+            "custom Code",
             "modify functionality",
             "frontend",
             "functionality",
@@ -416,10 +416,10 @@
             "frontend customization",
             "customize Javascript"
         ],
-        "title": "Custom Js",
-        "subtitle": "Write custom Javascript here to modify some functionality of frontend of the system if you need to.",
-        "icon": "lab la-js-square",
-        "route_name": "admin.setting.custom.js"
+        "title": "Custom Raw Code",
+        "subtitle": "Write custom Code here to modify some functionality of frontend of the system if you need to.",
+        "icon": "las la-code",
+        "route_name": "admin.setting.custom.code"
     },
     "sitemap": {
         "keyword": [

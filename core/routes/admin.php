@@ -177,8 +177,8 @@ Route::middleware('admin')->group(function () {
         Route::get('custom-css', 'customCss')->name('setting.custom.css');
         Route::post('custom-css', 'customCssSubmit');
         
-        Route::get('custom-js', 'customJs')->name('setting.custom.js');
-        Route::post('custom-js', 'customJsSubmit');
+        Route::get('custom-raw-code', 'customCode')->name('setting.custom.code');
+        Route::post('custom-raw-code', 'customCodeSubmit');
 
         // Custom Javascript
         // Route::get('custom-javascript', 'customJavascript')->name('setting.custom.javascript');

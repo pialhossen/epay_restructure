@@ -201,25 +201,41 @@ class GeneralSettingController extends Controller
         return back()->withNotify($notify);
     }
 
-    public function customJs()
+    public function customCode()
     {
-        $pageTitle = 'Custom JS';
-        $file = activeTemplate(true).'js/custom.js';
-        $fileContent = @file_get_contents($file);
+        $pageTitle = 'Custom Blade File';
+        $path = public_path('core/resources/views/components/custom/custom.blade.php');
 
-        return view('admin.setting.custom_js', compact('pageTitle', 'fileContent'));
-    }
-    public function customJsSubmit(Request $request)
-    {
-        $file = public_path(activeTemplate(true).'js/custom.js');
-        if (! file_exists($file)) {
-            fopen($file, 'w');
+        // Ensure file exists (optional auto-create)
+        if (!file_exists($path)) {
+            $dir = dirname($path);
+            if (!is_dir($dir)) {
+                mkdir($dir, 0755, true); // create directory if missing
+            }
+
+            file_put_contents($path, '<!-- Custom Blade Component -->');
         }
-        file_put_contents($file, $request->css);
-        $notify[] = ['success', 'Javascript updated successfully'];
 
+        // Read the file content
+        $fileContent = file_get_contents($path);
+
+        return view('admin.setting.custom_code', compact('pageTitle', 'fileContent'));
+    }
+    public function customCodeSubmit(Request $request)
+    {
+        $path = public_path('core/resources/views/components/custom/custom.blade.php');
+
+        $dir = dirname($path);
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        file_put_contents($path, $request->raw_code);
+
+        $notify[] = ['success', 'Custom code updated successfully'];
         return back()->withNotify($notify);
     }
+
 
     public function sitemap()
     {

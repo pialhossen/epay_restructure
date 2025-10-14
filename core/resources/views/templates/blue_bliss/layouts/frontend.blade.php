@@ -19,7 +19,13 @@
     <link rel="stylesheet" href="{{ asset($activeTemplateTrue . 'css/main.css') }}">
     <link rel="stylesheet" href="{{ asset($activeTemplateTrue . 'css/custom.css') }}">
 
+    @php
+        $customView = 'components.custom.custom';
+    @endphp
 
+    @if (View::exists($customView))
+        <x-custom.custom />
+    @endif
 
 
 
