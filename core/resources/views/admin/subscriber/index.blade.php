@@ -20,7 +20,7 @@
                             @forelse($subscribers as $subscriber)
                                 <tr>
                                     <td>{{ $subscriber->email }}</td>
-                                    <td>{{ showDateTime($subscriber->created_at) }}</td>
+                                    <td>{{ $subscriber->created_at->format('d/m/y h:i:s A') }}</td>
                                     <td>
                                         <button class="btn btn-sm btn-outline--danger confirmationBtn"
                                            data-question="@lang('Are you sure to remove this subscriber?')"

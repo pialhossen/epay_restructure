@@ -413,7 +413,7 @@
                         <li class="list-group-item d-flex justify-content-between flex-wrap">
                             <span class="fw-bold"> @lang('Exchange Time')</span>
                             <div class="text-end">
-                                <span class="d-block">{{ showDateTime($exchange->created_at) }}</span>
+                                <span class="d-block">{{ $exchange->created_at->format('d/m/y h:i:s A') }}</span>
                                 <span> {{ diffForHumans($exchange->created_at) }}</span>
                             </div>
                         </li>

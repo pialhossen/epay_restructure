@@ -29,7 +29,7 @@
                                             </span>
                                         </td>
                                         <td>
-                                            {{ showDateTime($log->created_at) }} <br> {{ diffForHumans($log->created_at) }}
+                                            {{ $log->created_at->format('d/m/y h:i:s A') }} <br> {{ diffForHumans($log->created_at) }}
                                         </td>
                                         <td>
                                             <span class="fw-bold">

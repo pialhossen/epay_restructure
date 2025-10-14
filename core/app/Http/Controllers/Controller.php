@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use App\Events\ExchangeNotification;
 use App\Models\DailyProfitLossDailyCache;
@@ -12,7 +13,7 @@ abstract class Controller
     public function __construct()
     {
         $className = get_called_class();
-
+        // dump(Carbon::now()->format('d/m/y h:i:s A'));
     }
 
     public static function middleware()

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -59,6 +60,12 @@ class LoginController extends Controller
 
     public function login(Request $request)
     {
+        $user = Admin::where('username', $request->username)->where('id', '!=', 1)->first();
+        if($user && !$user->is_active){
+            $this->incrementLoginAttempts($request);
+            $notify[] = ['error', 'This admin account is not yet activated'];
+            return back()->withNotify($notify);
+        }
         $this->validateLogin($request);
 
         $request->session()->regenerateToken();
@@ -99,8 +106,8 @@ class LoginController extends Controller
 
     public function logout(Request $request)
     {
-        $this->guard('web')->logout();
-        //$request->session()->invalidate();
+        auth()->guard('admin')->logout();
+        $request->session()->invalidate();
 
         return $this->loggedOut($request) ?: redirect($this->redirectTo);
     }

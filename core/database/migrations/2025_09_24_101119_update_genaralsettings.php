@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::table('general_settings', function (Blueprint $table) {
             $table->text('exchange_notification')->nullable();
+            $table->integer('exchange_lock_time')->nullable();
         });
     }
     
@@ -23,6 +24,7 @@ return new class extends Migration
     {
         Schema::table('general_settings', function (Blueprint $table) {
             $table->dropColumn('exchange_notification');
+            $table->dropColumn('exchange_lock_time');
         });
     }
 };

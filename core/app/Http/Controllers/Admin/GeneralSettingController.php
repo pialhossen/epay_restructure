@@ -50,6 +50,7 @@ class GeneralSettingController extends Controller
             'first_exchange_bonus_percentage' => 'required|min:0',
             'exchange_auto_cancel_time' => 'required|gt:0',
             'register_bonus_amount' => 'required|numeric:gte:0',
+            'exchange_lock_time' => 'required|numeric:gte:0',
         ]);
         
 
@@ -79,6 +80,7 @@ class GeneralSettingController extends Controller
         $general->first_exchange_bonus_percentage = $request->first_exchange_bonus_percentage;
         $general->exchange_auto_cancel_time = $request->exchange_auto_cancel_time;
         $general->register_bonus_amount = $request->register_bonus_amount;
+        $general->exchange_lock_time = $request->exchange_lock_time;
         $general->save();
 
         $timezoneFile = config_path('timezone.php');

@@ -75,7 +75,7 @@
                                         <td>{{ $exchange->sendCurrency->name }} {{ $exchange->sendCurrency->cur_sym }}
                                         </td>
                                         <td>{{ showAmount($exchange->sending_amount) }}</td>
-                                        <td>{{ showDateTime($exchange->created_at) }}</td>
+                                        <td>{{ $exchange->created_at->format('d/m/y h:i:s A') }}</td>
                                     </tr>
                                 @empty
                                     <tr>

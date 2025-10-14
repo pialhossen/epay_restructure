@@ -35,15 +35,15 @@
                     @endphp
                     <form class="m-2" action="{{ route('admin.exchange.list', $lastSegment) }}" method="GET">
                         <div class="row pb-2">
-                            <div class="col-3">
+                            <div class="col-lg-3 col-md-6 col-12">
                                 <label for="exchange_id">Exchange ID</label>
                                 <input @if($request->exchange_id) value="{{ $request->exchange_id }}" @endif type="text" name="exchange_id" class="form-control">
                             </div>
-                            <div class="col-3">
+                            <div class="col-lg-3 col-md-6 col-12">
                                 <label for="email">Email / Username</label>
                                 <input @if($request->email) value="{{ $request->email }}" @endif type="text" name="email" class="form-control">
                             </div>
-                            <div class="col-3">
+                            <div class="col-lg-3 col-md-6 col-12">
                                 <label for="transaction_type">Transaction Type</label>
                                 <select name="transaction_type[]" id="transaction_type" class="form-control select2" multiple="multiple">
                                     <option value="EXCHANGE" @if($request->transaction_type == 'EXCHANGE') selected @endif>EXCHANGE</option>
@@ -51,7 +51,7 @@
                                     <option value="WITHDRAW" @if($request->transaction_type == 'WITHDRAW') selected @endif>WITHDRAW</option>
                                 </select>
                             </div>
-                            <div class="col-3">
+                            <div class="col-lg-3 col-md-6 col-12">
                                 @php
                                     $send_old = isset(request()->query()['send_currency_id'])? request()->query()['send_currency_id']: [];
                                 @endphp
@@ -62,7 +62,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-3">
+                            <div class="col-lg-3 col-md-6 col-12">
                                 @php
                                     $receive_old = isset(request()->query()['receive_currency_id'])? request()->query()['receive_currency_id']: [];
                                 @endphp
@@ -73,11 +73,11 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-3">
+                            <div class="col-lg-3 col-md-6 col-12">
                                 <label for="created_from">Created From</label>
                                 <input @if($request->created_from) value="{{ $request->created_from }}" @endif type="date" name="created_from" class="form-control">
                             </div>
-                            <div class="col-3">
+                            <div class="col-lg-3 col-md-6 col-12">
                                 <label for="created_to">Created To</label>
                                 <input @if($request->created_to) value="{{ $request->created_to }}" @endif type="date" name="created_to" class="form-control">
                             </div>
@@ -164,7 +164,7 @@
                                         <td>
                                             <span class="fw-bold">{{ $exchange->exchange_id }}</span>
                                             <br>
-                                            <small class="text-muted">{{ showDateTime($exchange->created_at) }}</small>
+                                            <small class="text-muted">{{ $exchange->created_at->format('d/m/y h:i:s A') }}</small>
                                         </td>
                                         <td>
                                             <span class="d-block">{{ __(@$exchange->user->fullname) }}</span>
@@ -225,8 +225,8 @@
                                             $user = AdminUserModel::find($exchange->updated_by);
                                         @endphp
                                         <td> {{ $user? $user->name: "" }} </td>
-                                        <td> {{ $exchange->created_at->diffForhumans() }} </td>
-                                        <td> {{ $exchange->updated_at->diffForhumans() }} </td>
+                                        <td> {{ $exchange->created_at->format('d/m/y h:i:s A') }} </td>
+                                        <td> {{ $exchange->updated_at->format('d/m/y h:i:s A') }} </td>
                                         <td class="sticky-col" style="background: white;">
                                             @if(checkSpecificPermission('View - Exchange'))
                                             <a href="{{ route('admin.exchange.details', $exchange->id) }}"

@@ -55,6 +55,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\LanguageMiddleware::class,
             \App\Http\Middleware\ActiveTemplateMiddleware::class,
             \App\Http\Middleware\BlockIpMiddleware::class,
+            \App\Http\Middleware\Adminlockout::class,
         ]);
 
         $middleware->alias([

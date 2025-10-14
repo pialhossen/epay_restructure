@@ -17,6 +17,7 @@ class Exchange extends Model
         'user_data' => 'object',
         'transaction_proof_data' => 'object',
         'charge' => 'object',
+        'status_at' => 'datetime',
     ];
 
     public function user()

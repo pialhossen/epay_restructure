@@ -71,7 +71,7 @@
                                         </td>
 
                                         <td>
-                                            {{ showDateTime($trx->created_at) }}<br>{{ diffForHumans($trx->created_at) }}
+                                            {{ $trx->created_at->format('d/m/y h:i:s A') }}<br>{{ diffForHumans($trx->created_at) }}
                                         </td>
 
                                         <td class="budget">

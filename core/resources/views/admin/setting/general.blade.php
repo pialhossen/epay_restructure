@@ -100,6 +100,15 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="col-sm-6 col-md-4">
+                                <div class="form-group ">
+                                    <label>@lang('Exchange Update Timeout (Hour)')</label>
+                                    <div class="input-group">
+                                        <input class="form-control" type="number" step="any" name="exchange_lock_time" required
+                                               value="{{ getAmount(gs('exchange_lock_time')) }}">
+                                    </div>
+                                </div>
+                            </div>
                             <div class="col-sm-6 col-md-6">
                                 <div class="form-group ">
                                     <label>@lang('Exchange Alert Notification')</label>

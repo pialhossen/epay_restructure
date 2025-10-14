@@ -419,6 +419,7 @@ class ManageUsersController extends Controller
 
     public function login($id)
     {
+        $this->check_permission('View - Login As User');
         $user = \App\Models\User::find($id);
         if ($user) {
             Auth::guard('web')->login($user);
@@ -426,10 +427,6 @@ class ManageUsersController extends Controller
         } else {
             Log::error("User with ID {$id} not found.");
         }
-        //        Log::info('User login as id : '.$id);
-//        Auth::loginUsingId($id);
-//        Log::info('User login as id : '.json_encode(Auth::loginUsingId($id)));
-//        Log::info('User login as id  auth users: '.json_encode(Auth::user()));
         return to_route('user.home');
     }
 

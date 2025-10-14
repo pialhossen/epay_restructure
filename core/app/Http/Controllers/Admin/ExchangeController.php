@@ -39,6 +39,15 @@ class ExchangeController extends Controller
         }
         abort(403);
     }
+    public function check_exchnage_updated_at($exchange){
+        if(auth()->guard('admin')->user()->id == 1){
+            return false;
+        }
+        if($exchange->status_at && $exchange->status_at->diffInMinutes(now()) >= (60 * gs('exchange_lock_time'))){
+            return true;
+        }
+        return false;
+    }
     public static function checkPermission($user, $scope){
         if(($scope == 'pending' || $scope == 'Pending Exchange') && $user->can("View - Pending Exchange")){
             return true;
@@ -338,6 +347,12 @@ class ExchangeController extends Controller
     {
         $this->check_update_permission();
         $exchange = Exchange::where('id', $id)->firstOrFail();
+
+        if($this->check_exchnage_updated_at($exchange)){
+            $notify[] = ['error', 'This order has been locked as it was last updated more than 1 hours ago.'];
+            return back()->withNotify($notify);
+        }
+
         $user = $exchange->user;
 
         if ($exchange->status == Status::EXCHANGE_PENDING) {
@@ -355,6 +370,7 @@ class ExchangeController extends Controller
         $exchange->admin_feedback = $request->cancel_reason;
         $exchange->status = Status::EXCHANGE_PENDING;
         $exchange->updated_by = auth()->user()->id;
+        $exchange->status_at = now();
         $exchange->save();
 
         if($exchange->transaction_type == 'WITHDRAW' && ($previous_status == Status::EXCHANGE_CANCEL || $previous_status == Status::EXCHANGE_REFUND)){
@@ -391,6 +407,10 @@ class ExchangeController extends Controller
         ]);
 
         $exchange = Exchange::where('id', $id)->firstOrFail();
+        if($this->check_exchnage_updated_at($exchange)){
+            $notify[] = ['error', 'This order has been locked as it was last updated more than 1 hours ago.'];
+            return back()->withNotify($notify);
+        }
         $user = $exchange->user;
 
         if (!$this->canBeModifiedByCurrentUser($exchange)) {
@@ -413,6 +433,7 @@ class ExchangeController extends Controller
         $exchange->admin_feedback = $request->cancel_reason;
         $exchange->status = Status::EXCHANGE_CANCEL;
         $exchange->updated_by = auth()->user()->id;
+        $exchange->status_at = now();
         $exchange->save();
 
         if($exchange->transaction_type == 'WITHDRAW' && $previous_status != Status::EXCHANGE_REFUND){
@@ -450,6 +471,10 @@ class ExchangeController extends Controller
         ]);
 
         $exchange = Exchange::where('id', $id)->firstOrFail();
+        if($this->check_exchnage_updated_at($exchange)){
+            $notify[] = ['error', 'This order has been locked as it was last updated more than 1 hours ago.'];
+            return back()->withNotify($notify);
+        }
         $user = $exchange->user;
         if (!$this->canBeModifiedByCurrentUser($exchange)) {
             $notify[] = ['error', 'Only admin can modify after 30 minutes.'];
@@ -470,6 +495,7 @@ class ExchangeController extends Controller
         $exchange->admin_feedback = $request->refund_reason;
         $exchange->status = Status::EXCHANGE_REFUND;
         $exchange->updated_by = auth()->user()->id;
+        $exchange->status_at = now();
         $exchange->save();
 
         if($exchange->transaction_type == 'WITHDRAW' && $previous_status != Status::EXCHANGE_CANCEL){
@@ -508,6 +534,10 @@ class ExchangeController extends Controller
     {
         $this->check_update_permission();
         $exchange = Exchange::findOrFail($id);
+        if($this->check_exchnage_updated_at($exchange)){
+            $notify[] = ['error', 'This order has been locked as it was last updated more than 1 hours ago.'];
+            return back()->withNotify($notify);
+        }
         $user = $exchange->user;
 
         if ($exchange->status == Status::EXCHANGE_HOLD) {
@@ -525,6 +555,7 @@ class ExchangeController extends Controller
         $exchange->status = Status::EXCHANGE_HOLD;
         $exchange->admin_feedback = 'Marked as Hold by Admin';
         $exchange->updated_by = auth()->user()->id;
+        $exchange->status_at = now();
         $exchange->save();
 
 
@@ -554,6 +585,10 @@ class ExchangeController extends Controller
     {
         $this->check_update_permission();
         $exchange = Exchange::findOrFail($id);
+        if($this->check_exchnage_updated_at($exchange)){
+            $notify[] = ['error', 'This order has been locked as it was last updated more than 1 hours ago.'];
+            return back()->withNotify($notify);
+        }
         $user = $exchange->user;
 
         if ($exchange->status == Status::EXCHANGE_PROCESSING) {
@@ -571,6 +606,7 @@ class ExchangeController extends Controller
         $exchange->status = Status::EXCHANGE_PROCESSING;
         $exchange->admin_feedback = 'Marked as Processing by Admin';
         $exchange->updated_by = auth()->user()->id;
+        $exchange->status_at = now();
         $exchange->save();
 
         if($exchange->transaction_type == 'WITHDRAW' && ($previous_status == Status::EXCHANGE_CANCEL || $previous_status == Status::EXCHANGE_REFUND)){
@@ -607,6 +643,10 @@ class ExchangeController extends Controller
             ]);
 
             $exchange = Exchange::with("sendCurrency","receivedCurrency")->where('id', $id)->first();
+            if($this->check_exchnage_updated_at($exchange)){
+                $notify[] = ['error', 'This order has been locked as it was last updated more than 1 hours ago.'];
+                return back()->withNotify($notify);
+            }
             $finalReceivingAmount = $exchange->receiving_amount;
             $appliedHiddenCharge = 0;
             $hiddenCharges = \App\Models\GpayHiddenChargeModel::where('currency_id', $exchange->receive_currency_id)->get();
@@ -649,6 +689,7 @@ class ExchangeController extends Controller
             // Approve exchange
             $exchange->status = Status::EXCHANGE_APPROVED;
             $exchange->admin_trx_no = $request->transaction;
+            $exchange->status_at = now();
 
             $exchange->save();
 

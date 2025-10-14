@@ -42,7 +42,7 @@
                                             @endif
                                         </td>
 
-                                        <td>{{ $review->created_at ? $review->created_at->format('Y-m-d H:i') : '-' }}</td>
+                                        <td>{{ $review->created_at ? $review->created_at->format('d/m/y h:i:s A'): '-' }}</td>
                                     </tr>
                                 @empty
                                     <tr>

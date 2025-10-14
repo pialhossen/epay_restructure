@@ -1494,6 +1494,9 @@ a {
 /* button css start */
 .button--group {
     margin: -5px -15px;
+    display: flex;
+    flex-direction: row-reverse;
+    flex-wrap: wrap;
   }
   
   .button--group .btn {
@@ -3416,6 +3419,7 @@ select:focus-within {
   padding: 15px 25px;
   vertical-align: middle;
   white-space: nowrap;
+  
 }
 
 .white-space-wrap {
@@ -3872,6 +3876,9 @@ table.table--light.style--two tbody td {
   .table-responsive--md tbody tr:nth-child(odd) {
     background-color: #e2e2e233;
   }
+  .customTableBody .custom-row{
+    border-bottom: 5px solid red;
+  }
 
   .table-responsive--md tbody tr:nth-child(odd) td {
     border-top: 1px solid #10163a17;
@@ -3884,7 +3891,7 @@ table.table--light.style--two tbody td {
   .table-responsive--md tr th,
   .table-responsive--md tr td {
     display: block;
-    padding-left: 45% !important;
+    min-width: 100%;
     text-align: right !important;
   }
 
