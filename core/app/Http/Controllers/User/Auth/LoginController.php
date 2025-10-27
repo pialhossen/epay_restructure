@@ -133,8 +133,10 @@ class LoginController extends Controller
         $redirection = Intended::getRedirection();
         if ($redirection) {
             $currencyExchanger = session()->get('exchange_data');
-            session()->forget('exchange_data');
-            $currencyExchanger->createOrUpdateExchange();
+            if($currencyExchanger){
+                session()->forget('exchange_data');
+                $currencyExchanger->createOrUpdateExchange();
+            }
         }
 
         return $redirection ? $redirection : to_route('user.home');

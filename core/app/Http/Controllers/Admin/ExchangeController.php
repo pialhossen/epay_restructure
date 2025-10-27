@@ -229,8 +229,10 @@ class ExchangeController extends Controller
         $kyc_form = Form::where('act', 'kyc')->first();
         $user = $exchange->user;
         $user_kyc_data = [];
-        foreach($user->kyc_data as $kyc_data){
-            $user_kyc_data[$kyc_data->name] = $kyc_data;
+        if($user->kyc_data){
+            foreach($user->kyc_data as $kyc_data){
+                $user_kyc_data[$kyc_data->name] = $kyc_data;
+            }
         }
         $userDetails = UsersModel::find($exchange->user_id);
         $charges = json_decode($exchange->charge, true);

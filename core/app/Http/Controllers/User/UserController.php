@@ -37,8 +37,6 @@ class UserController extends Controller
         $tickets['answer'] = SupportTicket::where('user_id', $user->id)->where('status', Status::TICKET_ANSWER)->count();
         $tickets['reply'] = SupportTicket::where('user_id', $user->id)->where('status', Status::TICKET_REPLY)->count();
 
-        // $this->sendNotificationToTheAdmin(['id' => 1]);
-
         return view('Template::user.dashboard', compact('pageTitle', 'user', 'exchange', 'latestExchange', 'tickets', 'totalTransaction'));
     }
 
@@ -181,13 +179,22 @@ class UserController extends Controller
         $mobileCodes = implode(',', array_column($countryData, 'dial_code'));
         $countries = implode(',', array_column($countryData, 'country'));
 
-        $request->validate([
+        $validation_rules = [
             'country_code' => 'required|in:'.$countryCodes,
             'country' => 'required|in:'.$countries,
             'mobile_code' => 'required|in:'.$mobileCodes,
-            'username' => 'required|unique:users|min:6',
+            'username' => ["required", "min:6"],
             'mobile' => ['required', 'regex:/^([0-9]*)$/', Rule::unique('users')->where('dial_code', $request->mobile_code)],
-        ]);
+        ];
+
+        if($user->username != $request->username){
+            $validation_rules['username'][] = "unique:users";
+        }
+        if($user->mobile != $request->mobile){
+            $validation_rules['mobile'][] = Rule::unique('users')->where('dial_code', $request->mobile_code);
+        }
+
+        $request->validate($validation_rules);
 
         if (preg_match('/[^a-z0-9_]/', trim($request->username))) {
             $notify[] = ['info', 'Username can contain only small letters, numbers and underscore.'];

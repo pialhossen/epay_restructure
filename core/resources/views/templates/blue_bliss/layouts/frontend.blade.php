@@ -135,7 +135,8 @@
                 }
             });
         })(jQuery);
-    </script>
+
+        </script>
 </body>
 
 </html>

@@ -41,7 +41,7 @@
                         @if(checkSpecificPermission('Download - Pos Report'))
                         <button type="Submit" name="submit_button" class="btn btn-sm btn-success" value="DOWNLOAD">Download</button>
                         @endif
-                        <a href="{{ route('admin.pos.final_profit') }}" class="btn btn-sm btn-info">Reset</a>
+                        <a href="{{ url()->current() }}" class="btn btn-sm btn-info">Reset</a>
                     </form>
                 </div>
             </div>

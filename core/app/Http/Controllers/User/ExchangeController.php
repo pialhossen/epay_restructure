@@ -227,7 +227,7 @@ class ExchangeController extends Controller
         return redirect()->route('user.exchange.details', $exchange->exchange_id)->withNotify($notify);
     }
 
-    public function list($scope = 'list')
+    public function list(Request $request, $scope = 'list')
     {
         try {
             $exchanges = Exchange::query();
@@ -247,6 +247,25 @@ class ExchangeController extends Controller
                 $exchanges = $exchanges->where('status', Status::EXCHANGE_CANCEL);
             }
 
+            if($request->exchange_id){
+                $exchanges = $exchanges->where('exchange_id', $request->exchange_id);
+            }
+            if($request->transaction_type){
+                $exchanges = $exchanges->where('transaction_type', $request->transaction_type);
+            }
+            if($request->send_currency_id){
+                $exchanges = $exchanges->whereIn('send_currency_id', $request->send_currency_id);
+            }
+            if($request->receive_currency_id){
+                $exchanges = $exchanges->whereIn('receive_currency_id', $request->receive_currency_id);
+            }
+            if ($request->created_from && $request->created_to) {
+                $exchanges = $exchanges->whereBetween('created_at', [
+                    date('Y-m-d 00:00:00', strtotime($request->created_from)),
+                    date('Y-m-d 23:59:59', strtotime($request->created_to))
+                ]);
+            }
+
             if(request()->query('sort')){
                 [$column, $direction] = explode(':', request()->query('sort'));
                 $exchanges = $exchanges->orderBy($column, $direction); 
@@ -258,8 +277,8 @@ class ExchangeController extends Controller
 
             return back()->withNotify($notify);
         }
-
-        return view('Template::user.exchange.list', compact('pageTitle', 'exchanges', 'scope'));
+        $currencies = Currency::all();
+        return view('Template::user.exchange.list', compact('pageTitle', 'exchanges', 'scope','request','currencies'));
     }
 
     public function download_report($scope = 'list')

@@ -45,4 +45,7 @@ class Currency extends Model
     {
         return $query->where('available_for_buy', Status::YES);
     }
+    public static function enabled(){
+        return self::where('status', 1);
+    }
 }

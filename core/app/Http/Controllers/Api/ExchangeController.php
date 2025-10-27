@@ -406,7 +406,7 @@ class ExchangeController extends Controller
             ->where('status', 1)
             ->pluck('currency_to');
 
-        $currencies = Currency::whereIn('id', $linkedCurrencies)
+        $currencies = Currency::enabled()->whereIn('id', $linkedCurrencies)
             ->select('id', 'name', 'cur_sym', 'sell_at', 'reserve', 'minimum_limit_for_sell', 'maximum_limit_for_sell', 'show_number_after_decimal', 'image')
             ->get()
             ->map(function ($currency) {

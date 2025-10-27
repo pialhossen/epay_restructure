@@ -103,20 +103,21 @@
         const modal = document.getElementById('welcomeModal');
         const closeBtn = document.getElementById('closeModalBtn');
         const gotItBtn = document.getElementById('gotItBtn');
-
-        modal.style.display = 'flex';
-
-        // Auto-close after 2 minutes
-        setTimeout(() => {
-            modal.style.display = 'none';
-        }, 120000);
-
-        closeBtn.addEventListener('click', () => {
-            modal.style.display = 'none';
-        });
-
-        gotItBtn.addEventListener('click', () => {
-            modal.style.display = 'none';
-        });
+        if(modal){
+            modal.style.display = 'flex';
+    
+            // Auto-close after 2 minutes
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 120000);
+    
+            closeBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+            });
+    
+            gotItBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+            });
+        }
     });
 </script>

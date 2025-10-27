@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="{{ asset($activeTemplateTrue . 'css/nice-select.css') }}">
     <link rel="stylesheet" href="{{ asset($activeTemplateTrue . 'css/swiper.min.css') }}">
     <link rel="stylesheet" href="{{ asset($activeTemplateTrue . 'css/main.css') }}">
+    <link rel="stylesheet" href="{{ asset($activeTemplateTrue . 'css/select2.min.css') }}" />
     @php
         $customView = 'components.custom.custom';
     @endphp
@@ -48,6 +49,7 @@
     @include($activeTemplate . 'partials.footer')
 
     <script src="{{ asset('assets/global/js/jquery-3.7.1.min.js') }}"></script>
+    <script src="{{ asset($activeTemplateTrue . 'js/select2.full.min.js') }}"></script>
     <script src="{{ asset('assets/global/js/bootstrap.bundle.min.js') }}"></script>
 
     <script src="{{ asset($activeTemplateTrue . 'js/modernizr-3.6.0.min.js') }}"></script>
@@ -153,6 +155,12 @@
             url.searchParams.set('sort', nextSort);
             window.location = url.toString();
         }
+
+            $(function() {
+                console.log('jQuery:', $.fn.jquery);
+                console.log('Select2 loaded?', !!$.fn.select2);
+                $('.select2').select2();
+            });
     </script>
 </body>
 

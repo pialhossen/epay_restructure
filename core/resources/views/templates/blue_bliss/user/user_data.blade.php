@@ -16,7 +16,7 @@
                             <div class="row">
                                 <div class="form-group col-sm-12">
                                     <label class="form-label">@lang('Username')</label>
-                                    <input type="text" class="form-control form--control checkUser" name="username" value="{{ old('username') }}"
+                                    <input type="text" class="form-control form--control checkUser" name="username" value="{{ old('username',$user->username) }}"
                                         required>
                                     <small class="text--danger usernameExist"></small>
                                 </div>
@@ -25,7 +25,7 @@
                                     <select name="country" class="form-control form--control select2" required>
                                         @foreach ($countries as $key => $country)
                                             <option data-mobile_code="{{ $country->dial_code }}" value="{{ $country->country }}"
-                                                data-code="{{ $key }}">
+                                                data-code="{{ $key }}" @if($user->country_name == $country->country) selected @endif>
                                                 {{ __($country->country) }}
                                             </option>
                                         @endforeach
@@ -37,26 +37,26 @@
                                         <span class="input-group-text mobile-code"></span>
                                         <input type="hidden" name="mobile_code">
                                         <input type="hidden" name="country_code">
-                                        <input type="number" name="mobile" value="{{ old('mobile') }}" class="form-control form--control checkUser"
+                                        <input type="number" name="mobile" value="{{ old('mobile', $user->mobile) }}" class="form-control form--control checkUser"
                                             required>
                                     </div>
                                     <small class="text--danger mobileExist"></small>
                                 </div>
                                 <div class="form-group col-sm-6">
                                     <label class="form-label">@lang('Address')</label>
-                                    <input type="text" class="form-control form--control" name="address" value="{{ old('address') }}">
+                                    <input type="text" class="form-control form--control" name="address" value="{{ old('address', $user->address) }}">
                                 </div>
                                 <div class="form-group col-sm-6">
                                     <label class="form-label">@lang('State')</label>
-                                    <input type="text" class="form-control form--control" name="state" value="{{ old('state') }}">
+                                    <input type="text" class="form-control form--control" name="state" value="{{ old('state',$user->state) }}">
                                 </div>
                                 <div class="form-group col-sm-6">
                                     <label class="form-label">@lang('Zip Code')</label>
-                                    <input type="text" class="form-control form--control" name="zip" value="{{ old('zip') }}">
+                                    <input type="text" class="form-control form--control" name="zip" value="{{ old('zip',$user->zip) }}">
                                 </div>
                                 <div class="form-group col-sm-6">
                                     <label class="form-label">@lang('City')</label>
-                                    <input type="text" class="form-control form--control" name="city" value="{{ old('city') }}">
+                                    <input type="text" class="form-control form--control" name="city" value="{{ old('city',$user->city) }}">
                                 </div>
                             </div>
                             <button type="submit" class="btn btn--base w-100">
@@ -87,6 +87,7 @@
             @endif
 
             $('.select2').select2();
+            $('.select2').val("{{ $user->country_name }}").trigger('change');
 
             $('select[name=country]').on('change', function() {
                 $('input[name=mobile_code]').val($('select[name=country] :selected').data('mobile_code'));
@@ -109,10 +110,12 @@
             });
 
             function checkUser(value, name) {
+                const current_user = @json(auth()->user());
                 var url = '{{ route('user.checkUser') }}';
                 var token = '{{ csrf_token() }}';
 
                 if (name == 'mobile') {
+                    if(value == current_user.mobile) return;
                     var mobile = `${value}`;
                     var data = {
                         mobile: mobile,
@@ -121,6 +124,7 @@
                     }
                 }
                 if (name == 'username') {
+                    if(value == current_user.username) return;
                     var data = {
                         username: value,
                         _token: token

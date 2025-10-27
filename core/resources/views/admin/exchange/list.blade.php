@@ -345,10 +345,7 @@
                                 <option value="100">@lang('100')</option>
                                 <option value="500">@lang('500')</option>
                                 <option value="1000">@lang('1000')</option>
-                                @if ($exchanges->total() > 100)
-                                    <option value="{{ $exchanges->total() }}">{{ $exchanges->total() }}
-                                        @lang('Exchanges')</option>
-                                @endif
+                                <option value="{{ $exchanges->total() }}">{{ $exchanges->total() }} @lang('Exchanges')</option>
                             </select>
                         </div>
                     </div>

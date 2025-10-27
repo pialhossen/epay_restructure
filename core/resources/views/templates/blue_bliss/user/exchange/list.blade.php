@@ -35,6 +35,57 @@
                             <div class="card-header p-1 d-flex justify-content-end">
                                 <a href="{{ route('user.exchange.download_report', $scope) }}" class="btn btn-sm btn-success">Download</a>
                             </div>
+                            @php
+                                $lastSegment = request()->segment(count(request()->segments()));
+                            @endphp
+                            <form class="m-2" action="{{ url()->current() }}" method="GET">
+                                <div class="row pb-2">
+                                    <div class="col-lg-3 col-md-6 col-12">
+                                        <label for="exchange_id">Exchange ID</label>
+                                        <input @if($request->exchange_id) value="{{ $request->exchange_id }}" @endif type="text" name="exchange_id" class="form-control">
+                                    </div>
+                                    <div class="col-lg-3 col-md-6 col-12">
+                                        <label for="transaction_type">Transaction Type</label>
+                                        <select name="transaction_type[]" id="transaction_type" class="form-control select2" multiple="multiple">
+                                            <option value="EXCHANGE" @if($request->transaction_type == 'EXCHANGE') selected @endif>EXCHANGE</option>
+                                            <option value="DEPOSIT" @if($request->transaction_type == 'DEPOSIT') selected @endif>DEPOSIT</option>
+                                            <option value="WITHDRAW" @if($request->transaction_type == 'WITHDRAW') selected @endif>WITHDRAW</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-3 col-md-6 col-12">
+                                        @php
+                                            $send_old = isset(request()->query()['send_currency_id'])? request()->query()['send_currency_id']: [];
+                                        @endphp
+                                        <label for="send_currency_id">Send Method</label>
+                                        <select name="send_currency_id[]" id="send_currency_id" class="form-control select2" multiple="multiple">
+                                            @foreach($currencies as $currency)
+                                            <option value="{{ $currency->id }}" @selected(in_array($currency->id,$send_old ))>{{ $currency->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-3 col-md-6 col-12">
+                                        @php
+                                            $receive_old = isset(request()->query()['receive_currency_id'])? request()->query()['receive_currency_id']: [];
+                                        @endphp
+                                        <label for="receive_currency_id">Receive Method</label>
+                                        <select name="receive_currency_id[]" id="receive_currency_id" class="form-control select2" multiple="multiple">
+                                            @foreach($currencies as $currency)
+                                            <option value="{{ $currency->id }}" @selected(in_array($currency->id,$receive_old ))>{{ $currency->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-3 col-md-6 col-12">
+                                        <label for="created_from">Created From</label>
+                                        <input @if($request->created_from) value="{{ $request->created_from }}" @endif type="date" name="created_from" class="form-control">
+                                    </div>
+                                    <div class="col-lg-3 col-md-6 col-12">
+                                        <label for="created_to">Created To</label>
+                                        <input @if($request->created_to) value="{{ $request->created_to }}" @endif type="date" name="created_to" class="form-control">
+                                    </div>
+                                </div>
+                                <button type="Submit" class="btn btn-sm btn-primary">Search</button>
+                                <a href="{{ url()->current() }}" class="btn btn-sm btn-info">Reset</a>
+                            </form>
                             <x-item-per-page/>
                             <table class="table custom--table table-responsive--md data-table">
                                 <thead>
