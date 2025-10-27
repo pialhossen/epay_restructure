@@ -5,7 +5,16 @@
                 @php
                 $lastSegment = request()->segment(count(request()->segments()));
                 @endphp
-                <form class="m-2" action="{{ url()->full() }}" method="GET">
+                <form action="{{ request()->url() }}" method="GET">
+                    @foreach(request()->except('itemsPerPage') as $key => $value)
+                        @if(is_array($value))
+                            @foreach($value as $subKey => $subValue)
+                                <input type="hidden" name="{{ $key }}[{{ $subKey }}]" value="{{ $subValue }}">
+                            @endforeach
+                        @else
+                            <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                        @endif
+                    @endforeach
                     <div class="row pb-2">
                         <div style="display: flex; gap: 10px; align-items: center;">
                             <select name="itemsPerPage" id="" class="form-control" style="width: 200px;">

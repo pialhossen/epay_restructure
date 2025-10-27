@@ -118,7 +118,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>@lang('Address')</label>
-                                    <input class="form-control" type="text" name="address"
+                                    <input style="min-width: 300px;" class="form-control" type="text" name="address"
                                         value="{{ @$user->address }}">
                                 </div>
                             </div>

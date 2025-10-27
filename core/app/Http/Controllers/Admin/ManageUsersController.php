@@ -168,6 +168,7 @@ class ManageUsersController extends Controller
     protected function userData($scope = null)
     {
         $request = request();
+        // dd($request->query());
         if ($scope && method_exists(User::class, $scope)) {
             $users = User::$scope();
         } else {

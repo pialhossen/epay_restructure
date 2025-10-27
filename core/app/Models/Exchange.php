@@ -116,4 +116,7 @@ class Exchange extends Model
     public static function itemCount($status = Status::EXCHANGE_PENDING){
         return self::where('status', $status)->count();
     }
+    public function updatedBy(){
+        return $this->belongsTo(Admin::class, 'updated_by');
+    }
 }

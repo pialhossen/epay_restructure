@@ -274,8 +274,8 @@ function notify($user, $templateName, $shortCodes = null, $sendVia = null, $crea
     $notify->createLog = $createLog;
     $notify->pushImage = $pushImage;
     $notify->userColumn = isset($user->id) ? $user->getForeignKey() : 'user_id';
-    sleep(5);
-    if(env('APP_ENV') != 'local' && env('APP_DEBUG') != 'true' ){
+    if(env('APP_ENV') != 'local' && env('APP_DEBUG') != 'true' && env('APP_NOTIFY') == 'true'){
+        sleep(5);
         $notify->send();
     }
 }
@@ -701,7 +701,6 @@ function checkPermission($menu_name){
     if($menu_name == "Home Modal" && $user->can('View - Home Modal')){
         return true;
     }
-    // return true;
     return false;
 }
 function checkPermissionForSubMenu($parent_manu, $scope){

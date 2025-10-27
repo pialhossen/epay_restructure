@@ -184,7 +184,7 @@ class UserController extends Controller
             'country' => 'required|in:'.$countries,
             'mobile_code' => 'required|in:'.$mobileCodes,
             'username' => ["required", "min:6"],
-            'mobile' => ['required', 'regex:/^([0-9]*)$/', Rule::unique('users')->where('dial_code', $request->mobile_code)],
+            'mobile' => ['required', 'regex:/^([0-9]*)$/'],
         ];
 
         if($user->username != $request->username){

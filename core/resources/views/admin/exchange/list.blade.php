@@ -34,6 +34,9 @@
                     $lastSegment = request()->segment(count(request()->segments()));
                     @endphp
                     <form class="m-2" action="{{ route('admin.exchange.list', $lastSegment) }}" method="GET">
+                        @if(request()->query('itemsPerPage'))
+                            <input type="hidden" name="itemsPerPage" value="{{ request('itemsPerPage') }}">
+                        @endif
                         <div class="row pb-2">
                             <div class="col-lg-3 col-md-6 col-12">
                                 <label for="exchange_id">Exchange ID</label>
@@ -46,9 +49,9 @@
                             <div class="col-lg-3 col-md-6 col-12">
                                 <label for="transaction_type">Transaction Type</label>
                                 <select name="transaction_type[]" id="transaction_type" class="form-control select2" multiple="multiple">
-                                    <option value="EXCHANGE" @if($request->transaction_type == 'EXCHANGE') selected @endif>EXCHANGE</option>
-                                    <option value="DEPOSIT" @if($request->transaction_type == 'DEPOSIT') selected @endif>DEPOSIT</option>
-                                    <option value="WITHDRAW" @if($request->transaction_type == 'WITHDRAW') selected @endif>WITHDRAW</option>
+                                    <option value="EXCHANGE" @if(is_array($request->transaction_type) && in_array('EXCHANGE',$request->transaction_type)) selected @endif>EXCHANGE</option>
+                                    <option value="DEPOSIT" @if(is_array($request->transaction_type) && in_array('DEPOSIT',$request->transaction_type)) selected @endif>DEPOSIT</option>
+                                    <option value="WITHDRAW" @if(is_array($request->transaction_type) && in_array('WITHDRAW',$request->transaction_type)) selected @endif>WITHDRAW</option>
                                 </select>
                             </div>
                             <div class="col-lg-3 col-md-6 col-12">
@@ -263,12 +266,21 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title">@lang('Export Filter')</h4>
-                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                         <i class="la la-close" aria-hidden="true"></i>
                     </button>
                 </div>
                 <form method="post" action="{{ route('admin.exchange.export') }}" id="exportForm">
                     @csrf
+                    @foreach(request()->all() as $key => $value)
+                        @if(is_array($value))
+                            @foreach($value as $subKey => $subValue)
+                                <input type="hidden" name="{{ $key }}[{{ $subKey }}]" value="{{ $subValue }}">
+                            @endforeach
+                        @else
+                            <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                        @endif
+                    @endforeach
                     <div class="modal-body">
 
                         <!-- Standard Export Columns -->
@@ -286,6 +298,13 @@
                                     <label>@lang('User')</label>
                                     <input type="checkbox" name="columns[]" value="user_id" checked data-width="100%"
                                            data-size="large" data-onstyle="-success" data-offstyle="-danger"
+                                           data-bs-toggle="toggle" data-height="50" data-on="@lang('Yes')"
+                                           data-off="@lang('No')">
+                                </div>
+                                <div class="col-lg-6 mb-3">
+                                    <label>@lang('Transaction Type')</label>
+                                    <input type="checkbox" name="columns[]" value="transaction_type" checked
+                                           data-width="100%" data-size="large" data-onstyle="-success" data-offstyle="-danger"
                                            data-bs-toggle="toggle" data-height="50" data-on="@lang('Yes')"
                                            data-off="@lang('No')">
                                 </div>
@@ -324,6 +343,27 @@
                                            data-bs-toggle="toggle" data-height="50" data-on="@lang('Yes')"
                                            data-off="@lang('No')">
                                 </div>
+                                <div class="col-lg-6 mb-3">
+                                    <label>@lang('Updated By')</label>
+                                    <input type="checkbox" name="columns[]" value="updated_by" checked data-width="100%"
+                                           data-size="large" data-onstyle="-success" data-offstyle="-danger"
+                                           data-bs-toggle="toggle" data-height="50" data-on="@lang('Yes')"
+                                           data-off="@lang('No')">
+                                </div>
+                                <div class="col-lg-6 mb-3">
+                                    <label>@lang('Placed At')</label>
+                                    <input type="checkbox" name="columns[]" value="placed_at" checked data-width="100%"
+                                           data-size="large" data-onstyle="-success" data-offstyle="-danger"
+                                           data-bs-toggle="toggle" data-height="50" data-on="@lang('Yes')"
+                                           data-off="@lang('No')">
+                                </div>
+                                <div class="col-lg-6 mb-3">
+                                    <label>@lang('Updated At')</label>
+                                    <input type="checkbox" name="columns[]" value="updated_at" checked data-width="100%"
+                                           data-size="large" data-onstyle="-success" data-offstyle="-danger"
+                                           data-bs-toggle="toggle" data-height="50" data-on="@lang('Yes')"
+                                           data-off="@lang('No')">
+                                </div>
                             </div>
                         </div>
 
@@ -340,11 +380,11 @@
                         <div class="form-group">
                             <label class="fw-bold">@lang('Export Item')</label>
                             <select class="form-control form-control-lg" name="export_item">
-                                <option value="10">@lang('10')</option>
-                                <option value="50">@lang('50')</option>
-                                <option value="100">@lang('100')</option>
-                                <option value="500">@lang('500')</option>
-                                <option value="1000">@lang('1000')</option>
+                                <option value="10">10</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                                <option value="500">500</option>
+                                <option value="1000">1000</option>
                                 <option value="{{ $exchanges->total() }}">{{ $exchanges->total() }} @lang('Exchanges')</option>
                             </select>
                         </div>

@@ -17,7 +17,6 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\CommissionLog;
 use Barryvdh\DomPDF\Facade\Pdf;
-use App\Models\UserBlockListModel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
@@ -43,7 +42,15 @@ class ExchangeController extends Controller
         if(auth()->guard('admin')->user()->id == 1){
             return false;
         }
-        if($exchange->status_at && $exchange->status_at->diffInMinutes(now()) >= (60 * gs('exchange_lock_time'))){
+        if(
+            $exchange->status_at && 
+            (
+                $exchange->status == Status::EXCHANGE_APPROVED || 
+                $exchange->status == Status::EXCHANGE_REFUND || 
+                $exchange->status == Status::EXCHANGE_CANCEL
+            ) && 
+            $exchange->status_at->diffInMinutes(now()) >= (60 * gs('exchange_lock_time'))
+        ){
             return true;
         }
         return false;
@@ -94,7 +101,7 @@ class ExchangeController extends Controller
                 });
             }
             if($request->transaction_type){
-                $exchanges = $exchanges->where('transaction_type', $request->transaction_type);
+                $exchanges = $exchanges->whereIn('transaction_type', $request->transaction_type);
             }
             if($request->send_currency_id){
                 $exchanges = $exchanges->whereIn('send_currency_id', $request->send_currency_id);
@@ -130,7 +137,7 @@ class ExchangeController extends Controller
     public function exportExchanges(Request $request)
     {
         $exportColumns = $request->columns;
-        $query = Exchange::with(['user', 'sendCurrency', 'receivedCurrency']);
+        $query = Exchange::with(['user', 'sendCurrency', 'receivedCurrency','updatedBy']);
         if ($request->has('scope')) {
             switch ($request->scope) {
                 case 'pending':
@@ -155,8 +162,41 @@ class ExchangeController extends Controller
                     break;
             }
         }
-        $orderBy = $request->order_by ?? 'desc';
-        $query->orderBy('created_at', $orderBy);
+
+        if($request->exchange_id){
+            $query = $query->where('exchange_id', $request->exchange_id);
+        }
+        if ($request->email) {
+            $query = $query->whereHas('user', function ($query) use ($request) {
+                $query->where(function ($q) use ($request) {
+                    $q->where('email', $request->email)
+                    ->orWhere('username', $request->email);
+                });
+            });
+        }
+        if($request->transaction_type){
+            $query = $query->whereIn('transaction_type', $request->transaction_type);
+        }
+        if($request->send_currency_id){
+            $query = $query->whereIn('send_currency_id', $request->send_currency_id);
+        }
+        if($request->receive_currency_id){
+            $query = $query->whereIn('receive_currency_id', $request->receive_currency_id);
+        }
+        if ($request->created_from && $request->created_to) {
+            $query = $query->whereBetween('created_at', [
+                date('Y-m-d 00:00:00', strtotime($request->created_from)),
+                date('Y-m-d 23:59:59', strtotime($request->created_to))
+            ]);
+        }
+        if(request()->query('sort')){
+            [$column, $direction] = explode(':', request()->query('sort'));
+            $query = $query->orderBy($column, $direction); 
+        } else {
+            $orderBy = $request->order_by ?? 'desc';
+            $query = $query->orderBy('created_at', $orderBy);
+        }
+
 
         $exchanges = $query->take($request->export_item)->get();
 
@@ -197,6 +237,15 @@ class ExchangeController extends Controller
                             $row['Status'] = 'Cancelled';
                         }
                         break;
+                    case 'updated_by':
+                        $row['updated_by'] = optional($exchange->updatedBy)->name;
+                        break;
+                    case 'placed_at':
+                        $row['placed_at'] = Carbon::create($exchange->created_at)->format('d/m/y h:i:s A');
+                        break;
+                    case 'updated_at':
+                        $row['updated_at'] = Carbon::create($exchange->updated_at)->format('d/m/y h:i:s A');
+                        break;
                     default:
                         $row[ucwords(str_replace('_', ' ', $column))] = $exchange->$column;
                         break;
@@ -220,6 +269,7 @@ class ExchangeController extends Controller
     {
         $this->check_permission('View - Exchange');
         $exchange = Exchange::where('id', $id)->firstOrFail();
+        $exchange->is_locked = $this->check_exchnage_updated_at($exchange);
         $pageTitle = 'Exchange Details: ' . $exchange->exchange_id;
         $exchangeLog = GpayExchangeLogModel::where('exchange_id', $id)
             ->with(['adminUser:id,name'])
@@ -351,7 +401,7 @@ class ExchangeController extends Controller
         $exchange = Exchange::where('id', $id)->firstOrFail();
 
         if($this->check_exchnage_updated_at($exchange)){
-            $notify[] = ['error', 'This order has been locked as it was last updated more than 1 hours ago.'];
+            $notify[] = ['error', 'This order has been locked.'];
             return back()->withNotify($notify);
         }
 
@@ -410,7 +460,7 @@ class ExchangeController extends Controller
 
         $exchange = Exchange::where('id', $id)->firstOrFail();
         if($this->check_exchnage_updated_at($exchange)){
-            $notify[] = ['error', 'This order has been locked as it was last updated more than 1 hours ago.'];
+            $notify[] = ['error', 'This order has been locked.'];
             return back()->withNotify($notify);
         }
         $user = $exchange->user;
@@ -474,7 +524,7 @@ class ExchangeController extends Controller
 
         $exchange = Exchange::where('id', $id)->firstOrFail();
         if($this->check_exchnage_updated_at($exchange)){
-            $notify[] = ['error', 'This order has been locked as it was last updated more than 1 hours ago.'];
+            $notify[] = ['error', 'This order has been locked.'];
             return back()->withNotify($notify);
         }
         $user = $exchange->user;
@@ -537,7 +587,7 @@ class ExchangeController extends Controller
         $this->check_update_permission();
         $exchange = Exchange::findOrFail($id);
         if($this->check_exchnage_updated_at($exchange)){
-            $notify[] = ['error', 'This order has been locked as it was last updated more than 1 hours ago.'];
+            $notify[] = ['error', 'This order has been locked.'];
             return back()->withNotify($notify);
         }
         $user = $exchange->user;
@@ -588,7 +638,7 @@ class ExchangeController extends Controller
         $this->check_update_permission();
         $exchange = Exchange::findOrFail($id);
         if($this->check_exchnage_updated_at($exchange)){
-            $notify[] = ['error', 'This order has been locked as it was last updated more than 1 hours ago.'];
+            $notify[] = ['error', 'This order has been locked.'];
             return back()->withNotify($notify);
         }
         $user = $exchange->user;
@@ -637,21 +687,25 @@ class ExchangeController extends Controller
 
     public function approve(Request $request, $id)
     {
+        
         $this->check_update_permission();
-        // try {
+        try {
             DB::beginTransaction();
             $request->validate([
                 'transaction' => 'required',
             ]);
 
             $exchange = Exchange::with("sendCurrency","receivedCurrency")->where('id', $id)->first();
+            
             if($this->check_exchnage_updated_at($exchange)){
-                $notify[] = ['error', 'This order has been locked as it was last updated more than 1 hours ago.'];
+                $notify[] = ['error', 'This order has been locked.'];
                 return back()->withNotify($notify);
             }
+            
             $finalReceivingAmount = $exchange->receiving_amount;
             $appliedHiddenCharge = 0;
             $hiddenCharges = \App\Models\GpayHiddenChargeModel::where('currency_id', $exchange->receive_currency_id)->get();
+            
             foreach ($hiddenCharges as $hidden) {
                 if ($hidden->charge_percent && $hidden->charge_percent > 0) {
                     $appliedHiddenCharge += $finalReceivingAmount * ($hidden->charge_percent / 100);
@@ -662,12 +716,7 @@ class ExchangeController extends Controller
                     $exchange->hidden_charge_fixed = $hidden->charge_fixed;
                 }
             }
-
-            if (!$this->canBeModifiedByCurrentUser($exchange)) {
-                $notify[] = ['error', 'Only admin can modify after 30 minutes.'];
-                return back()->withNotify($notify);
-            }
-
+            
             if (!$exchange) {
                 return back()->withErrors(['error' => 'Exchange not found or not in pending status.']);
             }
@@ -814,16 +863,16 @@ class ExchangeController extends Controller
             $notify[] = ['success', 'Exchange approved successfully'];
             return back()->withNotify($notify);
 
-        // } catch (\Exception $e) {
-        //     DB::rollBack();
-        //     \Log::error('Exchange approval failed', [
-        //         'exchange_id' => $id,
-        //         'error_message' => $e->getMessage(),
-        //         'trace' => $e->getTraceAsString(),
-        //     ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Exchange approval failed', [
+                'exchange_id' => $id,
+                'error_message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
 
-        //     return back()->withErrors(['error' => 'An error occurred while approving the exchange.']);
-        // }
+            return back()->withErrors(['error' => 'An error occurred while approving the exchange.']);
+        }
     }
 
     public function levelCommission($id, $amount, $exchange_id, $commissionType = '')

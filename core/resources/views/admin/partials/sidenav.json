@@ -374,15 +374,6 @@
                 "route_name": "admin.employees.roles.index",
                 "menu_active": "admin.employees.roles*",
                 "scope": "roles"
-            },
-            {
-                "keyword": [
-                    "Manage Permissions"
-                ],
-                "title": "Manage Permissions",
-                "route_name": "admin.employees.permissions.index",
-                "menu_active": "admin.employees.permissions*",
-                "scope": "permissions"
             }
         ]
     },

@@ -33,6 +33,9 @@
         @php
             $query = request()->query();
         @endphp
+        @if(request()->query('itemsPerPage'))
+            <input type="hidden" name="itemsPerPage" value="{{ request('itemsPerPage') }}">
+        @endif
         <div class="row pb-2">
             <div class="col-lg-3 col-md-6 col-12">
                 <label for="first_name">First Name</label>

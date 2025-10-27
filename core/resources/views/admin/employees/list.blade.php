@@ -39,7 +39,9 @@
                         {{ $employee->email }}<br>
                     </td>
                     <td>
-                        address
+                        @foreach ($employee->roles as $index => $role)
+                        {{ $role->name }}{{ ($index != ($employee->roles->count()-1))? ',' : '' }}
+                        @endforeach
                     </td>
                     <td>
                         <div class="button--group">

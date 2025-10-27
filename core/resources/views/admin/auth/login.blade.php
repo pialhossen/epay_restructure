@@ -39,11 +39,10 @@
                                             display: flex;
                                             align-items: center;
                                             justify-content: center;
-                                            color: white;
+                                            color: #3D2BFB;
                                         }
                                         .eye:hover{
-                                            background-color: rgb(235 235 235);
-                                            color: black;
+                                            background-color: black;
                                         }
                                     </style>
                                     <script>

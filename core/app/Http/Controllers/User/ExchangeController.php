@@ -270,7 +270,7 @@ class ExchangeController extends Controller
                 [$column, $direction] = explode(':', request()->query('sort'));
                 $exchanges = $exchanges->orderBy($column, $direction); 
             }
-            $exchanges = $exchanges->$scope()->where('user_id', auth()->id())->with(['sendCurrency', 'receivedCurrency'])->paginate(getPaginate(request()->itemsPerPage));
+            $exchanges = $exchanges->$scope()->where('user_id', auth()->id())->with(['sendCurrency', 'receivedCurrency'])->orderBy('created_at','desc')->paginate(getPaginate(request()->itemsPerPage));
             $pageTitle = formateScope($scope).' Exchange';
         } catch (Exception $ex) {
             $notify[] = ['error', 'Invalid URL.'];
@@ -290,8 +290,6 @@ class ExchangeController extends Controller
             $notify[] = ['error', 'Invalid URL.'];
             return back()->withNotify($notify);
         }
-
-        return back();
     }
 
     public function details($trx)

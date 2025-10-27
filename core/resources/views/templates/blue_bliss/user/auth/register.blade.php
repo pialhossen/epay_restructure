@@ -48,28 +48,71 @@
                                             </div>
                                         </div>
                                         <div class="col-md-6">
-                                            <div class="form-group">
+                                            <div class="form-group" style="position: relative;">
                                                 <label class="form-label">@lang('Password')</label>
                                                 <input type="password"
                                                     class="form-control form--control @if (gs('secure_password')) secure-password @endif"
                                                     name="password" id="password" required>
+                                                <span onclick="togglePasswordVisibility(this,'#password')" class="eye"><i
+                                                    class="fa-solid fa-eye"></i></span>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
-                                            <div class="form-group">
+                                            <div class="form-group" style="position: relative;">
                                                 <label class="form-label">@lang('Confirm Password')</label>
                                                 <input type="password" class="form-control form--control"
                                                     name="password_confirmation" required>
+                                                <span onclick="togglePasswordVisibility(this,'#password')" class="eye"><i
+                                                    class="fa-solid fa-eye"></i></span>
                                             </div>
                                         </div>
+                                        <style>
+                                        .eye {
+                                            font-size: 18px;
+                                            position: absolute;
+                                            top: 42px;
+                                            right: 5px;
+                                            padding: 5px;
+                                            border-radius: 50%;
+                                            cursor: pointer;
+                                            width: 35px;
+                                            height: 35px;
+                                            display: flex;
+                                            align-items: center;
+                                            justify-content: center;
+                                            color: darkslategray;
+                                        }
+
+                                        .eye:hover {
+                                            background-color: rgb(235 235 235);
+                                            color: black;
+                                        }
+                                    </style>
+                                    <script>
+                                        function togglePasswordVisibility(element, inputId) {
+                                            let passwordFields = document.querySelectorAll("input[type='password']")
+                                            if(passwordFields.length === 0){
+                                                passwordFields = document.querySelectorAll("input[type='text']")
+                                            }
+                                            const eyes = document.querySelectorAll(".eye")
+                                            passwordFields.forEach(passwordField => {
+                                                if (passwordField.type == "password") {
+                                                    passwordField.type = "text"
+                                                    eyes.forEach(eye => {
+                                                        eye.innerHTML = `<i class="fa-solid fa-eye-slash"></i>`
+                                                    })
+                                                }
+                                                else if (passwordField.type == "text") {
+                                                    passwordField.type = "password"
+                                                    eyes.forEach(eye => {
+                                                        eye.innerHTML = `<i class="fa-solid fa-eye"></i>`
+                                                    })
+                                                }
+                                            })
+                                        }
+                                    </script>
                                     </div>
                                     <x-captcha />
-                                    <div class="col-md-12 mt-2">
-                                        <div class="form-group form-group form--check">
-                                            <input type="checkbox" id="togglePassword" onclick="togglePasswordVisibility()" class="form-check-input">
-                                            <label for="togglePassword" id="toggleLabel">Show Password</label>
-                                        </div>
-                                    </div>
                                     @if (gs('agree'))
                                         <div class="form-group form--check">
                                             <input class="form-check-input" type="checkbox" id="agree"
@@ -127,21 +170,6 @@
                 </div>
             </div>
         </div>
-
-        <script>
-            function togglePasswordVisibility() {
-                const password = document.getElementById("password");
-                const confirmPassword = document.getElementById("password_confirmation");
-                const toggleLabel = document.getElementById("toggleLabel");
-                const checkbox = document.getElementById("togglePassword");
-
-                const show = checkbox.checked;
-
-                password.type = show ? "text" : "password";
-                confirmPassword.type = show ? "text" : "password";
-                toggleLabel.textContent = show ? "Hide Password" : "Show Password";
-            }
-        </script>
     @endsection
 
     @if (gs('secure_password'))

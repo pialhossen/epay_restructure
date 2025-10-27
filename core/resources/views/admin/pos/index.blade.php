@@ -7,6 +7,17 @@
         .select2-container {
             z-index: 9999 !important;
         }
+        .select2-results__option--selectable{
+            color: darkslategray !important;
+        }
+        .select2-results__option--selectable:hover{
+            color: black !important;
+        }
+        .select2 .select2-selection{
+            /* display: inline-block; */
+            width: 100%;
+            height: 45px;
+        }
     </style>
 @endpush
 @section('panel')

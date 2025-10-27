@@ -252,28 +252,28 @@
                     @if(checkSpecificPermission('Update - Exchange'))
                     <div class="d-flex flex-wrap justify-content-end mb-3 gap-2">
                         {{-- @if ($exchange->status != Status::EXCHANGE_APPROVED) --}}
-                        <button class="btn btn-outline--warning btn-pending flex-grow-1" type="button">
+                        <button class="btn btn-outline--warning btn-pending flex-grow-1" type="button" @if($exchange->is_locked) disabled @endif>
                             <i class="fas fa-clock"></i>
                             @lang('Pending')
                         </button>
-                        <button class="btn btn-outline--success btn-hold flex-grow-1" type="button">
+                        <button class="btn btn-outline--success btn-hold flex-grow-1" type="button" @if($exchange->is_locked) disabled @endif>
                             <i class="fas fa-undo"></i>
                             @lang('Hold')
                         </button>
-                        <button class="btn btn-outline--success btn-processing flex-grow-1" type="button">
+                        <button class="btn btn-outline--success btn-processing flex-grow-1" type="button" @if($exchange->is_locked) disabled @endif>
                             <i class="fas fa-clock"></i>
                             @lang('Processing')
                         </button>
                         {{-- @endif --}}
-                        <button class="btn btn-outline--success btn-approved flex-grow-1" type="button">
+                        <button class="btn btn-outline--success btn-approved flex-grow-1" type="button" @if($exchange->is_locked) disabled @endif>
                             <i class="fas fa-check"></i>
                             @lang('Approve')
                         </button>
-                        <button type="button" class="btn-outline--danger btn btn-cancel flex-grow-1" type="button">
+                        <button type="button" class="btn-outline--danger btn btn-cancel flex-grow-1" type="button" @if($exchange->is_locked) disabled @endif>
                             <i class="fas fa-times"></i>
                             @lang('Cancel')
                         </button>
-                        <button type="button" class="btn btn-outline--warning btn-refund flex-grow-1" type="button">
+                        <button type="button" class="btn btn-outline--warning btn-refund flex-grow-1" type="button" @if($exchange->is_locked) disabled @endif>
                             <i class="fas fa-undo"></i>
                             @lang('Refund')
                         </button>
