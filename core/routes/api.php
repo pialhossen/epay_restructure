@@ -36,6 +36,7 @@ Route::namespace('Api')->name('api.')->group(function () {
         Route::get('rate/currencies', 'reteCurrency');
         Route::post('rate/currency/alert/request', 'retAlertCurrencyRequest');
         Route::post('best/currency/rate', 'bestCurrencyRate');
+        Route::post('stop/alert','stop_alert')->name('stop_alert');
     });
 
     Route::namespace('Auth')->group(function () {

@@ -4,7 +4,7 @@
         <div class="col-xl-4 col-sm-12">
             <div class="card {{ $userBlocked ? 'blocked-user' : '' }}">
                 <div class="card-header">
-                    <h5 class="card-title">@lang('Sent by user')</h5>
+                    <h5 class="card-title">@lang('Sent by '.$exchange->user->username)</h5>
                     {{-- <p>{{ json_encode($userBlocked) }}</p> --}}
                 </div>
                 <div class="card-body">
@@ -88,7 +88,7 @@
         <div class="col-xl-4 col-sm-12">
             <div class="card {{ $userBlocked ? 'blocked-user' : '' }}">
                 <div class="card-header">
-                    <h5 class="card-title">@lang('Receivable for User')</h5>
+                    <h5 class="card-title">@lang('Receivable for '.$exchange->user->username)</h5>
                 </div>
                 <div class="card-body">
                     <ul class="list-group list-group-flush">
@@ -333,6 +333,28 @@
                                 $buy_rate_customer = cutDecimals($exchange->buy_rate, $exchange->sendCurrency->show_number_after_decimal);
                                 $sell_rate_customer = cutDecimals(1 / (float)$exchange->buy_rate, $exchange->sendCurrency->show_number_after_decimal);
                             }
+                            /*
+                            $sell_rate_original = 0;
+                            $buy_rate_original = 0;
+                            if($exchange->transaction_type == "EXCHANGE"){
+                                $buy_rate_original =  cutDecimals((1 / (float)$exchange->sell_rate) * (float)$exchange->buy_rate, 4);
+                                $sell_rate_original = cutDecimals((1 / (float)$exchange->buy_rate) * (float)$exchange->sell_rate , 4);
+                                $buy_rate_customer =  cutDecimals(1 / (float)$exchange->customer_buying_rate, 4);
+                                $sell_rate_customer = cutDecimals(1 / (float)$exchange->customer_selling_rate, 4);
+                            } else if($exchange->transaction_type == "DEPOSIT") {
+
+                                $buy_rate_original = cutDecimals((float)$exchange->sendCurrency->buy_at, 4);
+                                $sell_rate_original = cutDecimals(1 / (float)$exchange->sendCurrency->buy_at, 4);
+                                $buy_rate_customer = cutDecimals($exchange->buy_rate, 4);
+                                $sell_rate_customer = cutDecimals(1 / (float)$exchange->buy_rate, 4); 
+                                
+                            } else if($exchange->transaction_type == "WITHDRAW") {
+
+                                $buy_rate_original = cutDecimals((float)$exchange->receivedCurrency->sell_at, 4);
+                                $sell_rate_original = cutDecimals(1 / (float)$exchange->receivedCurrency->sell_at, 4);
+                                $buy_rate_customer = cutDecimals($exchange->buy_rate, 4);
+                                $sell_rate_customer = cutDecimals(1 / (float)$exchange->buy_rate, 4);
+                            } */
 
                         @endphp
 

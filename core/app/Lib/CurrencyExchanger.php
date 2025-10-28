@@ -2,13 +2,14 @@
 
 namespace App\Lib;
 
+use Exception;
 use App\Models\Currency;
 use App\Models\Exchange;
-use App\Models\GpayCurrencyDiscountChargeModel;
-use App\Models\GpayHiddenChargeModel;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use App\Models\GpayHiddenChargeModel;
+use App\Models\GpayCurrencyDiscountChargeModel;
 
 class CurrencyExchanger
 {
@@ -119,6 +120,10 @@ class CurrencyExchanger
     
             $this->exchange->sending_charge = 0;
             $this->exchange->receiving_charge = 0;
+            if(Auth::guard('web')->check() && Auth::guard('admin')->check()){
+                $admin = Auth::guard('admin')->user();
+                $this->exchange->order_place_admin_id = $admin->id;
+            }
         }
 
 

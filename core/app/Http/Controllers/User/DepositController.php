@@ -14,6 +14,7 @@ use App\Models\GatewayCurrency;
 use App\Traits\TransactionTrait;
 use App\Models\AdminNotification;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use App\Models\GpayCurrencyDiscountChargeModel;
 
 class DepositController extends Controller
@@ -145,6 +146,10 @@ class DepositController extends Controller
         $deposit->custom_rate = $requestedCurrencyRate ? $requestedCurrencyRate: $currency->buy_at;
         $deposit->transaction_type = 'DEPOSIT';
         $deposit->transaction_proof_data = $formValue;
+        if(Auth::guard('web')->check() && Auth::guard('admin')->check()){
+            $admin = Auth::guard('admin')->user();
+            $deposit->order_place_admin_id = $admin->id;
+        }
         $deposit->save();
 
         if ($deposit->sendCurrency->gateway_id != 0) {

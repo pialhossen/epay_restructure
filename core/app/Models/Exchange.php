@@ -119,4 +119,7 @@ class Exchange extends Model
     public function updatedBy(){
         return $this->belongsTo(Admin::class, 'updated_by');
     }
+    public function orderPlaceAdmin(){
+        return $this->belongsTo(Admin::class, 'order_place_admin_id');
+    }
 }

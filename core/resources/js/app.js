@@ -9,18 +9,19 @@ import "../css/app.css";
 import "./echo";
 import Swal from "sweetalert2";
 
+const sound = general_settings
+            ? `/${window.APP_PUBLIC_FOLDER? window.APP_PUBLIC_FOLDER +'/': ''}${general_settings.exchange_notification}`
+            : `/${window.APP_PUBLIC_FOLDER? window.APP_PUBLIC_FOLDER +'/': ''}assets/sound/default_exchange_notification.mp3`;
+window.EXCHANGE_ALERT_AUDIO = new Audio(sound);
+
 window.Echo.private("check.admin").listen(
     ".exchange.notification",
     function (e) {
-        const sound = general_settings
-            ? `/${general_settings.exchange_notification}`
-            : "/assets/sound/default_exchange_notification.mp3";
-        const audio = new Audio(sound);
-        audio.volume = 1.0;
+        window.EXCHANGE_ALERT_AUDIO.volume = 1.0;
 
         if (exchange_alert_btn_status) {
-            audio.loop = true;
-            audio.play();
+            window.EXCHANGE_ALERT_AUDIO.loop = true;
+            window.EXCHANGE_ALERT_AUDIO.play();
             Swal.fire({
                 title: "New Order Placed!",
                 text: "A new order has been placed click redirect to view order details.",
@@ -30,13 +31,33 @@ window.Echo.private("check.admin").listen(
                 cancelButtonColor: "#d33",
                 confirmButtonText: "View Details",
             }).then((result) => {
+                fetch(window.stopAlertNotificationBroadcast, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        command: "stop-alert",
+                        message: "stop exchange alert"
+                    })
+                })
+                .then(res => res.json())
+                .then(data => console.log(data))
+                .catch(error => console.error('Error:', error))
+
                 if (result.isConfirmed) {
                     window.open(`/admin/exchange/details/${e.exchange.id}`, '_blank');
                 }
-                audio.pause();
-                audio.currentTime = 0;
-            });
+            })
         }
 
     }
 );
+window.Echo.private("check.admin").listen(
+    ".exchange.stop.notification",
+    function(e){
+        console.log('Alert Stop Broadcast Received')
+        window.EXCHANGE_ALERT_AUDIO.pause();
+        window.EXCHANGE_ALERT_AUDIO.currentTime = 0;
+    }
+)

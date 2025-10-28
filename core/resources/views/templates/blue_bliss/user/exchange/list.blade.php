@@ -16,7 +16,7 @@
         }
 
         .sticky-col {
-            position: sticky;
+            position: sticky !important;
             right: 0;
             z-index: 2; /* higher than other cells */
         }
@@ -39,6 +39,9 @@
                                 $lastSegment = request()->segment(count(request()->segments()));
                             @endphp
                             <form class="m-2" action="{{ url()->current() }}" method="GET">
+                                @if(request()->query('itemsPerPage'))
+                                    <input type="hidden" name="itemsPerPage" value="{{ request('itemsPerPage') }}">
+                                @endif
                                 <div class="row pb-2">
                                     <div class="col-lg-3 col-md-6 col-12">
                                         <label for="exchange_id">Exchange ID</label>
@@ -116,7 +119,7 @@
                                             </div>
                                         </th>
                                         <th>@lang('Status')</th>
-                                        <th>@lang('Action')</th>
+                                        <th class="sticky-col">@lang('Action')</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -149,7 +152,7 @@
                                                 </div>
                                             </td>
                                             <td>{!! $exchange->badgeData() !!}</td>
-                                            <td class="sticky-col">
+                                            <td class="sticky-col" style="background-color: white;">
                                                 <a href="{{ route('user.exchange.details', $exchange->exchange_id) }}" class="btn btn--base-outline btn-sm" data-reason="{{ $exchange->cancle_reason }}">
                                                     <i class="fa fa-desktop"></i> @lang('Details')
                                                 </a>

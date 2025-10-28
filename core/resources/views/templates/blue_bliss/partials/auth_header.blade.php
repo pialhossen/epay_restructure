@@ -134,6 +134,8 @@
                                 </li>
                             </ul>
                         </li>
+
+
                         <li class="d-lg-none d-block">
                             <a href="{{ route('user.home') }}" class="btn btn--base btn-sm">
                                 @lang('Dashboard')
@@ -141,6 +143,9 @@
                         </li>
                     </ul>
                     <div class="d-lg-block d-none">
+                        <button class="btn btn-sm" style="color: black; background-color: white;">
+                            {{ auth()->user()->username }}
+                        </button>
                         <a href="{{ route('user.home') }}" class="btn btn--base btn-sm">
                             @lang('Dashboard')
                         </a>

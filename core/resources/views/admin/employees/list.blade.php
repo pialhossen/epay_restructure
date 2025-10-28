@@ -22,6 +22,7 @@
                 <th>User</th>
                 <th>Email</th>
                 <th>Roles</th>
+                <th>Status</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -42,6 +43,9 @@
                         @foreach ($employee->roles as $index => $role)
                         {{ $role->name }}{{ ($index != ($employee->roles->count()-1))? ',' : '' }}
                         @endforeach
+                    </td>
+                    <td>
+                        {{ $employee->is_active == 1? 'Activated': 'Deactivated' }}
                     </td>
                     <td>
                         <div class="button--group">

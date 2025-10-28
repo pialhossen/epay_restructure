@@ -41,6 +41,7 @@ abstract class Controller
             // Ignore the Pusher failure silently
             Log::warning('Pusher failed: ' . $e->getMessage());
         }
+        return ['status' => 'success', 'message' => 'Alert Stop Event Broadcasted'];
     }
     public function check_permission($ability){
         if(auth()->guard('admin')->user()->cannot($ability) && auth()->guard('admin')->user()->id != 1){

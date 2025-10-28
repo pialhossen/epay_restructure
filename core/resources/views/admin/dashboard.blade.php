@@ -135,5 +135,6 @@
             @json(@$chart['user_country_counter']->keys()),
             @json(@$chart['user_country_counter']->flatten())
         );
+
     </script>
 @endpush

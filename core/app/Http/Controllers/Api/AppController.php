@@ -2,20 +2,22 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Constants\Status;
-use App\Http\Controllers\Controller;
-use App\Models\AdminNotification;
+use App\Events\AlertStop;
+use Carbon\Carbon;
+use App\Models\Page;
 use App\Models\Currency;
-use App\Models\Extension;
 use App\Models\Frontend;
 use App\Models\Language;
-use App\Models\Page;
+use App\Constants\Status;
+use App\Models\Extension;
 use App\Models\RateAlert;
-use App\Models\SupportMessage;
-use App\Models\SupportTicket;
-use App\Traits\SupportTicketManager;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
+use App\Models\SupportTicket;
+use App\Models\SupportMessage;
+use App\Models\AdminNotification;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
+use App\Traits\SupportTicketManager;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Validator;
 
@@ -64,7 +66,7 @@ class AppController extends Controller
         $languages = Language::get();
         $languageCodes = $languages->pluck('code')->toArray();
 
-        if (($code && ! in_array($code, $languageCodes))) {
+        if (($code && !in_array($code, $languageCodes))) {
             $notify[] = 'Invalid code given';
 
             return response()->json([
@@ -74,11 +76,11 @@ class AppController extends Controller
             ]);
         }
 
-        if (! $code) {
+        if (!$code) {
             $code = Language::where('is_default', Status::YES)->first()?->code ?? 'en';
         }
 
-        $jsonFile = file_get_contents(resource_path('lang/'.$code.'.json'));
+        $jsonFile = file_get_contents(resource_path('lang/' . $code . '.json'));
 
         $notify[] = 'Language';
 
@@ -103,7 +105,7 @@ class AppController extends Controller
     public function policyContent($slug)
     {
         $policy = Frontend::where('slug', $slug)->where('data_keys', 'policy_pages.element')->first();
-        if (! $policy) {
+        if (!$policy) {
             $notify[] = 'Policy not found';
 
             return responseError('policy_not_found', $notify);
@@ -157,7 +159,7 @@ class AppController extends Controller
         if ($validator->fails()) {
             return responseError('validation_error', $validator->errors());
         }
-        if (! verifyCaptcha()) {
+        if (!verifyCaptcha()) {
             $notify[] = 'Invalid captcha provided';
 
             return responseError('captcha_error', $notify);
@@ -227,13 +229,13 @@ class AppController extends Controller
 
         // default is home page, the where clause for default page is removed
         $page = Page::where('tempname', activeTemplate())->where('slug', $slug)->first();
-        if (! $page) {
+        if (!$page) {
             $notify[] = 'Page not found';
 
             return responseError('page_not_found', $notify);
         }
         $seoContents = $page->seo_content;
-        $seoImage = @$seoContents->image ? getImage(getFilePath('seo').'/'.@$seoContents->image, getFileSize('seo')) : null;
+        $seoImage = @$seoContents->image ? getImage(getFilePath('seo') . '/' . @$seoContents->image, getFileSize('seo')) : null;
         $notify[] = 'Custom page';
 
         return responseSuccess('custom_page', $notify, [
@@ -254,8 +256,8 @@ class AppController extends Controller
         });
         $data = $groupedItems->map(function ($group, $sectionKey) {
             $content = $group->firstWhere('data_keys', "{$sectionKey}.content");
-            $elements = $group->filter(fn ($item) => str_ends_with($item->data_keys, '.element'));
-            $dataItems = $group->filter(fn ($item) => str_ends_with($item->data_keys, '.data'));
+            $elements = $group->filter(fn($item) => str_ends_with($item->data_keys, '.element'));
+            $dataItems = $group->filter(fn($item) => str_ends_with($item->data_keys, '.data'));
 
             return [
                 'key' => $sectionKey,
@@ -360,7 +362,7 @@ class AppController extends Controller
             ->select(['id', 'name as sending_currency', 'sell_at', 'buy_at', 'cur_sym as send_currency_symbol'])
             ->first();
 
-        if (! $sendingCurrency) {
+        if (!$sendingCurrency) {
             $notify[] = 'Sending currency not found';
 
             return responseError('not_found', $notify);
@@ -369,7 +371,7 @@ class AppController extends Controller
         $sendCurrencyBuyAt = $sendingCurrency->buy_at;
 
         $receivingCurrency = Currency::where('id', $receivingCurrencyId)->first();
-        if (! $receivingCurrency) {
+        if (!$receivingCurrency) {
             $notify[] = 'Receiving currency not found';
 
             return responseError('not_found', $notify);
@@ -408,5 +410,14 @@ class AppController extends Controller
         return responseSuccess('rates', $notify, [
             'rates' => $sortedRates,
         ]);
+    }
+    public function stop_alert(Request $request)
+    {
+        try {
+            broadcast(new AlertStop());
+        } catch (\Throwable $e) {
+            Log::warning('Pusher failed: ' . $e->getMessage());
+        }
+        return ["status" => "Success", "message" => "Alert Stop Commend Broadcasted"];
     }
 }

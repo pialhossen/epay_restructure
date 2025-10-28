@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Gateway;
 
-use App\Constants\Status;
-use App\Http\Controllers\Controller;
-use App\Models\AdminNotification;
-use App\Models\Deposit;
 use App\Models\User;
+use App\Models\Deposit;
+use App\Constants\Status;
+use App\Models\AdminNotification;
+use Illuminate\Support\Facades\Log;
+use App\Events\ExchangeNotification;
+use App\Http\Controllers\Controller;
 
 class PaymentController extends Controller
 {
@@ -91,6 +93,12 @@ class PaymentController extends Controller
                 $adminNotification->title = 'Payment successful via ' . $methodName;
                 $adminNotification->click_url = urlPath('admin.exchange.details', $exchange->id);
                 $adminNotification->save();
+            }
+
+            try {
+                broadcast(new ExchangeNotification($exchange));
+            } catch (\Throwable $e) {
+                Log::warning('Pusher failed: ' . $e->getMessage());
             }
 
             notify($user, $isManual ? 'DEPOSIT_APPROVE' : 'DEPOSIT_COMPLETE', [

@@ -1,5 +1,27 @@
 @extends('admin.layouts.app')
 @section('panel')
+    <style>
+        .eye {
+            font-size: 18px;
+            position: absolute;
+            top: 33px;
+            right: 15px;
+            padding: 5px;
+            border-radius: 50%;
+            cursor: pointer;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: darkslategray;
+        }
+
+        .eye:hover {
+            background-color: rgb(235 235 235);
+            color: black;
+        }
+    </style>
     <div class="row">
         <div class="col-12">
 
@@ -66,15 +88,17 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>@lang('New Password')</label>
-                                    <input class="form-control" type="paaword" name="password" required
-                                        >
+                                    <input class="form-control" type='password' name="password" required>
+                                    <span onclick="togglePasswordVisibility(this,'#password')" class="eye"><i
+                                    class="fa-solid fa-eye"></i></span>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>@lang('Confirm Password')</label>
-                                    <input class="form-control" type="paaword" name="password_confirmation" required
-                                        >
+                                    <input class="form-control" type='password' name="password_confirmation" required>
+                                    <span onclick="togglePasswordVisibility(this,'#password')" class="eye"><i
+                                    class="fa-solid fa-eye"></i></span>
                                 </div>
                             </div>
                             @endif
@@ -97,17 +121,19 @@
                         @csrf
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="form-group">
+                                <div class="form-group" style="position: relative;">
                                     <label>@lang('New Password')</label>
-                                    <input class="form-control" type="paaword" name="password" required
-                                        >
+                                    <input class="form-control" type='password' name="password" required>
+                                    <span onclick="togglePasswordVisibility(this,'#password')" class="eye"><i
+                                    class="fa-solid fa-eye"></i></span>
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="form-group">
+                                <div class="form-group" style="position: relative;">
                                     <label>@lang('Confirm Password')</label>
-                                    <input class="form-control" type="paaword" name="password_confirmation" required
-                                        >
+                                    <input class="form-control" type='password' name="password_confirmation" required>
+                                    <span onclick="togglePasswordVisibility(this,'#password')" class="eye"><i
+                                    class="fa-solid fa-eye"></i></span>
                                 </div>
                             </div>
                             <div class="col-md-12">
@@ -214,5 +240,28 @@
 
 
         })(jQuery);
+        
+        function togglePasswordVisibility(element, inputId) {
+            let passwordFields = document.querySelectorAll("input[type='password']")
+            if(passwordFields.length === 0){
+                passwordFields = document.querySelectorAll("input[name='password_confirmation'], input[name='password']")
+                console.log(passwordFields)
+            }
+            const eyes = document.querySelectorAll(".eye")
+            passwordFields.forEach(passwordField => {
+                if (passwordField.type == "password") {
+                    passwordField.type = "text"
+                    eyes.forEach(eye => {
+                        eye.innerHTML = `<i class="fa-solid fa-eye-slash"></i>`
+                    })
+                }
+                else if (passwordField.type == "text") {
+                    passwordField.type = "password"
+                    eyes.forEach(eye => {
+                        eye.innerHTML = `<i class="fa-solid fa-eye"></i>`
+                    })
+                }
+            })
+        }
     </script>
 @endpush

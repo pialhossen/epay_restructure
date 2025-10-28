@@ -137,7 +137,7 @@ class ExchangeController extends Controller
     public function exportExchanges(Request $request)
     {
         $exportColumns = $request->columns;
-        $query = Exchange::with(['user', 'sendCurrency', 'receivedCurrency','updatedBy']);
+        $query = Exchange::with(['user', 'sendCurrency', 'receivedCurrency','updatedBy', 'orderPlaceAdmin']);
         if ($request->has('scope')) {
             switch ($request->scope) {
                 case 'pending':
@@ -398,7 +398,7 @@ class ExchangeController extends Controller
     public function pending(Request $request, $id)
     {
         $this->check_update_permission();
-        $exchange = Exchange::where('id', $id)->firstOrFail();
+        $exchange = Exchange::with('updatedBy')->where('id', $id)->firstOrFail();
 
         if($this->check_exchnage_updated_at($exchange)){
             $notify[] = ['error', 'This order has been locked.'];
@@ -458,7 +458,7 @@ class ExchangeController extends Controller
             'cancel_reason' => 'required',
         ]);
 
-        $exchange = Exchange::where('id', $id)->firstOrFail();
+        $exchange = Exchange::with('updatedBy')->where('id', $id)->firstOrFail();
         if($this->check_exchnage_updated_at($exchange)){
             $notify[] = ['error', 'This order has been locked.'];
             return back()->withNotify($notify);
@@ -522,7 +522,7 @@ class ExchangeController extends Controller
             'refund_reason' => 'required',
         ]);
 
-        $exchange = Exchange::where('id', $id)->firstOrFail();
+        $exchange = Exchange::with('updatedBy')->where('id', $id)->firstOrFail();
         if($this->check_exchnage_updated_at($exchange)){
             $notify[] = ['error', 'This order has been locked.'];
             return back()->withNotify($notify);
@@ -585,7 +585,7 @@ class ExchangeController extends Controller
     public function hold($id)
     {
         $this->check_update_permission();
-        $exchange = Exchange::findOrFail($id);
+        $exchange = Exchange::with('updatedBy')->findOrFail($id);
         if($this->check_exchnage_updated_at($exchange)){
             $notify[] = ['error', 'This order has been locked.'];
             return back()->withNotify($notify);
@@ -636,7 +636,7 @@ class ExchangeController extends Controller
     public function processing($id)
     {
         $this->check_update_permission();
-        $exchange = Exchange::findOrFail($id);
+        $exchange = Exchange::with('updatedBy')->findOrFail($id);
         if($this->check_exchnage_updated_at($exchange)){
             $notify[] = ['error', 'This order has been locked.'];
             return back()->withNotify($notify);
@@ -687,7 +687,6 @@ class ExchangeController extends Controller
 
     public function approve(Request $request, $id)
     {
-        
         $this->check_update_permission();
         try {
             DB::beginTransaction();
@@ -695,7 +694,7 @@ class ExchangeController extends Controller
                 'transaction' => 'required',
             ]);
 
-            $exchange = Exchange::with("sendCurrency","receivedCurrency")->where('id', $id)->first();
+            $exchange = Exchange::with("sendCurrency", "receivedCurrency", "updatedBy")->where('id', $id)->first();
             
             if($this->check_exchnage_updated_at($exchange)){
                 $notify[] = ['error', 'This order has been locked.'];
@@ -740,6 +739,7 @@ class ExchangeController extends Controller
             // Approve exchange
             $exchange->status = Status::EXCHANGE_APPROVED;
             $exchange->admin_trx_no = $request->transaction;
+            $exchange->updated_by = auth()->user()->id;
             $exchange->status_at = now();
 
             $exchange->save();

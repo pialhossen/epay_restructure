@@ -4,7 +4,10 @@
             <th>Exchange ID</th>
             <th>Sent</th>
             <th>Receied</th>
-            <th>Amount</th>
+            <th>Sending Amount</th>
+            <th>Sending currency symbol</th>
+            <th>Receiving Amount</th>
+            <th>Receiving currency symbol </th>
             <th>Date</th>
             <th>Status</th>
         </tr>
@@ -16,15 +19,16 @@
                 <td>{{ $transaction->sendCurrency->name }}</td>
                 <td>{{ $transaction->receivedCurrency->name }}</td>
                 <td>
-                    {{ number_format($transaction->sending_amount, $transaction->sendCurrency->show_number_after_decimal) }}
-                    &nbsp;&nbsp;
-                    {{ __(@$transaction->sendCurrency->cur_sym) }}
-                    &nbsp;&nbsp;
-                    -
-                    &nbsp;&nbsp;
-                    {{ number_format($transaction->receiving_amount, $transaction->receivedCurrency->show_number_after_decimal) }}
-                    &nbsp;&nbsp;
-                    {{ __(@$transaction->receivedCurrency->cur_sym) }}
+                    {{ $transaction->sending_amount }}
+                </td>
+                <td>
+                    {{ @$transaction->sendCurrency->cur_sym }}
+                </td>
+                <td>
+                    {{ $transaction->receiving_amount }}
+                </td>
+                <td>
+                    {{ @$transaction->receivedCurrency->cur_sym }}
                 </td>
                 <td>
                     <span>{{ showDateTime(@$transaction->created_at) }}</span>

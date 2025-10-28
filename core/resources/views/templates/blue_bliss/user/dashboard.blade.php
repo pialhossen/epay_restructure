@@ -173,7 +173,7 @@
                 <div class="widget-item">
                     <div class="widget-item__icon"><i class="fas fa-dollar-sign"></i></div>
                     <div class="widget-item__content">
-                        <h5 class="widget-item__title">@lang('Your Balance')</h5>
+                        <h5 class="widget-item__title">@lang(auth()->user()->username."'s Balance")</h5>
                         <h4 class="widget-item__amount ">{{ showAmount($user->balance) }}</h4>
                         <a href="{{ route('user.report.commission.log') }}" class="btn--simple">
                             @lang('View All')
@@ -183,7 +183,7 @@
                 </div>
             </div>
             <div class="col-12 mt-5">
-                <h5 class="title mb-2">@lang('Your Latest Exchanges')</h5>
+                <h5 class="title mb-2">@lang(auth()->user()->username."'s Latest Exchanges")</h5>
                 <div class="card custom--card">
                     @if (!$latestExchange->isEmpty())
                         <div class="card-body p-0">

@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use App\Traits\TransactionTrait;
 use App\Models\AdminNotification;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use App\Models\GpayHiddenChargeModel;
 use App\Models\GpayCurrencyDiscountChargeModel;
 
@@ -174,6 +175,10 @@ class WithdrawController extends Controller
             'email' => $request->input('email'),
             'phone_no' => $request->input('phone_no'),
         ];
+        if(Auth::guard('web')->check() && Auth::guard('admin')->check()){
+            $admin = Auth::guard('admin')->user();
+            $withdraw->order_place_admin_id = $admin->id;
+        }
         $withdraw->save();
         
         $user->balance -= $withdraw->refund_amount;

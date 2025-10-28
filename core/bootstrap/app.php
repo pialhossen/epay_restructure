@@ -1,21 +1,21 @@
 <?php
 
-use App\Http\Middleware\AdminAuthenticated;
-use App\Http\Middleware\Authenticate;
-use App\Http\Middleware\CheckStatus;
 use App\Http\Middleware\Demo;
+use App\Http\Middleware\CheckStatus;
+use App\Http\Middleware\Authenticate;
+use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\KycMiddleware;
+use Illuminate\Foundation\Application;
+use App\Schedules\DailyProfitLossCache;
 use App\Http\Middleware\MaintenanceMode;
 use App\Http\Middleware\RedirectIfAdmin;
-use App\Http\Middleware\RedirectIfAuthenticated;
-use App\Http\Middleware\RedirectIfNotAdmin;
 use App\Http\Middleware\RegistrationStep;
-use App\Schedules\DailyProfitLossCache;
-use Illuminate\Foundation\Application;
+use App\Http\Middleware\AdminAuthenticated;
+use App\Http\Middleware\RedirectIfNotAdmin;
+use Symfony\Component\HttpFoundation\Response;
+use App\Http\Middleware\RedirectIfAuthenticated;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Support\Facades\Route;
-use Symfony\Component\HttpFoundation\Response;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -56,6 +56,8 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\ActiveTemplateMiddleware::class,
             \App\Http\Middleware\BlockIpMiddleware::class,
             \App\Http\Middleware\Adminlockout::class,
+            App\Http\Middleware\LogoutIfIpChanged::class,
+            App\Http\Middleware\OneDeviceLogin::class,
         ]);
 
         $middleware->alias([

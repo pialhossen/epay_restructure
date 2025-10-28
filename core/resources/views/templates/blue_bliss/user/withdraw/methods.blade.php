@@ -8,7 +8,7 @@
                 <div class="gateway-card">
                     <div class="text-center card-header flex-column py-3">
                         <h5 class="d-block">@lang('Withdraw Balance')</h5>
-                        <span>@lang('Your Current Balance Is:') {{ showAmount($user->balance) }}</span>
+                        <span>@lang(auth()->user()->username. "'s Current Balance Is:") {{ showAmount($user->balance) }}</span>
                     </div>
                     <div class="row justify-content-center gy-sm-4 gy-3">
                         <div class="col-lg-6">

@@ -2,17 +2,18 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Constants\Status;
-use App\Http\Controllers\Controller;
+use Carbon\Carbon;
+use App\Models\User;
 use App\Lib\CurlRequest;
-use App\Models\AdminNotification;
 use App\Models\Currency;
 use App\Models\Exchange;
-use App\Models\User;
+use App\Constants\Status;
+use App\Events\AlertStop;
 use App\Models\UserLogin;
-use App\Rules\FileTypeValidate;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
+use App\Rules\FileTypeValidate;
+use App\Models\AdminNotification;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 
 class AdminController extends Controller
@@ -48,7 +49,7 @@ class AdminController extends Controller
         $exchange['canceled'] = (clone $exchangeQuery)->canceled()->count();
         $exchange['refund'] = (clone $exchangeQuery)->refunded()->count();
         $reserveCurrency = Currency::enabled()->where('reserve', '>', 0)->get();
-
+        
         return view('admin.dashboard', compact('pageTitle', 'widget', 'chart', 'exchange', 'reserveCurrency'));
     }
 

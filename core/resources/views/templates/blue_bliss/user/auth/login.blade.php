@@ -49,10 +49,6 @@
                             </div>
                             <x-captcha />
                             <div class="d-flex justify-content-between">
-                                <div class="form-group form--check">
-                                    <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="remember"> @lang('Remember Me')</label>
-                                </div>
                                 <a class="text--base" href="{{ route('user.password.request') }}">
                                     @lang('Forgot Password?')
                                 </a>

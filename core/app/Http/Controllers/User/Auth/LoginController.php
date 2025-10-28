@@ -50,7 +50,11 @@ class LoginController extends Controller
         }
 
         if ($this->attemptLogin($request)) {
-            return $this->sendLoginResponse($request);
+            $loginresponse = $this->sendLoginResponse($request); 
+            $user = auth()->user();
+            $user->session_id = session()->getId();
+            $user->save();
+            return $loginresponse;
         }
 
         // If the login attempt was unsuccessful we will increment the number of attempts
@@ -94,6 +98,9 @@ class LoginController extends Controller
     {
         $this->guard()->logout();
         request()->session()->invalidate();
+        $user = auth()->user();
+        $user->session_id = null;
+        $user->save();
 
         $notify[] = ['success', 'You have been logged out.'];
 

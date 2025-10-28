@@ -64,6 +64,11 @@
             url.searchParams.set('sort', nextSort);
             window.location = url.toString();
         }
+
+
+        
+        window.stopAlertNotificationBroadcast = "{{ route('api.stop_alert') }}";
+        window.APP_PUBLIC_FOLDER = "{{ APP_PUBLIC_FOLDER }}";
     </script>
     @php
         $customView = 'components.custom.custom';

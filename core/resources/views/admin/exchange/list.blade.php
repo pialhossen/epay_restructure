@@ -18,7 +18,7 @@
     .sticky-col {
         position: sticky;
         right: 0;
-        z-index: 2; /* higher than other cells */
+        z-index: 2;
     }
     .data-table th {
         position: sticky;
@@ -133,6 +133,7 @@
                                     </th>
                                     <th>@lang('Status')</th>
                                     <th >@lang('Updated By')</th>
+                                    <th >@lang('Placed By')</th>
                                     <th style="cursor: pointer;" onclick="toggleSort(event, 'created_at')">
                                         <div class="sortable-header">
                                             <span class="sort-indicate"> 
@@ -224,10 +225,8 @@
                                             </span>
                                         </td>
                                         <td> @php echo $exchange->badgeData() @endphp </td>
-                                        @php
-                                            $user = AdminUserModel::find($exchange->updated_by);
-                                        @endphp
-                                        <td> {{ $user? $user->name: "" }} </td>
+                                        <td> {{ @$exchange->updatedBy->name }} </td>
+                                        <td> {{ isset($exchange->orderPlaceAdmin->name)? $exchange->orderPlaceAdmin->name: "User"}} </td>
                                         <td> {{ $exchange->created_at->format('d/m/y h:i:s A') }} </td>
                                         <td> {{ $exchange->updated_at->format('d/m/y h:i:s A') }} </td>
                                         <td class="sticky-col" style="background: white;">
