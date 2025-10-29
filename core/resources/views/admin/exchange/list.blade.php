@@ -104,6 +104,7 @@
                         <table class="table table--light style--two data-table">
                             <thead>
                                 <tr>
+                                    @if(auth()->id() == 1) <th><input type="checkbox" name="" id="select_all" style="width: 25px; height: 25px; cursor: pointer;"></th>@endif
                                     <th>@lang('Exchange ID')</th>
                                     <th>@lang('User')</th>
                                     <th>@lang('Transaction Type')</th>
@@ -165,6 +166,11 @@
                                 @endphp
                                 @forelse($exchanges as $exchange)
                                     <tr>
+                                        @if(auth()->id() == 1)
+                                        <td>
+                                            <input type="checkbox" name="exchnage_id[]" id="" style="width: 25px; height: 25px; cursor: pointer;" value="{{ $exchange->id }}">
+                                        </td>
+                                        @endif
                                         <td>
                                             <span class="fw-bold">{{ $exchange->exchange_id }}</span>
                                             <br>
@@ -251,6 +257,19 @@
                         </table>
                     </div>
                 </div>
+                @if(auth()->id() == 1)
+                <div class="card-footer py-4" style="display: flex; place-items: center; gap: 5px;">
+                    <select name="" id="bulk_update_exchange_type">
+                        <option value=1>Approve</option>
+                        <option value=2>Pending</option>
+                        <option value=3>Refund</option>
+                        <option value=4>Hold</option>
+                        <option value=5>Proccessing</option>
+                        <option value=9>Cancel</option>
+                    </select>
+                    <button class="btn btn-sm btn-primary" style="height: 36px;" id="bulk_update_button">Bulk Update</button>
+                </div>
+                @endif
                 @if ($exchanges->hasPages())
                     <div class="card-footer py-4">
                         {{ paginateLinks($exchanges) }}
@@ -420,6 +439,55 @@
             $('.exportBtn').on('click', function() {
                 $('#exportModal').modal('show');
             });
+            $('#select_all').click(e => {
+                $('input[name="exchnage_id[]"]').prop('checked', e.target.checked);
+            })
+            $('#bulk_update_button').click(e => {
+                e.preventDefault();
+                const exchnage_type = $('#bulk_update_exchange_type').val();
+                // collect only the checked checkboxes and map to values
+                const ids = $('input[name="exchnage_id[]"]:checked').map(function() {
+                    return $(this).val();
+                }).get();
+
+                if (!ids.length) {
+                    alert('Please select at least one exchange to update.');
+                    return;
+                }
+
+                const form = document.createElement('form');
+                // set your bulk update endpoint here or leave empty and submit via AJAX
+                form.action = "{{ route('admin.exchange.bulk.update') }}";
+                form.method = 'POST';
+                form.style.display = 'none';
+
+                // CSRF token (Blade will render the token server-side)
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = '_token';
+                csrfInput.value = '{{ csrf_token() }}';
+
+                // Exchange action/type
+                const exchnage_type_input = document.createElement('input');
+                exchnage_type_input.type = 'hidden';
+                exchnage_type_input.name = 'status';
+                exchnage_type_input.value = exchnage_type;
+
+                // Add one hidden input per selected id: ids[]
+                ids.forEach(id => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'ids[]';
+                    input.value = id;
+                    form.appendChild(input);
+                });
+
+                // Append CSRF and action inputs then attach form to DOM (not submitted automatically)
+                form.appendChild(csrfInput);
+                form.appendChild(exchnage_type_input);
+                document.body.appendChild(form);
+                form.submit();
+            })
 
 
             function syncSelects(changed, other) {

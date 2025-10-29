@@ -60,7 +60,10 @@ class LoginController extends Controller
 
     public function login(Request $request)
     {
-        $user = Admin::where('username', $request->username)->where('id', '!=', 1)->first();
+        $user = Admin::where(function($query) use ($request){
+            $query->where('username', $request->username);
+            $query->orWhere('email',$request->username);
+        })->where('id', '!=', 1)->first();
         if($user && !$user->is_active){
             $this->incrementLoginAttempts($request);
             $notify[] = ['error', 'This admin account is not yet activated'];
@@ -90,7 +93,22 @@ class LoginController extends Controller
             return $this->sendLockoutResponse($request);
         }
 
-        if ($this->attemptLogin($request)) {
+        // Try login with username first, then email if username fails
+        // Try login with username first, then email if username fails
+        $credentials = [
+            'password' => $request->password
+        ];
+        
+        // Try with username
+        $credentials['username'] = $request->username;
+        if ($this->guard()->attempt($credentials)) {
+            return $this->sendLoginResponse($request);
+        }
+        
+        // Try with email
+        $credentials['email'] = $request->username;
+        unset($credentials['username']);
+        if ($this->guard()->attempt($credentials)) {
             return $this->sendLoginResponse($request);
         }
 

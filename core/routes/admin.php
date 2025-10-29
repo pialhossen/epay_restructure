@@ -76,6 +76,7 @@ Route::middleware('admin')->group(function () {
 
         Route::get('send-notification', 'showNotificationAllForm')->name('notification.all');
         Route::post('send-notification', 'sendNotificationAll')->name('notification.all.send');
+        Route::post('send-single-notification', 'sendSingleNotification')->name('notification.single.send');
         Route::get('list', 'list')->name('list');
         Route::get('count-by-segment/{methodName}', 'countBySegment')->name('segment.count');
         Route::get('notification-log/{id}', 'notificationLog')->name('notification.log');
@@ -395,6 +396,7 @@ Route::middleware('admin')->group(function () {
         Route::post('refund/{id}', 'refund')->name('refund');
         Route::get('download/{id}', 'download')->name('download');
         Route::post('export/exchanges', 'exportExchanges')->name('export');
+        Route::post('exchanges-bulk-update', 'exchanges_bulk_update')->name('bulk.update');
     });
 
     // referral

@@ -274,8 +274,7 @@ function notify($user, $templateName, $shortCodes = null, $sendVia = null, $crea
     $notify->createLog = $createLog;
     $notify->pushImage = $pushImage;
     $notify->userColumn = isset($user->id) ? $user->getForeignKey() : 'user_id';
-    if(env('APP_ENV') != 'local' && env('APP_DEBUG') != 'true' && env('APP_NOTIFY') == 'true'){
-        sleep(5);
+    if(env('APP_NOTIFY') == 'true'){
         $notify->send();
     }
 }

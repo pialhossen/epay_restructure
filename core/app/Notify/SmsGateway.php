@@ -123,9 +123,11 @@ class SmsGateway
         $credential->urlPost = $credential->url;
         $credential->url = $credential->url.'?'.http_build_query($body);
         if ($method == 'get') {
-            CurlRequest::curlContent($credential->url, $header);
+            $sms_response = CurlRequest::curlContent($credential->url, $header);
+            logger($sms_response);
         } else {
-            CurlRequest::curlPostContent($credential->urlPost, $body, $header);
+            $sms_response = CurlRequest::curlPostContent($credential->urlPost, $body, $header);
+            logger($sms_response);
         }
         
     }

@@ -18,8 +18,6 @@ class UserNotificationSender
     /**
      * Send notifications to all or selected users based on the request parameters.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse
      */
     public function notificationToAll($request)
     {
@@ -42,21 +40,26 @@ class UserNotificationSender
         
         $imageUrl = $this->handlePushNotificationImage($request);
         $users = $userQuery->get();
+        $user_ids = $users->pluck('id')->toArray();
+        // $this->sendNotifications($users, $request, $imageUrl);
 
-        $this->sendNotifications($users, $request, $imageUrl);
+        $message = $request->message;
+        $subject = $request->subject;
 
+        $notification_type = $request->via;
+        if ($request->via == 'email') {
+            $pageTitle = "Send Email Notifictions";
 
-        if($request->via == 'email'){
-            $notify[] = ['success', "Email Successfully Send"];
+            return view('admin.send-notification',compact('pageTitle','notification_type', 'user_ids','message','subject','imageUrl'));
         }
-        if($request->via == 'sms'){
-            $notify[] = ['success', "SMS Successfully Send"];
+        if ($request->via == 'sms') {
+            $pageTitle = "SMS Notifictions";
+            return view('admin.send-notification', compact('pageTitle','notification_type', 'user_ids','message','subject','imageUrl'));
         }
-        if($request->via == 'push'){
-            $notify[] = ['success', "Push Notification Successfully Send"];
+        if ($request->via == 'push') {
+            $pageTitle = "Push Notifictions";
+            return view('admin.send-notification', compact('pageTitle','notification_type', 'user_ids','message','subject','imageUrl'));
         }
-
-        return redirect()->back()->withNotify($notify);
     }
 
     /**

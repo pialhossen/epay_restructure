@@ -26,47 +26,48 @@ class ManageUsersController extends Controller
         $this->check_permission('View - Manage Users');
     }
 
-    public static function checkPermission($user, $scope){
-        if($user->id == 1){
+    public static function checkPermission($user, $scope)
+    {
+        if ($user->id == 1) {
             return true;
         }
-        if(($scope == 'index' || $scope == 'Manage Currencies') && $user->can('View - All Users')){
+        if (($scope == 'index' || $scope == 'Manage Currencies') && $user->can('View - All Users')) {
             return true;
         }
-        if(($scope == 'active' || $scope == 'Active Users') && $user->can('View - Active Users')){
+        if (($scope == 'active' || $scope == 'Active Users') && $user->can('View - Active Users')) {
             return true;
         }
-        if(($scope == 'banned' || $scope == 'Banned Users') && $user->can('View - Banned Users')){
+        if (($scope == 'banned' || $scope == 'Banned Users') && $user->can('View - Banned Users')) {
             return true;
         }
-        if(($scope == 'emailUnverified' || $scope == 'Email Unverified') && $user->can('View - Email Unverified')){
+        if (($scope == 'emailUnverified' || $scope == 'Email Unverified') && $user->can('View - Email Unverified')) {
             return true;
         }
-        if(($scope == 'mobileUnverified' || $scope == 'Mobile Unverified') && $user->can('View - Mobile Unverified')){
+        if (($scope == 'mobileUnverified' || $scope == 'Mobile Unverified') && $user->can('View - Mobile Unverified')) {
             return true;
         }
-        if(($scope == 'kycUnverified' || $scope == 'KYC Unverified') && $user->can('View - KYC Unverified')){
+        if (($scope == 'kycUnverified' || $scope == 'KYC Unverified') && $user->can('View - KYC Unverified')) {
             return true;
         }
-        if(($scope == 'kycPending' || $scope == 'KYC Pending') && $user->can('View - KYC Pending')){
+        if (($scope == 'kycPending' || $scope == 'KYC Pending') && $user->can('View - KYC Pending')) {
             return true;
         }
-        if(($scope == 'withBalance' || $scope == 'With Balance') && $user->can('View - With Balance')){
+        if (($scope == 'withBalance' || $scope == 'With Balance') && $user->can('View - With Balance')) {
             return true;
         }
-        if(($scope == 'showNotification' || $scope == 'Send Notification') && $user->can('View - Send Notification')){
+        if (($scope == 'showNotification' || $scope == 'Send Notification') && $user->can('View - Send Notification')) {
             return true;
         }
-        if($scope == 'Block Data Alert' && $user->can('View - Block Data Alert')){
+        if ($scope == 'Block Data Alert' && $user->can('View - Block Data Alert')) {
             return true;
         }
-       
+
         return false;
     }
 
     public function allUsers()
     {
-        if(!$this->checkPermission($this->user, 'index')){
+        if (!$this->checkPermission($this->user, 'index')) {
             abort(403);
         }
         $pageTitle = 'All Users';
@@ -77,29 +78,29 @@ class ManageUsersController extends Controller
 
     public function activeUsers()
     {
-        if(!$this->checkPermission($this->user, 'active')){
+        if (!$this->checkPermission($this->user, 'active')) {
             abort(403);
         }
         $pageTitle = 'Active Users';
         $users = $this->userData('active');
-        
+
         return view('admin.users.list', compact('pageTitle', 'users'));
     }
-    
+
     public function bannedUsers()
     {
-        if(!$this->checkPermission($this->user, 'banned')){
+        if (!$this->checkPermission($this->user, 'banned')) {
             abort(403);
         }
         $pageTitle = 'Banned Users';
         $users = $this->userData('banned');
-        
+
         return view('admin.users.list', compact('pageTitle', 'users'));
     }
-    
+
     public function emailUnverifiedUsers()
     {
-        if(!$this->checkPermission($this->user, 'emailUnverified')){
+        if (!$this->checkPermission($this->user, 'emailUnverified')) {
             abort(403);
         }
         $pageTitle = 'Email Unverified Users';
@@ -110,26 +111,26 @@ class ManageUsersController extends Controller
 
     public function kycUnverifiedUsers()
     {
-        if(!$this->checkPermission($this->user, 'kycUnverified')){
+        if (!$this->checkPermission($this->user, 'kycUnverified')) {
             abort(403);
         }
         $pageTitle = 'KYC Unverified Users';
         $users = $this->userData('kycUnverified');
-        
+
         return view('admin.users.list', compact('pageTitle', 'users'));
     }
-    
+
     public function kycPendingUsers()
     {
-        if(!$this->checkPermission($this->user, 'kycPending')){
+        if (!$this->checkPermission($this->user, 'kycPending')) {
             abort(403);
         }
         $pageTitle = 'KYC Pending Users';
         $users = $this->userData('kycPending');
-        
+
         return view('admin.users.list', compact('pageTitle', 'users'));
     }
-    
+
     public function emailVerifiedUsers()
     {
         $pageTitle = 'Email Verified Users';
@@ -156,7 +157,7 @@ class ManageUsersController extends Controller
 
     public function usersWithBalance()
     {
-        if(!$this->checkPermission($this->user, 'withBalance')){
+        if (!$this->checkPermission($this->user, 'withBalance')) {
             abort(403);
         }
         $pageTitle = 'Users with Balance';
@@ -173,23 +174,23 @@ class ManageUsersController extends Controller
             $users = User::$scope();
         } else {
             $users = User::withCount('approvedExchanges');
-            if($scope == 'active'){
+            if ($scope == 'active') {
                 $users = $users->where('status', Status::USER_ACTIVE)->where('ev', Status::VERIFIED)->where('sv', Status::VERIFIED);
-            } elseif($scope == 'kycUnverified'){
+            } elseif ($scope == 'kycUnverified') {
                 $users = $users->where('status', Status::USER_ACTIVE)->where('kv', 0);
-            } elseif($scope == 'banned'){
+            } elseif ($scope == 'banned') {
                 $users = $users->where('status', 0);
-            } elseif($scope == 'emailUnverified'){
+            } elseif ($scope == 'emailUnverified') {
                 $users = $users->where('status', Status::USER_ACTIVE)->where('ev', 0);
-            } elseif($scope == 'mobileUnverified'){
+            } elseif ($scope == 'mobileUnverified') {
                 $users = $users->where('status', Status::USER_ACTIVE)->where('sv', 0);
-            } elseif($scope == 'kycPending'){
+            } elseif ($scope == 'kycPending') {
                 $users = $users->where('status', Status::USER_ACTIVE)->where('kv', 2);
-            } elseif($scope == 'withBalance'){
-                $users = $users->where('status', Status::USER_ACTIVE)->where('balance','>', 0);
+            } elseif ($scope == 'withBalance') {
+                $users = $users->where('status', Status::USER_ACTIVE)->where('balance', '>', 0);
             }
-            
-            
+
+
         }
         if (isset($request->phone_no) && $request->phone_no) {
             $users = $users->where('mobile', $request->phone_no);
@@ -209,20 +210,20 @@ class ManageUsersController extends Controller
         if (isset($request->address) && $request->address) {
             $users = $users->where('address', 'like', '%' . $request->address . '%');
         }
-        if(request()->query('sort')){
+        if (request()->query('sort')) {
             [$column, $direction] = explode(':', request()->query('sort'));
-            if(str_contains(request()->query("sort"),'completed_orders')){
-                if($direction == "asc"){
+            if (str_contains(request()->query("sort"), 'completed_orders')) {
+                if ($direction == "asc") {
                     $users = $users->orderBy('approved_exchanges_count', 'asc');
                 } else {
                     $users = $users->orderBy('approved_exchanges_count', 'desc');
                 }
             } else {
-                $users = $users->orderBy($column, $direction); 
+                $users = $users->orderBy($column, $direction);
             }
         }
         $users_data = $users->orderBy('id', 'desc')
-                    ->paginate(getPaginate($request->itemsPerPage? $request->itemsPerPage: null));
+            ->paginate(getPaginate($request->itemsPerPage ? $request->itemsPerPage : null));
 
         return $users_data;
     }
@@ -246,7 +247,7 @@ class ManageUsersController extends Controller
         $totalExchange = Exchange::list()->where('user_id', $user->id)->count();
         $commission_levels = Referral::all();
 
-        return view('admin.users.detail', compact('pageTitle', 'user', 'totalWithdrawals', 'countries', 'totalTicket', 'totalExchange','commission_levels'));
+        return view('admin.users.detail', compact('pageTitle', 'user', 'totalWithdrawals', 'countries', 'totalTicket', 'totalExchange', 'commission_levels'));
     }
 
     public function kycDetails($id)
@@ -453,7 +454,7 @@ class ManageUsersController extends Controller
 
     public function showNotificationSingleForm($id)
     {
-        
+
         $user = User::findOrFail($id);
         if (!gs('en') && !gs('sn') && !gs('pn')) {
             $notify[] = ['warning', 'Notification options are disabled currently'];
@@ -485,7 +486,7 @@ class ManageUsersController extends Controller
 
     public function showNotificationAllForm()
     {
-        if(!$this->checkPermission($this->user, 'showNotification')){
+        if (!$this->checkPermission($this->user, 'showNotification')) {
             abort(403);
         }
         if (!gs('en') && !gs('sn') && !gs('pn')) {
@@ -522,11 +523,23 @@ class ManageUsersController extends Controller
 
         if (!gs('en') && !gs('sn') && !gs('pn')) {
             $notify[] = ['warning', 'Notification options are disabled currently'];
-
             return to_route('admin.dashboard')->withNotify($notify);
         }
 
         return (new UserNotificationSender)->notificationToAll($request);
+    }
+    public function sendSingleNotification(Request $request){
+        try {
+            $user = User::find($request->user_id);
+            notify($user, 'DEFAULT', [
+                'subject' => $request->subject,
+                'message' => $request->message,
+            ], [$request->via], pushImage: $request->imageUrl);
+            return ["status" => "success", "message" => "notification send success"];
+        } catch (\Throwable $th) {
+            logger()->error($th->getMessage());
+            return ["status" => "error", "message" => "notification send failed"];
+        }
     }
 
     public function countBySegment($methodName)

@@ -32,81 +32,84 @@ class ExchangeController extends Controller
         $this->user = auth()->user();
         $this->check_permission("View - Exchange Menu");
     }
-    public function check_update_permission(){
-        if($this->user->id == 1 || $this->user->can('Update - Exchange')){
+    public function check_update_permission()
+    {
+        if ($this->user->id == 1 || $this->user->can('Update - Exchange')) {
             return 0;
         }
         abort(403);
     }
-    public function check_exchnage_updated_at($exchange){
-        if(auth()->guard('admin')->user()->id == 1){
+    public function check_exchnage_updated_at($exchange)
+    {
+        if (auth()->guard('admin')->user()->id == 1) {
             return false;
         }
-        if(
-            $exchange->status_at && 
+        if (
+            $exchange->status_at &&
             (
-                $exchange->status == Status::EXCHANGE_APPROVED || 
-                $exchange->status == Status::EXCHANGE_REFUND || 
+                $exchange->status == Status::EXCHANGE_APPROVED ||
+                $exchange->status == Status::EXCHANGE_REFUND ||
                 $exchange->status == Status::EXCHANGE_CANCEL
-            ) && 
+            ) &&
             $exchange->status_at->diffInMinutes(now()) >= (60 * gs('exchange_lock_time'))
-        ){
+        ) {
             return true;
         }
         return false;
     }
-    public static function checkPermission($user, $scope){
-        if(($scope == 'pending' || $scope == 'Pending Exchange') && $user->can("View - Pending Exchange")){
+    public static function checkPermission($user, $scope)
+    {
+        if (($scope == 'pending' || $scope == 'Pending Exchange') && $user->can("View - Pending Exchange")) {
             return true;
         }
-        if(($scope == 'hold' || $scope == 'Hold Exchange') && $user->can("View - Hold Exchange")){
+        if (($scope == 'hold' || $scope == 'Hold Exchange') && $user->can("View - Hold Exchange")) {
             return true;
         }
-        if(($scope == 'processing' || $scope == 'Processing Exchange') && $user->can("View - Processing Exchnage")){
+        if (($scope == 'processing' || $scope == 'Processing Exchange') && $user->can("View - Processing Exchnage")) {
             return true;
         }
-        if(($scope == 'approved' || $scope == 'Approved Exchange') && $user->can("View - Approved Exchange")){
+        if (($scope == 'approved' || $scope == 'Approved Exchange') && $user->can("View - Approved Exchange")) {
             return true;
         }
-        if(($scope == 'canceled' || $scope == 'Canceled Exchange') && $user->can("View - Canceled Exchnage")){
+        if (($scope == 'canceled' || $scope == 'Canceled Exchange') && $user->can("View - Canceled Exchnage")) {
             return true;
         }
-        if(($scope == 'refunded' || $scope == 'Refunded Exchange') && $user->can("View - Refunded Exchange")){
+        if (($scope == 'refunded' || $scope == 'Refunded Exchange') && $user->can("View - Refunded Exchange")) {
             return true;
         }
-        if(($scope == 'list' || $scope == 'All Exchange') && $user->can("View - All Exchange")){
+        if (($scope == 'list' || $scope == 'All Exchange') && $user->can("View - All Exchange")) {
             return true;
         }
         return false;
     }
     public function index(Request $request, $scope)
     {
-        if($this->user->id != 1){
-           if(!$this->checkPermission($this->user, $scope)){
+        if ($this->user->id != 1) {
+            if (!$this->checkPermission($this->user, $scope)) {
                 abort(403);
-           }
+            }
         }
         try {
             $exchanges = Exchange::$scope()->with('user', 'sendCurrency', 'receivedCurrency');
 
-            if($request->exchange_id){
+            if ($request->exchange_id) {
                 $exchanges = $exchanges->where('exchange_id', $request->exchange_id);
             }
             if ($request->email) {
                 $exchanges = $exchanges->whereHas('user', function ($query) use ($request) {
                     $query->where(function ($q) use ($request) {
                         $q->where('email', $request->email)
-                        ->orWhere('username', $request->email);
+                            ->orWhere('username', $request->email);
                     });
                 });
             }
-            if($request->transaction_type){
+            if ($request->transaction_type) {
                 $exchanges = $exchanges->whereIn('transaction_type', $request->transaction_type);
             }
-            if($request->send_currency_id){
+            if ($request->send_currency_id) {
                 $exchanges = $exchanges->whereIn('send_currency_id', $request->send_currency_id);
             }
-            if($request->receive_currency_id){
+            if ($request->receive_currency_id) {
                 $exchanges = $exchanges->whereIn('receive_currency_id', $request->receive_currency_id);
             }
             if ($request->created_from && $request->created_to) {
@@ -115,13 +118,13 @@ class ExchangeController extends Controller
                     date('Y-m-d 23:59:59', strtotime($request->created_to))
                 ]);
             }
-            if(request()->query('sort')){
+            if (request()->query('sort')) {
                 [$column, $direction] = explode(':', request()->query('sort'));
-                $exchanges = $exchanges->orderBy($column, $direction); 
+                $exchanges = $exchanges->orderBy($column, $direction);
             } else {
-                $exchanges = $exchanges->orderBy('created_at', 'desc'); 
+                $exchanges = $exchanges->orderBy('created_at', 'desc');
             }
-            $exchanges = $exchanges->paginate(getPaginate($request->itemsPerPage? $request->itemsPerPage: null ));
+            $exchanges = $exchanges->paginate(getPaginate($request->itemsPerPage ? $request->itemsPerPage : null));
             $pageTitle = formateScope($scope) . ' Exchange';
         } catch (Exception $ex) {
             $notify[] = ['error', $ex];
@@ -137,7 +140,7 @@ class ExchangeController extends Controller
     public function exportExchanges(Request $request)
     {
         $exportColumns = $request->columns;
-        $query = Exchange::with(['user', 'sendCurrency', 'receivedCurrency','updatedBy', 'orderPlaceAdmin']);
+        $query = Exchange::with(['user', 'sendCurrency', 'receivedCurrency', 'updatedBy', 'orderPlaceAdmin']);
         if ($request->has('scope')) {
             switch ($request->scope) {
                 case 'pending':
@@ -163,24 +166,24 @@ class ExchangeController extends Controller
             }
         }
 
-        if($request->exchange_id){
+        if ($request->exchange_id) {
             $query = $query->where('exchange_id', $request->exchange_id);
         }
         if ($request->email) {
             $query = $query->whereHas('user', function ($query) use ($request) {
                 $query->where(function ($q) use ($request) {
                     $q->where('email', $request->email)
-                    ->orWhere('username', $request->email);
+                        ->orWhere('username', $request->email);
                 });
             });
         }
-        if($request->transaction_type){
+        if ($request->transaction_type) {
             $query = $query->whereIn('transaction_type', $request->transaction_type);
         }
-        if($request->send_currency_id){
+        if ($request->send_currency_id) {
             $query = $query->whereIn('send_currency_id', $request->send_currency_id);
         }
-        if($request->receive_currency_id){
+        if ($request->receive_currency_id) {
             $query = $query->whereIn('receive_currency_id', $request->receive_currency_id);
         }
         if ($request->created_from && $request->created_to) {
@@ -189,9 +192,9 @@ class ExchangeController extends Controller
                 date('Y-m-d 23:59:59', strtotime($request->created_to))
             ]);
         }
-        if(request()->query('sort')){
+        if (request()->query('sort')) {
             [$column, $direction] = explode(':', request()->query('sort'));
-            $query = $query->orderBy($column, $direction); 
+            $query = $query->orderBy($column, $direction);
         } else {
             $orderBy = $request->order_by ?? 'desc';
             $query = $query->orderBy('created_at', $orderBy);
@@ -279,8 +282,8 @@ class ExchangeController extends Controller
         $kyc_form = Form::where('act', 'kyc')->first();
         $user = $exchange->user;
         $user_kyc_data = [];
-        if($user->kyc_data){
-            foreach($user->kyc_data as $kyc_data){
+        if ($user->kyc_data) {
+            foreach ($user->kyc_data as $kyc_data) {
                 $user_kyc_data[$kyc_data->name] = $kyc_data;
             }
         }
@@ -400,7 +403,7 @@ class ExchangeController extends Controller
         $this->check_update_permission();
         $exchange = Exchange::with('updatedBy')->where('id', $id)->firstOrFail();
 
-        if($this->check_exchnage_updated_at($exchange)){
+        if ($this->check_exchnage_updated_at($exchange)) {
             $notify[] = ['error', 'This order has been locked.'];
             return back()->withNotify($notify);
         }
@@ -411,8 +414,8 @@ class ExchangeController extends Controller
             $notify[] = ['warning', 'This order is already pending!'];
 
             return back()->withNotify($notify);
-        }       
-        
+        }
+
         if ($exchange->status == Status::EXCHANGE_APPROVED) {
             $this->reverseApprovedExchangeReserve($exchange, $user);
         }
@@ -425,11 +428,11 @@ class ExchangeController extends Controller
         $exchange->status_at = now();
         $exchange->save();
 
-        if($exchange->transaction_type == 'WITHDRAW' && ($previous_status == Status::EXCHANGE_CANCEL || $previous_status == Status::EXCHANGE_REFUND)){
+        if ($exchange->transaction_type == 'WITHDRAW' && ($previous_status == Status::EXCHANGE_CANCEL || $previous_status == Status::EXCHANGE_REFUND)) {
             $user->balance -= $exchange->sending_amount + $exchange->sending_charge;
             $user->save();
         }
-        if($exchange->transaction_type == 'DEPOSIT' && ($previous_status == Status::EXCHANGE_APPROVED)){
+        if ($exchange->transaction_type == 'DEPOSIT' && ($previous_status == Status::EXCHANGE_APPROVED)) {
             $user->balance -= $exchange->receiving_amount - $exchange->receiving_charge;
             $user->save();
         }
@@ -459,7 +462,7 @@ class ExchangeController extends Controller
         ]);
 
         $exchange = Exchange::with('updatedBy')->where('id', $id)->firstOrFail();
-        if($this->check_exchnage_updated_at($exchange)){
+        if ($this->check_exchnage_updated_at($exchange)) {
             $notify[] = ['error', 'This order has been locked.'];
             return back()->withNotify($notify);
         }
@@ -474,8 +477,8 @@ class ExchangeController extends Controller
             $notify[] = ['warning', 'This order already canceled!'];
 
             return back()->withNotify($notify);
-        }       
-        
+        }
+
         if ($exchange->status == Status::EXCHANGE_APPROVED) {
             $this->reverseApprovedExchangeReserve($exchange, $user);
         }
@@ -488,11 +491,11 @@ class ExchangeController extends Controller
         $exchange->status_at = now();
         $exchange->save();
 
-        if($exchange->transaction_type == 'WITHDRAW' && $previous_status != Status::EXCHANGE_REFUND){
+        if ($exchange->transaction_type == 'WITHDRAW' && $previous_status != Status::EXCHANGE_REFUND) {
             $user->balance += $exchange->refund_amount;
             $user->save();
         }
-        if($exchange->transaction_type == 'DEPOSIT' && ($previous_status == Status::EXCHANGE_APPROVED)){
+        if ($exchange->transaction_type == 'DEPOSIT' && ($previous_status == Status::EXCHANGE_APPROVED)) {
             $user->balance -= $exchange->receiving_amount - $exchange->receiving_charge;
             $user->save();
         }
@@ -523,7 +526,7 @@ class ExchangeController extends Controller
         ]);
 
         $exchange = Exchange::with('updatedBy')->where('id', $id)->firstOrFail();
-        if($this->check_exchnage_updated_at($exchange)){
+        if ($this->check_exchnage_updated_at($exchange)) {
             $notify[] = ['error', 'This order has been locked.'];
             return back()->withNotify($notify);
         }
@@ -537,7 +540,7 @@ class ExchangeController extends Controller
             $notify[] = ['warning', 'This order already refunded!'];
             return back()->withNotify($notify);
         }
-        
+
         if ($exchange->status == Status::EXCHANGE_APPROVED) {
             $this->reverseApprovedExchangeReserve($exchange, $user);
         }
@@ -550,12 +553,12 @@ class ExchangeController extends Controller
         $exchange->status_at = now();
         $exchange->save();
 
-        if($exchange->transaction_type == 'WITHDRAW' && $previous_status != Status::EXCHANGE_CANCEL){
+        if ($exchange->transaction_type == 'WITHDRAW' && $previous_status != Status::EXCHANGE_CANCEL) {
             $user->balance += $exchange->refund_amount;
             $user->save();
         }
 
-        if($exchange->transaction_type == 'DEPOSIT' && $previous_status == Status::EXCHANGE_APPROVED){
+        if ($exchange->transaction_type == 'DEPOSIT' && $previous_status == Status::EXCHANGE_APPROVED) {
             $user->balance -= $exchange->receiving_amount - $exchange->receiving_charge;
             $user->save();
         }
@@ -586,7 +589,7 @@ class ExchangeController extends Controller
     {
         $this->check_update_permission();
         $exchange = Exchange::with('updatedBy')->findOrFail($id);
-        if($this->check_exchnage_updated_at($exchange)){
+        if ($this->check_exchnage_updated_at($exchange)) {
             $notify[] = ['error', 'This order has been locked.'];
             return back()->withNotify($notify);
         }
@@ -611,11 +614,11 @@ class ExchangeController extends Controller
         $exchange->save();
 
 
-        if($exchange->transaction_type == 'WITHDRAW' && ($previous_status == Status::EXCHANGE_CANCEL || $previous_status == Status::EXCHANGE_REFUND)){
+        if ($exchange->transaction_type == 'WITHDRAW' && ($previous_status == Status::EXCHANGE_CANCEL || $previous_status == Status::EXCHANGE_REFUND)) {
             $user->balance -= $exchange->refund_amount;
             $user->save();
         }
-        if($exchange->transaction_type == 'DEPOSIT' && ($previous_status == Status::EXCHANGE_APPROVED)){
+        if ($exchange->transaction_type == 'DEPOSIT' && ($previous_status == Status::EXCHANGE_APPROVED)) {
             $user->balance -= $exchange->receiving_amount - $exchange->receiving_charge;
             $user->save();
         }
@@ -637,7 +640,7 @@ class ExchangeController extends Controller
     {
         $this->check_update_permission();
         $exchange = Exchange::with('updatedBy')->findOrFail($id);
-        if($this->check_exchnage_updated_at($exchange)){
+        if ($this->check_exchnage_updated_at($exchange)) {
             $notify[] = ['error', 'This order has been locked.'];
             return back()->withNotify($notify);
         }
@@ -661,12 +664,12 @@ class ExchangeController extends Controller
         $exchange->status_at = now();
         $exchange->save();
 
-        if($exchange->transaction_type == 'WITHDRAW' && ($previous_status == Status::EXCHANGE_CANCEL || $previous_status == Status::EXCHANGE_REFUND)){
+        if ($exchange->transaction_type == 'WITHDRAW' && ($previous_status == Status::EXCHANGE_CANCEL || $previous_status == Status::EXCHANGE_REFUND)) {
             $user = $exchange->user;
             $user->balance -= $exchange->refund_amount;
             $user->save();
         }
-        if($exchange->transaction_type == 'DEPOSIT' && ($previous_status == Status::EXCHANGE_APPROVED)){
+        if ($exchange->transaction_type == 'DEPOSIT' && ($previous_status == Status::EXCHANGE_APPROVED)) {
             $user = $exchange->user;
             $user->balance -= $exchange->receiving_amount - $exchange->receiving_charge;
             $user->save();
@@ -695,34 +698,34 @@ class ExchangeController extends Controller
             ]);
 
             $exchange = Exchange::with("sendCurrency", "receivedCurrency", "updatedBy")->where('id', $id)->first();
-            
-            if($this->check_exchnage_updated_at($exchange)){
+
+            if ($this->check_exchnage_updated_at($exchange)) {
                 $notify[] = ['error', 'This order has been locked.'];
                 return back()->withNotify($notify);
             }
-            
+
             $finalReceivingAmount = $exchange->receiving_amount;
             $appliedHiddenCharge = 0;
             $hiddenCharges = \App\Models\GpayHiddenChargeModel::where('currency_id', $exchange->receive_currency_id)->get();
-            
+
             foreach ($hiddenCharges as $hidden) {
                 if ($hidden->charge_percent && $hidden->charge_percent > 0) {
                     $appliedHiddenCharge += $finalReceivingAmount * ($hidden->charge_percent / 100);
                     $exchange->hidden_charge_percent = $hidden->charge_percent;
-                } 
+                }
                 if ($hidden->charge_fixed && $hidden->charge_fixed > 0) {
                     $appliedHiddenCharge += $hidden->charge_fixed;
                     $exchange->hidden_charge_fixed = $hidden->charge_fixed;
                 }
             }
-            
+
             if (!$exchange) {
                 return back()->withErrors(['error' => 'Exchange not found or not in pending status.']);
             }
             $totalReceivedAmount = $appliedHiddenCharge + $finalReceivingAmount + (-1 * $exchange->receiving_charge);
             if (
-                $totalReceivedAmount > $exchange->receivedCurrency->reserve && 
-                (int)$exchange->receivedCurrency->neg_bal_allowed !== 1 && 
+                $totalReceivedAmount > $exchange->receivedCurrency->reserve &&
+                (int) $exchange->receivedCurrency->neg_bal_allowed !== 1 &&
                 ($exchange->receivedCurrency->reserve - $totalReceivedAmount) < 0
             ) {
                 $notify[] = ['error', 'Sorry, reserve limit exceeded'];
@@ -763,7 +766,7 @@ class ExchangeController extends Controller
                 $user->balance += $exchange->receiving_amount - $exchange->receiving_charge;
                 $user->save();
 
-            } elseif ($exchange->transaction_type == 'WITHDRAW'){
+            } elseif ($exchange->transaction_type == 'WITHDRAW') {
                 $sendCurrency = $exchange->sendCurrency;
                 $oldSendReserve = $sendCurrency->reserve;
                 $sendCurrency->reserve -= ($exchange->sending_amount + $exchange->sending_charge);
@@ -774,8 +777,8 @@ class ExchangeController extends Controller
                 $receivedCurrency->reserve -= ($exchange->receiving_amount - $exchange->receiving_charge) + $appliedHiddenCharge;
                 $receivedCurrency->save();
 
-                
-                if($previous_status == Status::EXCHANGE_CANCEL || $previous_status == Status::EXCHANGE_REFUND){
+
+                if ($previous_status == Status::EXCHANGE_CANCEL || $previous_status == Status::EXCHANGE_REFUND) {
                     $user->balance -= $exchange->sending_amount + $exchange->sending_charge;
                     $user->save();
                 }
@@ -794,14 +797,14 @@ class ExchangeController extends Controller
             }
 
             // ========== COMMISSION ==========
-            
+
             if (!$user) {
                 return back()->withErrors(['error' => 'User not found.']);
             }
 
             if (gs('exchange_commission') == Status::YES && $exchange->transaction_type != 'WITHDRAW') {
                 $amount = $exchange->buy_rate * $exchange->sending_amount;
-                $this->levelCommission($user->id, $amount,$exchange->id, 'exchange_commission');
+                $this->levelCommission($user->id, $amount, $exchange->id, 'exchange_commission');
             }
 
             // ========== FIRST EXCHANGE BONUS ==========
@@ -886,7 +889,7 @@ class ExchangeController extends Controller
         }
 
         $commission = Referral::where('level', $refer->commission_level)->first();
-        if(!$commission){
+        if (!$commission) {
             return 1;
         }
         $i = $commission->level;
@@ -926,13 +929,13 @@ class ExchangeController extends Controller
     public function levelCommissionRevert($id, $amount, $exchange_id, $commissionType = '')
     {
         $usr = $id;
-        
+
         $me = User::find($usr);
         $refer = User::find($me->ref_by);
         if ($refer == '') {
             return 1;
         }
-        
+
         $commission = Referral::where('level', $refer->commission_level)->first();
         if ($commission == null) {
             return 1;
@@ -944,7 +947,7 @@ class ExchangeController extends Controller
         $refer->balance = $newBal;
         $refer->save();
 
-        
+
         $commission = CommissionLog::where('exchange_id', $exchange_id)->first();
 
         $trx = $commission->trx;
@@ -1037,7 +1040,7 @@ class ExchangeController extends Controller
             if ($hidden->charge_percent && $hidden->charge_percent > 0) {
                 $appliedHiddenCharge += $finalReceivingAmount * ($hidden->charge_percent / 100);
                 $exchange->hidden_charge_percent = $hidden->charge_percent;
-            } 
+            }
             if ($hidden->charge_fixed && $hidden->charge_fixed > 0) {
                 $appliedHiddenCharge += $hidden->charge_fixed;
                 $exchange->hidden_charge_fixed = $hidden->charge_fixed;
@@ -1046,7 +1049,7 @@ class ExchangeController extends Controller
 
         if (gs('exchange_commission') == Status::YES && $exchange->transaction_type != 'WITHDRAW') {
             $amount = $exchange->buy_rate * $exchange->sending_amount;
-            $this->levelCommissionRevert($user->id, $amount,$exchange->id, 'exchange_commission');
+            $this->levelCommissionRevert($user->id, $amount, $exchange->id, 'exchange_commission');
         }
 
         if ($exchange->transaction_type == 'DEPOSIT') {
@@ -1057,21 +1060,21 @@ class ExchangeController extends Controller
             $receivedCurrency = $exchange->receivedCurrency;
             $receivedCurrency->reserve -= ($exchange->receiving_amount - $exchange->receiving_charge);
             $receivedCurrency->save();
-        } elseif($exchange->transaction_type == 'WITHDRAW'){
+        } elseif ($exchange->transaction_type == 'WITHDRAW') {
             $sendCurrency = $exchange->sendCurrency;
             $sendCurrency->reserve += ($exchange->sending_amount + $exchange->sending_charge);
             $sendCurrency->save();
-            
+
             $receivedCurrency = $exchange->receivedCurrency;
             $receivedCurrency->reserve += ($exchange->receiving_amount + (-1 * $exchange->receiving_charge) + $appliedHiddenCharge);
             $receivedCurrency->save();
 
-        }else{
+        } else {
             $sendCurrency = $exchange->sendCurrency;
             $sendCurrency->reserve -= ($exchange->sending_amount + $exchange->sending_charge);
 
-            
-            
+
+
             $receivedCurrency = $exchange->receivedCurrency;
             $receivedCurrency->reserve += ($exchange->receiving_amount + (-1 * $exchange->receiving_charge) + $appliedHiddenCharge);
 
@@ -1079,5 +1082,290 @@ class ExchangeController extends Controller
             $receivedCurrency->save();
         }
     }
+    public function exchanges_bulk_update(Request $request)
+    {
+        $this->check_update_permission();
+        $request->validate([
+            "status" => "required",
+            "ids" => "required"
+        ]);
+        $exchange_status = $request->status;
+        $id_array = $request->ids;
+        $exchanges = Exchange::whereIn('id', $id_array)->get();
+        foreach ($exchanges as $exchange) {
+            $user = $exchange->user;
+            $previous_status = $exchange->status;
 
+            if ($this->check_exchnage_updated_at($exchange)) {
+                continue;
+            }
+            if (!$this->canBeModifiedByCurrentUser($exchange)) {
+                continue;
+            }
+            if ($exchange->status == Status::EXCHANGE_APPROVED) {
+                $this->reverseApprovedExchangeReserve($exchange, $user);
+            }
+
+            $newExchangeLog = new GpayExchangeLogModel;
+            $newExchangeLog->exchange_id = $exchange->id;
+
+            if ($exchange_status == Status::EXCHANGE_PENDING) {
+
+                if ($exchange->status == Status::EXCHANGE_PENDING) {
+                    continue;
+                }
+
+                if ($exchange->transaction_type == 'WITHDRAW' && ($previous_status == Status::EXCHANGE_CANCEL || $previous_status == Status::EXCHANGE_REFUND)) {
+                    $user->balance -= $exchange->sending_amount + $exchange->sending_charge;
+                    $user->save();
+                }
+                if ($exchange->transaction_type == 'DEPOSIT' && ($previous_status == Status::EXCHANGE_APPROVED)) {
+                    $user->balance -= $exchange->receiving_amount - $exchange->receiving_charge;
+                    $user->save();
+                }
+
+                $newExchangeLog->exchange_status = 'Pending';
+
+                notify($exchange->user, 'PENDING_EXCHANGE', [
+                    'exchange' => $exchange->exchange_id,
+                    'reason' => $exchange->admin_feedback,
+                ]);
+            }
+            if ($exchange_status == Status::EXCHANGE_CANCEL) {
+
+                if ($exchange->status == Status::EXCHANGE_CANCEL) {
+                    continue;
+                }
+
+                if ($exchange->transaction_type == 'WITHDRAW' && $previous_status != Status::EXCHANGE_REFUND) {
+                    $user->balance += $exchange->refund_amount;
+                    $user->save();
+                }
+                if ($exchange->transaction_type == 'DEPOSIT' && ($previous_status == Status::EXCHANGE_APPROVED)) {
+                    $user->balance -= $exchange->receiving_amount - $exchange->receiving_charge;
+                    $user->save();
+                }
+
+                $newExchangeLog->exchange_status = 'Cancel';
+
+                notify($exchange->user, 'CANCEL_EXCHANGE', [
+                    'exchange' => $exchange->exchange_id,
+                    'reason' => $exchange->admin_feedback,
+                ]);
+
+            }
+            if ($exchange_status == Status::EXCHANGE_REFUND) {
+    
+                if ($exchange->status == Status::EXCHANGE_REFUND) {
+                    continue;
+                }
+
+                if ($exchange->transaction_type == 'WITHDRAW' && $previous_status != Status::EXCHANGE_CANCEL) {
+                    $user->balance += $exchange->refund_amount;
+                    $user->save();
+                }
+
+                if ($exchange->transaction_type == 'DEPOSIT' && $previous_status == Status::EXCHANGE_APPROVED) {
+                    $user->balance -= $exchange->receiving_amount - $exchange->receiving_charge;
+                    $user->save();
+                }
+
+                $newExchangeLog->exchange_status = 'Refund';
+
+                notify($exchange->user, 'EXCHANGE_REFUND', [
+                    'exchange' => $exchange->exchange_id,
+                    'currency' => $exchange->sendCurrency->cur_sym,
+                    'amount' => showAmount($exchange->sending_amount, currencyFormat: false),
+                    'method' => $exchange->sendCurrency->name,
+                    'reason' => $exchange->admin_feedback,
+                ]);
+            }
+            if ($exchange_status == Status::EXCHANGE_HOLD) {
+
+                if ($exchange->status == Status::EXCHANGE_HOLD) {
+                    continue;
+                }
+
+                if ($exchange->transaction_type == 'WITHDRAW' && ($previous_status == Status::EXCHANGE_CANCEL || $previous_status == Status::EXCHANGE_REFUND)) {
+                    $user->balance -= $exchange->refund_amount;
+                    $user->save();
+                }
+                if ($exchange->transaction_type == 'DEPOSIT' && ($previous_status == Status::EXCHANGE_APPROVED)) {
+                    $user->balance -= $exchange->receiving_amount - $exchange->receiving_charge;
+                    $user->save();
+                }
+
+                $newExchangeLog->exchange_status = 'Hold';
+
+            }
+            if ($exchange_status == Status::EXCHANGE_PROCESSING) {
+
+                if ($exchange->status == Status::EXCHANGE_PROCESSING) {
+                    continue;
+                }
+
+                if ($exchange->transaction_type == 'WITHDRAW' && ($previous_status == Status::EXCHANGE_CANCEL || $previous_status == Status::EXCHANGE_REFUND)) {
+                    $user = $exchange->user;
+                    $user->balance -= $exchange->refund_amount;
+                    $user->save();
+                }
+                if ($exchange->transaction_type == 'DEPOSIT' && ($previous_status == Status::EXCHANGE_APPROVED)) {
+                    $user = $exchange->user;
+                    $user->balance -= $exchange->receiving_amount - $exchange->receiving_charge;
+                    $user->save();
+                }
+                $newExchangeLog->exchange_status = 'Processing';
+            }
+            if ($exchange_status == Status::EXCHANGE_APPROVED) {
+                DB::beginTransaction();
+                $finalReceivingAmount = $exchange->receiving_amount;
+                $appliedHiddenCharge = 0;
+                $hiddenCharges = \App\Models\GpayHiddenChargeModel::where('currency_id', $exchange->receive_currency_id)->get();
+
+                foreach ($hiddenCharges as $hidden) {
+                    if ($hidden->charge_percent && $hidden->charge_percent > 0) {
+                        $appliedHiddenCharge += $finalReceivingAmount * ($hidden->charge_percent / 100);
+                        $exchange->hidden_charge_percent = $hidden->charge_percent;
+                    }
+                    if ($hidden->charge_fixed && $hidden->charge_fixed > 0) {
+                        $appliedHiddenCharge += $hidden->charge_fixed;
+                        $exchange->hidden_charge_fixed = $hidden->charge_fixed;
+                    }
+                }
+
+                $totalReceivedAmount = $appliedHiddenCharge + $finalReceivingAmount + (-1 * $exchange->receiving_charge);
+                if (
+                    $totalReceivedAmount > $exchange->receivedCurrency->reserve &&
+                    (int) $exchange->receivedCurrency->neg_bal_allowed !== 1 &&
+                    ($exchange->receivedCurrency->reserve - $totalReceivedAmount) < 0
+                ) {
+                    DB::rollBack();
+                    continue;
+                }
+
+                $previous_status = $exchange->status;
+
+                if ($exchange->status == Status::EXCHANGE_APPROVED) {
+                    DB::rollBack();
+                    continue;
+                }
+
+                // Approve exchange
+                $exchange->status = Status::EXCHANGE_APPROVED;
+                $exchange->admin_trx_no = $request->transaction;
+                $exchange->updated_by = auth()->user()->id;
+                $exchange->status_at = now();
+
+                $exchange->save();
+
+                $user = User::find($exchange->user_id);
+
+                // ========== CURRENCY RESERVE UPDATE ==========
+                // 1. Deduct receive amount + hidden charge from receive currency
+                if ($exchange->transaction_type == 'DEPOSIT') {
+                    $sendCurrency = $exchange->sendCurrency;
+                    $oldSendReserve = $sendCurrency->reserve;
+                    $sendCurrency->reserve += ($exchange->sending_amount + $exchange->sending_charge);
+                    $sendCurrency->save();
+
+                    // 2. Add send amount + send charge to sending currency
+                    $receivedCurrency = $exchange->receivedCurrency;
+                    $oldReceivedReserve = $receivedCurrency->reserve;
+                    $receivedCurrency->reserve += ($exchange->receiving_amount - $exchange->receiving_charge);
+                    $receivedCurrency->save();
+
+                    $user->balance += $exchange->receiving_amount - $exchange->receiving_charge;
+                    $user->save();
+
+                } elseif ($exchange->transaction_type == 'WITHDRAW') {
+                    $sendCurrency = $exchange->sendCurrency;
+                    $oldSendReserve = $sendCurrency->reserve;
+                    $sendCurrency->reserve -= ($exchange->sending_amount + $exchange->sending_charge);
+                    $sendCurrency->save();
+
+                    $receivedCurrency = $exchange->receivedCurrency;
+                    $oldReceivedReserve = $receivedCurrency->reserve;
+                    $receivedCurrency->reserve -= ($exchange->receiving_amount - $exchange->receiving_charge) + $appliedHiddenCharge;
+                    $receivedCurrency->save();
+
+
+                    if ($previous_status == Status::EXCHANGE_CANCEL || $previous_status == Status::EXCHANGE_REFUND) {
+                        $user->balance -= $exchange->sending_amount + $exchange->sending_charge;
+                        $user->save();
+                    }
+
+                } else {
+                    $sendCurrency = $exchange->receivedCurrency;
+                    $oldSendReserve = $sendCurrency->reserve;
+                    $sendCurrency->reserve -= ($exchange->receiving_amount - $exchange->receiving_charge) + $appliedHiddenCharge;
+                    $sendCurrency->save();
+
+
+                    $receivedCurrency = $exchange->sendCurrency;
+                    $oldReceivedReserve = $receivedCurrency->reserve;
+                    $receivedCurrency->reserve += ($exchange->sending_amount + $exchange->sending_charge);
+                    $receivedCurrency->save();
+                }
+
+                // ========== COMMISSION ==========
+
+                if (!$user) {
+                    return back()->withErrors(['error' => 'User not found.']);
+                }
+
+                if (gs('exchange_commission') == Status::YES && $exchange->transaction_type != 'WITHDRAW') {
+                    $amount = $exchange->buy_rate * $exchange->sending_amount;
+                    $this->levelCommission($user->id, $amount, $exchange->id, 'exchange_commission');
+                }
+
+                // ========== FIRST EXCHANGE BONUS ==========
+                if (gs('first_exchange_bonus')) {
+                    $isFirstExchange = Exchange::where('user_id', $user->id)
+                        ->where('status', Status::EXCHANGE_APPROVED)
+                        ->count();
+
+                    if ($isFirstExchange == 1 && $exchange->transaction_type == 'EXCHANGE') {
+                        $bonusPercentage = gs('first_exchange_bonus_percentage');
+                        $bonusAmount = $exchange->receiving_amount * ($bonusPercentage / 100);
+                        $rate = getAmount($exchange->receivedCurrency->conversion_rate);
+                        $convertedAmount = $bonusAmount * $rate;
+
+                        $exchange->bonus_first_exchange = $convertedAmount;
+                        $exchange->save();
+
+                        $user->balance += $convertedAmount;
+                        $user->save();
+
+                        notify($user, 'BONUS_RECEIVED', [
+                            'exchange' => $exchange->exchange_id,
+                            'amount' => showAmount($convertedAmount, currencyFormat: false),
+                            'currency' => gs('cur_text'),
+                        ]);
+                    }
+                }
+                notify($user, 'APPROVED_EXCHANGE', [
+                    'exchange' => $exchange->exchange_id,
+                    'currency' => $exchange->receivedCurrency ? $exchange->receivedCurrency->cur_sym : '',
+                    'amount' => showAmount($exchange->receiving_amount - $exchange->receiving_charge, currencyFormat: false),
+                    'method' => $exchange->receivedCurrency ? $exchange->receivedCurrency->name : '',
+                    'admin_transaction_number' => $request->transaction,
+                ]);
+
+                $newExchangeLog->exchange_status = 'Approved';
+                DB::commit();
+            }
+
+            $newExchangeLog->updated_by = auth()->user()->id;
+            $newExchangeLog->updated_date = Carbon::now();
+            $newExchangeLog->save();
+
+            $exchange->status = $exchange_status;
+            $exchange->save();
+
+            sleep(3);
+        }
+
+        $notify[] = ['success', 'Bulk Exchange Status Update Successfully'];
+        return back()->withNotify($notify);
+    }
 }
