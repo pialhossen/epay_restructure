@@ -93,10 +93,15 @@
                             </ul>
                         </li>
                         <li class="menu-item">
-                            <a href="#" class="menu-item__link {{ menuActive(['user.affiliate.index', 'user.report.commission.log', 'user.profile.setting', 'user.twofactor', 'user.change.password']) }}">
+                            <a href="#" class="menu-item__link {{ menuActive(['user.statement.balance','user.affiliate.index', 'user.report.commission.log', 'user.profile.setting', 'user.twofactor', 'user.change.password']) }}">
                                 @lang('Account')
                             </a>
                             <ul class="sub-menu">
+                                <li>
+                                    <a href="{{ route('user.statement.balance') }}" class="{{ menuActive('user.statement.balance') }}">
+                                        @lang('Balence Statement')
+                                    </a>
+                                </li>
                                 <li>
                                     <a href="{{ route('user.affiliate.index') }}" class="{{ menuActive('user.affiliate.index') }}">
                                         @lang('Affiliation')

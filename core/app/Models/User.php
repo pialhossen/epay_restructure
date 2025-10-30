@@ -156,4 +156,7 @@ class User extends Authenticatable
     {
         return $this->hasMany(DeviceToken::class);
     }
+    public function balanceStatement(){
+        return $this->hasMany(BalanceStatement::class);
+    }
 }

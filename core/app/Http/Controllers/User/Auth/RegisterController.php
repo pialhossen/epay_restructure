@@ -6,6 +6,7 @@ use App\Constants\Status;
 use App\Http\Controllers\Controller;
 use App\Lib\Intended;
 use App\Models\AdminNotification;
+use App\Models\BalanceStatement;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Models\UserLogin;
@@ -111,6 +112,12 @@ class RegisterController extends Controller
         $user->save();
 
         if (gs('register_bonus') && gs('register_bonus_amount')) {
+            BalanceStatement::create([
+                "user_id" => $user->id,
+                "amount" => gs('register_bonus_amount'),
+                "via" => "Register Bonus",
+                "admin_id" => null,
+            ]);
             $user->balance += gs('register_bonus_amount');
             $user->save();
 

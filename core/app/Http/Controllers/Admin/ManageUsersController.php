@@ -375,6 +375,11 @@ class ManageUsersController extends Controller
         $transaction = new Transaction;
 
         if ($request->act == 'add') {
+            $user->balanceStatement()->create([
+                "amount" => $amount,
+                "via" => "Balance Add",
+                "admin_id" => auth("admin")->id(),
+            ]);
             $user->balance += $amount;
 
             $transaction->trx_type = '+';
@@ -389,7 +394,11 @@ class ManageUsersController extends Controller
 
                 return back()->withNotify($notify);
             }
-
+            $user->balanceStatement()->create([
+                "amount" => -$amount,
+                "via" => "Balance Subtract",
+                "admin_id" => auth("admin")->id(),
+            ]);
             $user->balance -= $amount;
 
             $transaction->trx_type = '-';

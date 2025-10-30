@@ -8,6 +8,7 @@ use App\Constants\Status;
 use App\Lib\FormProcessor;
 use App\Models\Withdrawal;
 use Illuminate\Http\Request;
+use App\Models\BalanceStatement;
 use App\Traits\TransactionTrait;
 use App\Models\AdminNotification;
 use App\Http\Controllers\Controller;
@@ -183,6 +184,11 @@ class WithdrawController extends Controller
         
         $user->balance -= $withdraw->refund_amount;
         $user->save();
+        $user->balanceStatement()->create([
+            "amount" => -$withdraw->refund_amount,
+            "via" => "Withdraw Placed",
+            "admin_id" => null,
+        ]);
 
         $adminNotification = new AdminNotification;
         $adminNotification->user_id = $user->id;
