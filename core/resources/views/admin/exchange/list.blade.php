@@ -33,18 +33,24 @@
                     @php
                     $lastSegment = request()->segment(count(request()->segments()));
                     @endphp
-                    <form class="m-2" action="{{ route('admin.exchange.list', $lastSegment) }}" method="GET">
+                    <form class="m-2" action="{{ route('admin.exchange.list', $lastSegment) }}" method="GET" autocomplete="off">
                         @if(request()->query('itemsPerPage'))
                             <input type="hidden" name="itemsPerPage" value="{{ request('itemsPerPage') }}">
                         @endif
                         <div class="row pb-2">
-                            <div class="col-lg-3 col-md-6 col-12">
+                            <div class="col-lg-3 col-md-6 col-12 advance-search" data-advance-search-url="{{ route('admin.exchange.advance.search') }}">
                                 <label for="exchange_id">Exchange ID</label>
-                                <input @if($request->exchange_id) value="{{ $request->exchange_id }}" @endif type="text" name="exchange_id" class="form-control">
+                                <input @if($request->exchange_id) value="{{ $request->exchange_id }}" @endif type="text" name="exchange_id" class="form-control" autocomplete="off">
+                                <div class="suggestion-box">
+                                    Input Search Text
+                                </div>
                             </div>
-                            <div class="col-lg-3 col-md-6 col-12">
+                            <div class="col-lg-3 col-md-6 col-12 advance-search" data-advance-search-url="{{ route('admin.exchange.advance.search') }}">
                                 <label for="email">Email / Username</label>
-                                <input @if($request->email) value="{{ $request->email }}" @endif type="text" name="email" class="form-control">
+                                <input @if($request->email) value="{{ $request->email }}" @endif type="text" name="email" class="form-control" autocomplete="off">
+                                <div class="suggestion-box">
+                                    Input Search Text
+                                </div>
                             </div>
                             <div class="col-lg-3 col-md-6 col-12">
                                 <label for="transaction_type">Transaction Type</label>
@@ -76,7 +82,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-lg-3 col-md-6 col-12">
+                            <div class="col-lg-3 col-md-6 col-12" data-advance-search-url="">
                                 <label for="created_from">Created From</label>
                                 <input @if($request->created_from) value="{{ $request->created_from }}" @endif type="date" name="created_from" class="form-control">
                             </div>

@@ -166,7 +166,7 @@ class ManageUsersController extends Controller
         return view('admin.users.list', compact('pageTitle', 'users'));
     }
 
-    protected function userData($scope = null)
+    protected function userData($scope = null, $isPaginate = true, $query = false)
     {
         $request = request();
         // dd($request->query());
@@ -192,8 +192,8 @@ class ManageUsersController extends Controller
 
 
         }
-        if (isset($request->phone_no) && $request->phone_no) {
-            $users = $users->where('mobile', $request->phone_no);
+        if (isset($request->mobile) && $request->mobile) {
+            $users = $users->where('mobile', $request->mobile);
         }
         if (isset($request->email) && $request->email) {
             $users = $users->where('email', $request->email);
@@ -201,11 +201,11 @@ class ManageUsersController extends Controller
         if (isset($request->username) && $request->username) {
             $users = $users->where('username', $request->username);
         }
-        if (isset($request->first_name) && $request->first_name) {
-            $users = $users->where('firstname', 'like', '%' . $request->first_name . '%');
+        if (isset($request->firstname) && $request->firstname) {
+            $users = $users->where('firstname', 'like', '%' . $request->firstname . '%');
         }
-        if (isset($request->last_name) && $request->last_name) {
-            $users = $users->where('lastname', 'like', '%' . $request->last_name . '%');
+        if (isset($request->lastname) && $request->lastname) {
+            $users = $users->where('lastname', 'like', '%' . $request->lastname . '%');
         }
         if (isset($request->address) && $request->address) {
             $users = $users->where('address', 'like', '%' . $request->address . '%');
@@ -222,8 +222,15 @@ class ManageUsersController extends Controller
                 $users = $users->orderBy($column, $direction);
             }
         }
-        $users_data = $users->orderBy('id', 'desc')
-            ->paginate(getPaginate($request->itemsPerPage ? $request->itemsPerPage : null));
+        if($query){
+            return $users;
+        }
+        if($isPaginate){
+            $users_data = $users->orderBy('id', 'desc')
+                ->paginate(getPaginate($request->itemsPerPage ? $request->itemsPerPage : null));
+        } else {
+            $users_data = $users->orderBy('id', 'desc')->get();
+        }
 
         return $users_data;
     }
@@ -586,5 +593,17 @@ class ManageUsersController extends Controller
         $logs = NotificationLog::where('user_id', $id)->with('user')->orderBy('id', 'desc')->paginate(getPaginate());
 
         return view('admin.reports.notification_history', compact('pageTitle', 'logs', 'user'));
+    }
+    public function advance_search_users(Request $request){
+        $field = $request->field;
+        $value = $request->value;
+        $current_url = $request->current_url;
+        $url_array = explode('/', $current_url);
+        $last_segment = $url_array[count($url_array) - 1];
+
+        $users_query = $this->userData(scope: $last_segment,isPaginate: false, query: true);
+        $users = $users_query->where($field,'like',"%$value%")->limit(100)->get();
+        $data = $users->pluck($field)->toArray();
+        return ["status" => "success", "data" => $data];
     }
 }

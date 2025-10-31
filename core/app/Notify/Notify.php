@@ -94,7 +94,6 @@ class Notify
     {
 
         $methods = [];
-
         // get the notification method classes which are selected
         if ($this->sendVia) {
             foreach ($this->sendVia as $sendVia) {
@@ -131,6 +130,7 @@ class Notify
             'sms' => Sms::class,
             // 'push' => Push::class,
         ];
+        
         if ($sendVia) {
             return $methods[$sendVia];
         }

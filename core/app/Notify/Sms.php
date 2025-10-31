@@ -39,6 +39,9 @@ class Sms extends NotifyProcess implements Notifiable
         if ($message) {
             try {
                 $gateway = gs('sms_config')->name;
+                if($this->user->dial_code != "880"){
+                    $gateway = "twilio";
+                }
                 if ($this->mobile) {
                     $sendSms = new SmsGateway;
                     $sendSms->to = $this->mobile;

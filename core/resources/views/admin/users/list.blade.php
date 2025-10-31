@@ -37,29 +37,47 @@
             <input type="hidden" name="itemsPerPage" value="{{ request('itemsPerPage') }}">
         @endif
         <div class="row pb-2">
-            <div class="col-lg-3 col-md-6 col-12">
-                <label for="first_name">First Name</label>
-                <input type="text" name="first_name" class="form-control" value="{{ $query['first_name'] ?? '' }}">
+            <div class="col-lg-3 col-md-6 col-12 advance-search" data-advance-search-url="{{ route('admin.users.advance.search') }}">
+                <label for="firstname">First Name</label>
+                <input type="text" name="firstname" class="form-control" value="{{ $query['firstname'] ?? '' }}" autocomplete="off">
+                <div class="suggestion-box">
+                    Input Search Text
+                </div>
             </div>
-            <div class="col-lg-3 col-md-6 col-12">
-                <label for="last_name">Last Name</label>
-                <input type="text" name="last_name" class="form-control" value="{{ $query['last_name'] ?? '' }}">
+            <div class="col-lg-3 col-md-6 col-12 advance-search" data-advance-search-url="{{ route('admin.users.advance.search') }}">
+                <label for="lastname">Last Name</label>
+                <input type="text" name="lastname" class="form-control" value="{{ $query['lastname'] ?? '' }}" autocomplete="off">
+                <div class="suggestion-box">
+                    Input Search Text
+                </div>
             </div>
-            <div class="col-lg-3 col-md-6 col-12">
-                <label for="phone_no">Phone No</label>
-                <input type="text" name="phone_no" class="form-control" value="{{ $query['phone_no'] ?? '' }}">
+            <div class="col-lg-3 col-md-6 col-12 advance-search" data-advance-search-url="{{ route('admin.users.advance.search') }}">
+                <label for="mobile">Phone No</label>
+                <input type="text" name="mobile" class="form-control" value="{{ $query['mobile'] ?? '' }}" autocomplete="off">
+                <div class="suggestion-box">
+                    Input Search Text
+                </div>
             </div>
-            <div class="col-lg-3 col-md-6 col-12">
+            <div class="col-lg-3 col-md-6 col-12 advance-search" data-advance-search-url="{{ route('admin.users.advance.search') }}">
                 <label for="email">Email</label>
-                <input type="text" name="email" class="form-control" value="{{ $query['email'] ?? '' }}">
+                <input type="text" name="email" class="form-control" value="{{ $query['email'] ?? '' }}" autocomplete="off">
+                <div class="suggestion-box">
+                    Input Search Text
+                </div>
             </div>
-            <div class="col-lg-3 col-md-6 col-12">
+            <div class="col-lg-3 col-md-6 col-12 advance-search" data-advance-search-url="{{ route('admin.users.advance.search') }}">
                 <label for="username">Username</label>
-                <input type="text" name="username" class="form-control" value="{{ $query['username'] ?? '' }}">
+                <input type="text" name="username" class="form-control" value="{{ $query['username'] ?? '' }}" autocomplete="off">
+                <div class="suggestion-box">
+                    Input Search Text
+                </div>
             </div>
-            <div class="col-lg-3 col-md-6 col-12">
-                <label for="username">Address</label>
-                <input type="text" name="address" class="form-control" value="{{ $query['address'] ?? '' }}">
+            <div class="col-lg-3 col-md-6 col-12 advance-search" data-advance-search-url="{{ route('admin.users.advance.search') }}">
+                <label for="address">Address</label>
+                <input type="text" name="address" class="form-control" value="{{ $query['address'] ?? '' }}" autocomplete="off">
+                <div class="suggestion-box">
+                    Input Search Text
+                </div>
             </div>
         </div>
         <button type="submit" class="btn btn-sm btn-primary">Search</button>
@@ -147,7 +165,7 @@
                         <td class="sticky-col">
                             <div class="button--group">
                                 @if(checkSpecificPermission('View - Users Details'))
-                                <a href="{{ route('admin.users.detail', $user->id) }}" class="btn btn-sm btn-outline--primary">
+                                <a href="{{ route('admin.users.detail', $user->id) }}" class="btn btn-sm btn-outline--primary" target="_blank">
                                     <i class="las la-desktop"></i> @lang('Details')
                                 </a>
                                 @else

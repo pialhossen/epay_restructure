@@ -99,8 +99,10 @@ class LoginController extends Controller
         $this->guard()->logout();
         request()->session()->invalidate();
         $user = auth()->user();
-        $user->session_id = null;
-        $user->save();
+        if($user){
+            $user->session_id = null;
+            $user->save();
+        }
 
         $notify[] = ['success', 'You have been logged out.'];
 

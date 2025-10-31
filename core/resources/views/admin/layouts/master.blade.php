@@ -69,6 +69,8 @@
         
         window.stopAlertNotificationBroadcast = "{{ route('api.stop_alert') }}";
         window.APP_PUBLIC_FOLDER = "{{ APP_PUBLIC_FOLDER }}";
+        window.exchange_advance_search = "{{ route('admin.exchange.advance.search') }}";
+        window.current_url = "{{ url()->current() }}"
     </script>
     @php
         $customView = 'components.custom.custom';

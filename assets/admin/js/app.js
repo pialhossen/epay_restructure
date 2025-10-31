@@ -190,4 +190,63 @@ Array.from(document.querySelectorAll('table')).forEach(table => {
     });
   }
 
+  function paste_suggestion(element){
+    const parent = element.parentElement
+    const grandparent = element.parentElement.parentElement
+    const inputElement = grandparent.querySelector('input[type="text"]')
+    inputElement.value = element.innerHTML
+    parent.style.display = 'none';
+  }
+  const advanceSearchFieldParents = document.querySelectorAll('.advance-search');
+  advanceSearchFieldParents.forEach(advanceSearchFieldParent => {
+    const input_field = advanceSearchFieldParent.querySelector('input[type="text"]')
+    const suggestion_box = advanceSearchFieldParent.querySelector('.suggestion-box')
+    const url = advanceSearchFieldParent.dataset.advanceSearchUrl
+    input_field.addEventListener('blur', e => {
+      setTimeout(() => {
+        suggestion_box.style.display = 'none'
+      }, 200)
+    })
+    let debaunceSetTimeOut = null;
+    input_field.addEventListener('input', e => {
+      if(!debaunceSetTimeOut){}
+      if(debaunceSetTimeOut === null){
+        suggestion_box.style.display = 'flex'
+        suggestion_box.innerHTML = `<div class="spinner-container">
+                                          <div class="spinner"></div>
+                                      </div>`;
+      }
+      if(debaunceSetTimeOut) clearTimeout(debaunceSetTimeOut);
+      debaunceSetTimeOut = setTimeout(async () => {
+        debaunceSetTimeOut = null;
+        const tokenMeta = document.querySelector('meta[name="csrf-token"]');
+        const csrfToken = tokenMeta ? tokenMeta.getAttribute('content') : '';
+        const result = await fetch(url+`?field=${input_field.getAttribute('name')}&value=${input_field.value}&current_url=${window.current_url}`, {
+          method: "GET",
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken
+          },
+        });
+        const responseData = await result.json();
+        const suggestions = responseData.data;
+        suggestion_box.innerHTML = '';
+        if(suggestions.length > 0){
+          suggestions.forEach(text => {
+            const span = document.createElement('span');
+            span.className = 'suggestion';
+            span.textContent = text;
+            span.addEventListener('click', function () {
+              paste_suggestion(this);
+            });
+            suggestion_box.appendChild(span);
+          });
+        } else {
+          suggestion_box.innerHTML = "<div class='empty-suggestion'>No Data Found</div>";
+        }
+
+      },1000)
+    })
+  })
+
 })(jQuery);

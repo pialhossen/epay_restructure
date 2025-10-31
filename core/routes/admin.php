@@ -80,6 +80,8 @@ Route::middleware('admin')->group(function () {
         Route::get('list', 'list')->name('list');
         Route::get('count-by-segment/{methodName}', 'countBySegment')->name('segment.count');
         Route::get('notification-log/{id}', 'notificationLog')->name('notification.log');
+
+        Route::get('/advance_search_users', 'advance_search_users')->name('advance.search');
     });
 
     // Subscriber
@@ -386,6 +388,8 @@ Route::middleware('admin')->group(function () {
 
     // exchange
     Route::controller('ExchangeController')->prefix('exchange')->name('exchange.')->group(function () {
+        Route::get('/advance_search_exchange', 'advance_search')->name('advance.search');
+
         Route::get('/{scope}', 'index')->name('list');
         Route::get('details/{id}', 'details')->name('details');
         Route::post('cancel/{id}', 'cancel')->name('cancel');

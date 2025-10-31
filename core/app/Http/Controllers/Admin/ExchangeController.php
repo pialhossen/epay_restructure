@@ -1228,7 +1228,7 @@ class ExchangeController extends Controller
 
             }
             if ($exchange_status == Status::EXCHANGE_REFUND) {
-    
+
                 if ($exchange->status == Status::EXCHANGE_REFUND) {
                     continue;
                 }
@@ -1445,7 +1445,7 @@ class ExchangeController extends Controller
 
                         $exchange->bonus_first_exchange = $convertedAmount;
                         $exchange->save();
-                        
+
                         $user->balanceStatement()->create([
                             "amount" => $convertedAmount,
                             "via" => "First Exchange Bonus",
@@ -1485,5 +1485,76 @@ class ExchangeController extends Controller
 
         $notify[] = ['success', 'Bulk Exchange Status Update Successfully'];
         return back()->withNotify($notify);
+    }
+    public function advance_search(Request $request)
+    {
+        $field = $request->field;
+        $value = $request->value;
+        $current_url = $request->current_url;
+        $url_array = explode('/', $current_url);
+        $last_segment = $url_array[count($url_array) - 1];
+
+        $allowedFields = ['exchange_id', 'email'];
+        if (!in_array($field, $allowedFields)) {
+            abort(400, 'Invalid search field');
+        }
+        if ($field == "exchange_id") {
+            $data_query = Exchange::where("status", "!=", 0)->where($field, "like", "%$value%");
+
+            if ($last_segment == 'pending') {
+                $data_query = $data_query->where('status', Status::EXCHANGE_PENDING);
+            }
+            if ($last_segment == 'hold') {
+                $data_query = $data_query->where('status', Status::EXCHANGE_HOLD);
+            }
+            if ($last_segment == 'processing') {
+                $data_query = $data_query->where('status', Status::EXCHANGE_PROCESSING);
+            }
+            if ($last_segment == 'approved') {
+                $data_query = $data_query->where('status', Status::EXCHANGE_APPROVED);
+            }
+            if ($last_segment == 'refunded') {
+                $data_query = $data_query->where('status', Status::EXCHANGE_REFUND);
+            }
+            if ($last_segment == 'canceled') {
+                $data_query = $data_query->where('status', Status::EXCHANGE_CANCEL);
+            }
+
+            $data = $data_query->limit(100)->get()->pluck($field)->toArray();
+        } else {
+            $data_query = Exchange::whereHas('user', function ($query) use ($value) {
+                $query->where(function ($q) use ($value) {
+                    $q->where('email', 'like', "%$value%")
+                        ->orWhere('username', 'like', "%$value%");
+                });
+            })
+                ->with('user:id,email,username');
+            if ($last_segment == 'pending') {
+                $data_query = $data_query->where('status', Status::EXCHANGE_PENDING);
+            }
+            if ($last_segment == 'hold') {
+                $data_query = $data_query->where('status', Status::EXCHANGE_HOLD);
+            }
+            if ($last_segment == 'processing') {
+                $data_query = $data_query->where('status', Status::EXCHANGE_PROCESSING);
+            }
+            if ($last_segment == 'approved') {
+                $data_query = $data_query->where('status', Status::EXCHANGE_APPROVED);
+            }
+            if ($last_segment == 'refunded') {
+                $data_query = $data_query->where('status', Status::EXCHANGE_REFUND);
+            }
+            if ($last_segment == 'canceled') {
+                $data_query = $data_query->where('status', Status::EXCHANGE_CANCEL);
+            }
+            $data = $data_query->get()
+                ->unique(fn($exchange) => $exchange->user->email)
+                ->flatMap(function ($exchange) {
+                    return [$exchange->user->email, $exchange->user->username];
+                })
+                ->values()
+                ->toArray();
+        }
+        return ["status" => "success", "data" => $data];
     }
 }
