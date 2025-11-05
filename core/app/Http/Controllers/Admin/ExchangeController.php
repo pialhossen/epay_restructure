@@ -246,6 +246,25 @@ class ExchangeController extends Controller
                     case 'placed_at':
                         $row['placed_at'] = Carbon::create($exchange->created_at)->format('d/m/y h:i:s A');
                         break;
+                    case 'placed_by':
+                        $row['placed_by'] = isset($exchange->orderPlaceAdmin->name) ? $exchange->orderPlaceAdmin->name : 'User';
+                        break;
+                    case 'aditional_field_payment_prove':
+                        $text = '';
+                        if ($exchange->transaction_proof_data) {
+                            foreach ($exchange->transaction_proof_data as $transaction_proof) {
+                                $text .= "$transaction_proof->name: $transaction_proof->value \n";
+                            }
+                        }
+
+                        if ($exchange->user_data) {
+                            foreach ($exchange->user_data as $user_data) {
+                                $text .= "$user_data->name: $user_data->value \n";
+                            }
+                        }
+
+                        $row['aditional_field_payment_prove'] = $text;
+                        break;
                     case 'updated_at':
                         $row['updated_at'] = Carbon::create($exchange->updated_at)->format('d/m/y h:i:s A');
                         break;

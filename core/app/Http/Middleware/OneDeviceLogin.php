@@ -12,9 +12,10 @@ class OneDeviceLogin
     {
         if (Auth::guard('web')->check()) {
             $user = Auth::guard('web')->user();
+            $is_admin_user = Auth::guard('admin')->check();
             $currentSessionId = session()->getId();
             
-            if ($user->session_id && $user->session_id !== $currentSessionId) {
+            if ($user->session_id && $user->session_id !== $currentSessionId && !$is_admin_user) {
                 Auth::guard('web')->logout();
                 session()->invalidate();
                 session()->regenerateToken();

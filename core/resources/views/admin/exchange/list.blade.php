@@ -141,6 +141,7 @@
                                     <th>@lang('Status')</th>
                                     <th >@lang('Updated By')</th>
                                     <th >@lang('Placed By')</th>
+                                    <th >@lang('Aditional field / payment prove')</th>
                                     <th style="cursor: pointer;" onclick="toggleSort(event, 'created_at')">
                                         <div class="sortable-header">
                                             <span class="sort-indicate"> 
@@ -239,6 +240,18 @@
                                         <td> @php echo $exchange->badgeData() @endphp </td>
                                         <td> {{ @$exchange->updatedBy->name }} </td>
                                         <td> {{ isset($exchange->orderPlaceAdmin->name)? $exchange->orderPlaceAdmin->name: "User"}} </td>
+                                        <td>
+                                            @if($exchange->transaction_proof_data)
+                                                @foreach ($exchange->transaction_proof_data as $transaction_proof)
+                                                {{ $transaction_proof->name }}: {{ $transaction_proof->value }}<br> 
+                                                @endforeach
+                                            @endif
+                                            @if($exchange->user_data)
+                                                @foreach ($exchange->user_data as $user_data)
+                                                {{ $user_data->name }}: {{ $user_data->value }}<br> 
+                                                @endforeach
+                                            @endif
+                                        </td>
                                         <td> {{ $exchange->created_at->format('d/m/y h:i:s A') }} </td>
                                         <td> {{ $exchange->updated_at->format('d/m/y h:i:s A') }} </td>
                                         <td class="sticky-col" style="background: white;">
@@ -363,6 +376,20 @@
                                 <div class="col-lg-6 mb-3">
                                     <label>@lang('Status')</label>
                                     <input type="checkbox" name="columns[]" value="status" checked data-width="100%"
+                                           data-size="large" data-onstyle="-success" data-offstyle="-danger"
+                                           data-bs-toggle="toggle" data-height="50" data-on="@lang('Yes')"
+                                           data-off="@lang('No')">
+                                </div>
+                                <div class="col-lg-6 mb-3">
+                                    <label>@lang('Placed By')</label>
+                                    <input type="checkbox" name="columns[]" value="placed_by" checked data-width="100%"
+                                           data-size="large" data-onstyle="-success" data-offstyle="-danger"
+                                           data-bs-toggle="toggle" data-height="50" data-on="@lang('Yes')"
+                                           data-off="@lang('No')">
+                                </div>
+                                <div class="col-lg-6 mb-3">
+                                    <label>@lang('Aditional field / payment prove')</label>
+                                    <input type="checkbox" name="columns[]" value="aditional_field_payment_prove" checked data-width="100%"
                                            data-size="large" data-onstyle="-success" data-offstyle="-danger"
                                            data-bs-toggle="toggle" data-height="50" data-on="@lang('Yes')"
                                            data-off="@lang('No')">
