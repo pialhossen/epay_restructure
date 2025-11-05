@@ -90,7 +90,7 @@ class PosController extends Controller
                 }
 
                 // Fetch once (no N+1 queries)
-                $exchanges = $exchangesQuery->get();
+                $exchanges = $exchangesQuery->paginate(getPaginate());
 
                 // Prepare calculations
                 $transactions = [];

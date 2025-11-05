@@ -24,7 +24,7 @@ class BalanceController extends Controller
             ->orderByDesc('month')
             ->get();
         if ($months->isEmpty()) {
-            return collect();
+            return view('Template::user.balance.list', compact( 'pageTitle'));
         }
         $currentMonth = $months->get($page - 1);
         $statements = auth()->user()->balanceStatement()->whereYear('created_at', $currentMonth->year)

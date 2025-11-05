@@ -46,7 +46,7 @@ window.Echo.private("check.admin").listen(
                 .catch(error => console.error('Error:', error))
 
                 if (result.isConfirmed) {
-                    window.open(`/admin/exchange/details/${e.exchange.id}`, '_blank');
+                    window.open(`/${window.APP_PUBLIC_FOLDER? window.APP_PUBLIC_FOLDER +'/': ''}admin/exchange/details/${e.exchange.id}`, '_blank');
                 }
             })
         }

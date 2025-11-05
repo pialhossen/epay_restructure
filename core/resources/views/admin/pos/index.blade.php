@@ -273,11 +273,11 @@
                         </table>
                     </div>
                 </div>
-                {{--  @if ($exchanges->hasPages())
+                @if ($exchanges->hasPages())
                     <div class="card-footer py-4">
                         {{ paginateLinks($exchanges) }}
                     </div>
-                @endif  --}}
+                @endif
             </div>
         </div>
     </div>

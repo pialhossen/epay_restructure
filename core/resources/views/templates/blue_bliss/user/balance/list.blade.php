@@ -30,7 +30,7 @@
         <div class="row justify-content-center">
             <div class="col-lg-12">
                 <div class="card custom--card">
-                    @if (!$statements->isEmpty())
+                    @if (isset($statements) && !$statements->isEmpty())
                         <div class="card-body p-0 table-container">
                             <div class="card-header p-2 d-flex justify-content-between">
                                 <h5>{{ auth()->user()->username }}'s Current balance = {{ number_format(auth()->user()->balance,2) }}</h5>
@@ -62,11 +62,11 @@
                         </div>
                     @else
                         @include($activeTemplate . 'partials.empty', [
-                            'message' => 'No exchange found',
+                            'message' => 'No Balance Statement found',
                         ])
                     @endif
                 </div>    
-                {{ $paginator->links() }}
+                {{ isset($paginator) && $paginator->links() }}
             </div>
         </div>
     </div>
