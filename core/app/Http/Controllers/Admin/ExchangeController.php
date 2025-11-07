@@ -449,18 +449,22 @@ class ExchangeController extends Controller
 
         if ($exchange->transaction_type == 'WITHDRAW' && ($previous_status == Status::EXCHANGE_CANCEL || $previous_status == Status::EXCHANGE_REFUND)) {
             $user->balanceStatement()->create([
-                "amount" => -($exchange->sending_amount + $exchange->sending_charge),
+                "before" => $user->balance,
+                "after" => $user->balance - ($exchange->sending_amount + $exchange->sending_charge),
                 "via" => "Withdraw Pending",
                 "admin_id" => auth("admin")->id(),
+                "exchange_id" => $exchange->id,
             ]);
             $user->balance -= $exchange->sending_amount + $exchange->sending_charge;
             $user->save();
         }
         if ($exchange->transaction_type == 'DEPOSIT' && ($previous_status == Status::EXCHANGE_APPROVED)) {
             $user->balanceStatement()->create([
-                "amount" => -($exchange->receiving_amount - $exchange->receiving_charge),
+                "before" => $user->balance,
+                "after" => $user->balance - ($exchange->receiving_amount - $exchange->receiving_charge),
                 "via" => "Deposit Pending",
                 "admin_id" => auth("admin")->id(),
+                "exchange_id" => $exchange->id,
             ]);
             $user->balance -= $exchange->receiving_amount - $exchange->receiving_charge;
             $user->save();
@@ -522,18 +526,22 @@ class ExchangeController extends Controller
 
         if ($exchange->transaction_type == 'WITHDRAW' && $previous_status != Status::EXCHANGE_REFUND) {
             $user->balanceStatement()->create([
-                "amount" => $exchange->refund_amount,
+                "before" => $user->balance,
+                "after" => $user->balance + $exchange->refund_amount,
                 "via" => "Withdraw Cancel",
                 "admin_id" => auth("admin")->id(),
+                "exchange_id" => $exchange->id,
             ]);
             $user->balance += $exchange->refund_amount;
             $user->save();
         }
         if ($exchange->transaction_type == 'DEPOSIT' && ($previous_status == Status::EXCHANGE_APPROVED)) {
             $user->balanceStatement()->create([
-                "amount" => -($exchange->receiving_amount - $exchange->receiving_charge),
+                "before" => $user->balance,
+                "after" => $user->balance - ($exchange->receiving_amount - $exchange->receiving_charge),
                 "via" => "Deposit Cancel",
                 "admin_id" => auth("admin")->id(),
+                "exchange_id" => $exchange->id,
             ]);
             $user->balance -= $exchange->receiving_amount - $exchange->receiving_charge;
             $user->save();
@@ -594,9 +602,11 @@ class ExchangeController extends Controller
 
         if ($exchange->transaction_type == 'WITHDRAW' && $previous_status != Status::EXCHANGE_CANCEL) {
             $user->balanceStatement()->create([
-                "amount" => $exchange->refund_amount,
+                "before" => $user->balance,
+                "after" => $user->balance + $exchange->refund_amount,
                 "via" => "Withdaw Refund",
                 "admin_id" => auth("admin")->id(),
+                "exchange_id" => $exchange->id,
             ]);
             $user->balance += $exchange->refund_amount;
             $user->save();
@@ -604,9 +614,11 @@ class ExchangeController extends Controller
 
         if ($exchange->transaction_type == 'DEPOSIT' && $previous_status == Status::EXCHANGE_APPROVED) {
             $user->balanceStatement()->create([
-                "amount" => -($exchange->receiving_amount - $exchange->receiving_charge),
+                "before" => $user->balance,
+                "after" => $user->balance - ($exchange->receiving_amount - $exchange->receiving_charge),
                 "via" => "Deposit Refund",
                 "admin_id" => auth("admin")->id(),
+                "exchange_id" => $exchange->id,
             ]);
             $user->balance -= $exchange->receiving_amount - $exchange->receiving_charge;
             $user->save();
@@ -665,18 +677,22 @@ class ExchangeController extends Controller
 
         if ($exchange->transaction_type == 'WITHDRAW' && ($previous_status == Status::EXCHANGE_CANCEL || $previous_status == Status::EXCHANGE_REFUND)) {
             $user->balanceStatement()->create([
-                "amount" => -$exchange->refund_amount,
+                "before" => $user->balance,
+                "after" => $user->balance - $exchange->refund_amount,
                 "via" => "Withdraw Hold",
                 "admin_id" => auth("admin")->id(),
+                "exchange_id" => $exchange->id,
             ]);
             $user->balance -= $exchange->refund_amount;
             $user->save();
         }
         if ($exchange->transaction_type == 'DEPOSIT' && ($previous_status == Status::EXCHANGE_APPROVED)) {
             $user->balanceStatement()->create([
-                "amount" => -($exchange->receiving_amount - $exchange->receiving_charge),
+                "before" => $user->balance,
+                "after" => $user->balance - ($exchange->receiving_amount - $exchange->receiving_charge),
                 "via" => "Deposit Hold",
                 "admin_id" => auth("admin")->id(),
+                "exchange_id" => $exchange->id,
             ]);
             $user->balance -= $exchange->receiving_amount - $exchange->receiving_charge;
             $user->save();
@@ -726,9 +742,11 @@ class ExchangeController extends Controller
         if ($exchange->transaction_type == 'WITHDRAW' && ($previous_status == Status::EXCHANGE_CANCEL || $previous_status == Status::EXCHANGE_REFUND)) {
             $user = $exchange->user;
             $user->balanceStatement()->create([
-                "amount" => -$exchange->refund_amount,
+                "before" => $user->balance,
+                "after" => $user->balance - $exchange->refund_amount,
                 "via" => "Withdraw Processing",
                 "admin_id" => auth("admin")->id(),
+                "exchange_id" => $exchange->id,
             ]);
             $user->balance -= $exchange->refund_amount;
             $user->save();
@@ -736,9 +754,11 @@ class ExchangeController extends Controller
         if ($exchange->transaction_type == 'DEPOSIT' && ($previous_status == Status::EXCHANGE_APPROVED)) {
             $user = $exchange->user;
             $user->balanceStatement()->create([
-                "amount" => -($exchange->receiving_amount - $exchange->receiving_charge),
+                "before" => $user->balance,
+                "after" => $user->balance - ($exchange->receiving_amount - $exchange->receiving_charge),
                 "via" => "Deposit Processing",
                 "admin_id" => auth("admin")->id(),
+                "exchange_id" => $exchange->id,
             ]);
             $user->balance -= $exchange->receiving_amount - $exchange->receiving_charge;
             $user->save();
@@ -832,9 +852,11 @@ class ExchangeController extends Controller
                 $receivedCurrency->reserve += ($exchange->receiving_amount - $exchange->receiving_charge);
                 $receivedCurrency->save();
                 $user->balanceStatement()->create([
-                    "amount" => $exchange->receiving_amount - $exchange->receiving_charge,
+                    "before" => $user->balance,
+                    "after" => $user->balance + ($exchange->receiving_amount - $exchange->receiving_charge),
                     "via" => "Deposit Approve",
                     "admin_id" => auth("admin")->id(),
+                    "exchange_id" => $exchange->id,
                 ]);
                 $user->balance += $exchange->receiving_amount - $exchange->receiving_charge;
                 $user->save();
@@ -853,9 +875,11 @@ class ExchangeController extends Controller
 
                 if ($previous_status == Status::EXCHANGE_CANCEL || $previous_status == Status::EXCHANGE_REFUND) {
                     $user->balanceStatement()->create([
-                        "amount" => -($exchange->sending_amount + $exchange->sending_charge),
+                        "before" => $user->balance,
+                        "after" => $user->balance - ($exchange->sending_amount + $exchange->sending_charge),
                         "via" => "Withdraw Approve",
                         "admin_id" => auth("admin")->id(),
+                        "exchange_id" => $exchange->id,
                     ]);
                     $user->balance -= $exchange->sending_amount + $exchange->sending_charge;
                     $user->save();
@@ -900,9 +924,11 @@ class ExchangeController extends Controller
                     $exchange->bonus_first_exchange = $convertedAmount;
                     $exchange->save();
                     $user->balanceStatement()->create([
-                        "amount" => $convertedAmount,
+                        "before" => $user->balance,
+                        "after" => $user->balance + $convertedAmount,
                         "via" => "First Exchange Bonus",
                         "admin_id" => auth("admin")->id(),
+                        "exchange_id" => $exchange->id,
                     ]);
                     $user->balance += $convertedAmount;
                     $user->save();
@@ -1189,18 +1215,22 @@ class ExchangeController extends Controller
 
                 if ($exchange->transaction_type == 'WITHDRAW' && ($previous_status == Status::EXCHANGE_CANCEL || $previous_status == Status::EXCHANGE_REFUND)) {
                     $user->balanceStatement()->create([
-                        "amount" => -($exchange->sending_amount + $exchange->sending_charge),
+                        "before" => $user->balance,
+                        "after" => $user->balance - ($exchange->sending_amount + $exchange->sending_charge),
                         "via" => "Withdraw Bulk Pending",
                         "admin_id" => auth("admin")->id(),
+                        "exchange_id" => $exchange->id,
                     ]);
                     $user->balance -= $exchange->sending_amount + $exchange->sending_charge;
                     $user->save();
                 }
                 if ($exchange->transaction_type == 'DEPOSIT' && ($previous_status == Status::EXCHANGE_APPROVED)) {
                     $user->balanceStatement()->create([
-                        "amount" => -($exchange->receiving_amount - $exchange->receiving_charge),
+                        "before" => $user->balance,
+                        "after" => $user->balance - ($exchange->receiving_amount - $exchange->receiving_charge),
                         "via" => "Deposit Bulk Pending",
                         "admin_id" => auth("admin")->id(),
+                        "exchange_id" => $exchange->id,
                     ]);
                     $user->balance -= $exchange->receiving_amount - $exchange->receiving_charge;
                     $user->save();
@@ -1221,18 +1251,22 @@ class ExchangeController extends Controller
 
                 if ($exchange->transaction_type == 'WITHDRAW' && $previous_status != Status::EXCHANGE_REFUND) {
                     $user->balanceStatement()->create([
-                        "amount" => $exchange->refund_amount,
+                        "before" => $user->balance,
+                        "after" => $user->balance + $exchange->refund_amount,
                         "via" => "Withdraw Cancel",
                         "admin_id" => auth("admin")->id(),
+                        "exchange_id" => $exchange->id,
                     ]);
                     $user->balance += $exchange->refund_amount;
                     $user->save();
                 }
                 if ($exchange->transaction_type == 'DEPOSIT' && ($previous_status == Status::EXCHANGE_APPROVED)) {
                     $user->balanceStatement()->create([
-                        "amount" => -($exchange->receiving_amount - $exchange->receiving_charge),
+                        "before" => $user->balance,
+                        "after" => $user->balance - ($exchange->receiving_amount - $exchange->receiving_charge),
                         "via" => "Deposit Cancel",
                         "admin_id" => auth("admin")->id(),
+                        "exchange_id" => $exchange->id,
                     ]);
                     $user->balance -= $exchange->receiving_amount - $exchange->receiving_charge;
                     $user->save();
@@ -1254,9 +1288,11 @@ class ExchangeController extends Controller
 
                 if ($exchange->transaction_type == 'WITHDRAW' && $previous_status != Status::EXCHANGE_CANCEL) {
                     $user->balanceStatement()->create([
-                        "amount" => $exchange->refund_amount,
+                        "before" => $user->balance,
+                        "after" => $user->balance + $exchange->refund_amount,
                         "via" => "Withdaw Refund",
                         "admin_id" => auth("admin")->id(),
+                        "exchange_id" => $exchange->id,
                     ]);
                     $user->balance += $exchange->refund_amount;
                     $user->save();
@@ -1264,9 +1300,11 @@ class ExchangeController extends Controller
 
                 if ($exchange->transaction_type == 'DEPOSIT' && $previous_status == Status::EXCHANGE_APPROVED) {
                     $user->balanceStatement()->create([
-                        "amount" => -($exchange->receiving_amount - $exchange->receiving_charge),
+                        "before" => $user->balance,
+                        "after" => $user->balance - ($exchange->receiving_amount - $exchange->receiving_charge),
                         "via" => "Deposit Refund",
                         "admin_id" => auth("admin")->id(),
+                        "exchange_id" => $exchange->id,
                     ]);
                     $user->balance -= $exchange->receiving_amount - $exchange->receiving_charge;
                     $user->save();
@@ -1290,18 +1328,22 @@ class ExchangeController extends Controller
 
                 if ($exchange->transaction_type == 'WITHDRAW' && ($previous_status == Status::EXCHANGE_CANCEL || $previous_status == Status::EXCHANGE_REFUND)) {
                     $user->balanceStatement()->create([
-                        "amount" => -$exchange->refund_amount,
+                        "before" => $user->balance,
+                        "after" => $user->balance - $exchange->refund_amount,
                         "via" => "Withdraw Hold",
                         "admin_id" => auth("admin")->id(),
+                        "exchange_id" => $exchange->id,
                     ]);
                     $user->balance -= $exchange->refund_amount;
                     $user->save();
                 }
                 if ($exchange->transaction_type == 'DEPOSIT' && ($previous_status == Status::EXCHANGE_APPROVED)) {
                     $user->balanceStatement()->create([
-                        "amount" => -($exchange->receiving_amount - $exchange->receiving_charge),
+                        "before" => $user->balance,
+                        "after" => $user->balance - ($exchange->receiving_amount - $exchange->receiving_charge),
                         "via" => "Deposit Hold",
                         "admin_id" => auth("admin")->id(),
+                        "exchange_id" => $exchange->id,
                     ]);
                     $user->balance -= $exchange->receiving_amount - $exchange->receiving_charge;
                     $user->save();
@@ -1319,9 +1361,11 @@ class ExchangeController extends Controller
                 if ($exchange->transaction_type == 'WITHDRAW' && ($previous_status == Status::EXCHANGE_CANCEL || $previous_status == Status::EXCHANGE_REFUND)) {
                     $user = $exchange->user;
                     $user->balanceStatement()->create([
-                        "amount" => -$exchange->refund_amount,
+                        "before" => $user->balance,
+                        "after" => $user->balance - $exchange->refund_amount,
                         "via" => "Withdraw Processing",
                         "admin_id" => auth("admin")->id(),
+                        "exchange_id" => $exchange->id,
                     ]);
                     $user->balance -= $exchange->refund_amount;
                     $user->save();
@@ -1329,9 +1373,11 @@ class ExchangeController extends Controller
                 if ($exchange->transaction_type == 'DEPOSIT' && ($previous_status == Status::EXCHANGE_APPROVED)) {
                     $user = $exchange->user;
                     $user->balanceStatement()->create([
-                        "amount" => -($exchange->receiving_amount - $exchange->receiving_charge),
+                        "before" => $user->balance,
+                        "after" => $user->balance - ($exchange->receiving_amount - $exchange->receiving_charge),
                         "via" => "Deposit Processing",
                         "admin_id" => auth("admin")->id(),
+                        "exchange_id" => $exchange->id,
                     ]);
                     $user->balance -= $exchange->receiving_amount - $exchange->receiving_charge;
                     $user->save();
@@ -1395,11 +1441,12 @@ class ExchangeController extends Controller
                     $oldReceivedReserve = $receivedCurrency->reserve;
                     $receivedCurrency->reserve += ($exchange->receiving_amount - $exchange->receiving_charge);
                     $receivedCurrency->save();
-
                     $user->balanceStatement()->create([
-                        "amount" => $exchange->receiving_amount - $exchange->receiving_charge,
+                        "before" => $user->balance,
+                        "after" => $user->balance + ($exchange->receiving_amount - $exchange->receiving_charge),
                         "via" => "Deposit Approve",
                         "admin_id" => auth("admin")->id(),
+                        "exchange_id" => $exchange->id,
                     ]);
                     $user->balance += $exchange->receiving_amount - $exchange->receiving_charge;
                     $user->save();
@@ -1418,9 +1465,11 @@ class ExchangeController extends Controller
 
                     if ($previous_status == Status::EXCHANGE_CANCEL || $previous_status == Status::EXCHANGE_REFUND) {
                         $user->balanceStatement()->create([
-                            "amount" => -($exchange->sending_amount + $exchange->sending_charge),
+                            "before" => $user->balance,
+                            "after" => $user->balance - ($exchange->sending_amount + $exchange->sending_charge),
                             "via" => "Withdraw Approve",
                             "admin_id" => auth("admin")->id(),
+                            "exchange_id" => $exchange->id,
                         ]);
                         $user->balance -= $exchange->sending_amount + $exchange->sending_charge;
                         $user->save();
@@ -1466,9 +1515,11 @@ class ExchangeController extends Controller
                         $exchange->save();
 
                         $user->balanceStatement()->create([
-                            "amount" => $convertedAmount,
+                            "before" => $user->balance,
+                            "after" => $user->balance + $convertedAmount,
                             "via" => "First Exchange Bonus",
                             "admin_id" => auth("admin")->id(),
+                            "exchange_id" => $exchange->id,
                         ]);
                         $user->balance += $convertedAmount;
                         $user->save();

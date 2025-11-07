@@ -185,9 +185,11 @@ class WithdrawController extends Controller
         $user->balance -= $withdraw->refund_amount;
         $user->save();
         $user->balanceStatement()->create([
-            "amount" => -$withdraw->refund_amount,
             "via" => "Withdraw Placed",
             "admin_id" => null,
+            "before" => $user->balance + $withdraw->refund_amount,
+            "after" => $user->balance,
+            "exchange_id" => $withdraw->id,
         ]);
 
         $adminNotification = new AdminNotification;

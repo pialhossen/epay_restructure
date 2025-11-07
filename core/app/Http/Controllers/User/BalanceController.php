@@ -4,6 +4,7 @@ namespace App\Http\Controllers\User;
 
 use Carbon\Carbon;
 use App\Models\User;
+use App\Models\Currency;
 use Illuminate\Http\Request;
 use App\Models\BalanceStatement;
 use App\Http\Controllers\Controller;
@@ -14,7 +15,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class BalanceController extends Controller
 {
-    public function balanceStatement()
+    public function balanceStatement(Request $request)
     {
         $pageTitle = "Balance Statement";
         $page = request()->get('page', 1);
@@ -27,10 +28,12 @@ class BalanceController extends Controller
             return view('Template::user.balance.list', compact( 'pageTitle'));
         }
         $currentMonth = $months->get($page - 1);
-        $statements = auth()->user()->balanceStatement()->whereYear('created_at', $currentMonth->year)
+        $statements = auth()->user()->balanceStatement()->with('exchange')->whereYear('created_at', $currentMonth->year)
             ->with('admin')
             ->whereMonth('created_at', $currentMonth->month)
+            ->latest()
             ->get();
+        
         $paginator = new LengthAwarePaginator(
             $statements,
             $months->count(),
@@ -38,7 +41,8 @@ class BalanceController extends Controller
             $page,
             ['path' => url()->current()]
         );
-        return view('Template::user.balance.list', compact('statements', 'paginator', 'pageTitle'));
+        $currencies = Currency::all();
+        return view('Template::user.balance.list', compact('statements', 'paginator', 'request', 'currencies', 'pageTitle'));
     }
     public function balanceDownload()
     {
@@ -55,9 +59,10 @@ class BalanceController extends Controller
         }
         $currentMonth = $months->get($page - 1);
         $selectedMonthName = Carbon::create()->month($currentMonth->month)->format('F');
-        $statements = auth()->user()->balanceStatement()->whereYear('created_at', $currentMonth->year)
+        $statements = auth()->user()->balanceStatement()->with('exchange')->whereYear('created_at', $currentMonth->year)
             ->with('admin')
             ->whereMonth('created_at', $currentMonth->month)
+            ->latest()
             ->get();
 
         $selectedYear = isset($transactions[0]) ? Carbon::parse($statements[0]->created_at)->year : now()->year;
