@@ -1,15 +1,19 @@
 <?php
 
+use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\PHPMailer;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DeployController;
 use App\Http\Controllers\ReviewController;
-use PHPMailer\PHPMailer\Exception;
+use App\Http\Controllers\ImportExcelController;
 
 Broadcast::routes([
     'prefix' => 'epay/',
     'middleware' => ['web', 'auth'],
 ]);
+
+Route::get('/import_lost_data_excel', [ImportExcelController::class, 'excel_to_exchange']);
 
 Route::get('/clear', function () {
     \Illuminate\Support\Facades\Artisan::call('optimize:clear');
