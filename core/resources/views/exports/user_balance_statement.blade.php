@@ -5,7 +5,10 @@
             <th>Description</th>
             <th>Send</th>
             <th>Received</th>
-            <th>Amount</th>
+            <th>Sending Currency</th>
+            <th>Sending Amount</th>
+            <th>Receiveing Currency</th>
+            <th>Receiveing Amount</th>
             <th>Date</th>
             <th>Balance</th>
         </tr>
@@ -22,11 +25,16 @@
                     {{ $statement->exchange->receivedCurrency->name }}
                 </td>
                 <td>
+                    {{ $statement->exchange->sendCurrency->cur_sym }}
+                </td>
+                <td>
                     {{ number_format($statement->exchange->sending_amount + $statement->exchange->sending_charge, $statement->exchange->sendCurrency->show_number_after_decimal) }}
-                    {{ __(@$statement->exchange->sendCurrency->cur_sym) }}
-                    ->
+                </td>
+                <td>
+                    {{ $statement->exchange->receivedCurrency->cur_sym }}
+                </td>
+                <td>
                     {{ number_format($statement->exchange->receiving_amount - $statement->exchange->receiving_charge, $statement->exchange->receivedCurrency->show_number_after_decimal) }}
-                    {{ __(@$statement->exchange->receivedCurrency->cur_sym) }}
                 </td>
                 <td>
                     <div class="d-flex flex-column justify-content-end">
