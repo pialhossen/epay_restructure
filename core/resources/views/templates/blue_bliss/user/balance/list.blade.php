@@ -33,7 +33,7 @@
                     @if (isset($statements) && !$statements->isEmpty())
                         <div class="card-body p-0 table-container">
                             <div class="card-header p-1 d-flex justify-content-end">
-                                <a href="{{ route('user.statement.balance.download') }}" class="btn btn-sm btn-success">Download</a>
+                                <a href="{{ route('user.statement.balance.download',request()->query()) }}" class="btn btn-sm btn-success">Download</a>
                             </div>
                             @php
                                 $lastSegment = request()->segment(count(request()->segments()));
