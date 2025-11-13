@@ -64,7 +64,6 @@ class BalanceController extends Controller
             ->whereMonth('created_at', $currentMonth->month)
             ->latest()
             ->get();
-        dd($statements);
 
         $selectedYear = isset($transactions[0]) ? Carbon::parse($statements[0]->created_at)->year : now()->year;
 
