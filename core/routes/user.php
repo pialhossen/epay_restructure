@@ -121,7 +121,6 @@ Route::middleware('auth')->name('user.')->group(function () {
                 Route::get('/report-download/{scope?}', 'download_report')->name('download_report');
             });
             Route::controller('BalanceController')->name('statement.')->prefix('statement')->group(function (){
-                Route::get('setup-balance-statement', 'setup_balance_statement');
                 Route::get('balance', 'balanceStatement')->name('balance');
                 Route::get('balance/download', 'balanceDownload')->name('balance.download');
             });

@@ -38,7 +38,7 @@
                             @php
                                 $lastSegment = request()->segment(count(request()->segments()));
                             @endphp
-                            <!-- <form class="m-2" action="{{ url()->current() }}" method="GET">
+                            <form class="m-2" action="{{ url()->current() }}" method="GET">
                                 @if(request()->query('itemsPerPage'))
                                     <input type="hidden" name="itemsPerPage" value="{{ request('itemsPerPage') }}">
                                 @endif
@@ -50,7 +50,6 @@
                                     <div class="col-lg-3 col-md-6 col-12">
                                         <label for="transaction_type">Transaction Type</label>
                                         <select name="transaction_type[]" id="transaction_type" class="form-control select2" multiple="multiple">
-                                            <option value="EXCHANGE" @if($request->transaction_type == 'EXCHANGE') selected @endif>EXCHANGE</option>
                                             <option value="DEPOSIT" @if($request->transaction_type == 'DEPOSIT') selected @endif>DEPOSIT</option>
                                             <option value="WITHDRAW" @if($request->transaction_type == 'WITHDRAW') selected @endif>WITHDRAW</option>
                                         </select>
@@ -89,7 +88,7 @@
                                 <button type="Submit" class="btn btn-sm btn-primary">Search</button>
                                 <a href="{{ url()->current() }}" class="btn btn-sm btn-info">Reset</a>
                             </form>
-                            <x-item-per-page/> -->
+                            <x-item-per-page/>
                             <table class="table custom--table table-responsive--md data-table">
                                 <thead>
                                     <tr>
@@ -170,10 +169,10 @@
                         ])
                     @endif
                 </div>
-                @if (isset($paginator) && $paginator->hasPages())
-                    <div class="py-3 custom__paginate">
-                        {{ paginateLinks($paginator) }}
-                    </div>
+                @if ($statements->hasPages())
+                <div class="py-3 custom__paginate">
+                    {{ paginateLinks($statements) }}
+                </div>
                 @endif
             </div>
         </div>
