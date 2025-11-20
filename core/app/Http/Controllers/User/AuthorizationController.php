@@ -13,7 +13,7 @@ class AuthorizationController extends Controller
 {
     protected function checkCodeValidity($user, $addMin = 2)
     {
-        if (! $user->ver_code_send_at) {
+        if (!$user->ver_code_send_at) {
             return false;
         }
         if ($user->ver_code_send_at->addMinutes($addMin) < Carbon::now()) {

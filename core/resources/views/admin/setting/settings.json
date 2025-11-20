@@ -421,6 +421,16 @@
         "icon": "las la-code",
         "route_name": "admin.setting.custom.code"
     },
+    "imap_setup": {
+        "keyword": [
+            "Imap",
+            "Gmail"
+        ],
+        "title": "Imap Setup",
+        "subtitle": "Setup Imap Credentials To Get Emails Forword",
+        "icon": "las la-envelope-square",
+        "route_name": "admin.imap.edit"
+    },
     "sitemap": {
         "keyword": [
             "Site map",

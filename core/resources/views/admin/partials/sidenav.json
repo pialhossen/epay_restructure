@@ -575,6 +575,15 @@
         "route_name": "admin.subscriber.index",
         "menu_active": "admin.subscriber.*"
     },
+    "emails": {
+        "keyword": [
+            "Emails"
+        ],
+        "title": "Emails",
+        "icon": "las la-envelope",
+        "route_name": "admin.forwardEmails.index",
+        "menu_active": "admin.subscriber.*"
+    },
     "ip_blocking": {
         "keyword": [
             "blocking ip",
