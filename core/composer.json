@@ -31,7 +31,8 @@
         "spatie/laravel-permission": "^6.21",
         "stripe/stripe-php": "^13.13",
         "twilio/sdk": "^7.16",
-        "vonage/client": "^4.0"
+        "vonage/client": "^4.0",
+        "webklex/php-imap": "^6.2"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3",

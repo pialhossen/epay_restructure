@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\GoogleController;
+use App\Http\Controllers\ImapController;
 use App\Http\Controllers\Admin\BlockController;
 
 Route::
@@ -452,8 +452,8 @@ Route::middleware('admin')->group(function () {
         });
         
     });
-    Route::get('imap', [GoogleController::class, 'imap_config'])->name('imap.edit');
-    Route::post('imap', [GoogleController::class, 'save_imap_config'])->name('imap.store');
+    Route::get('imap', [ImapController::class, 'imap_config'])->name('imap.edit');
+    Route::post('imap', [ImapController::class, 'save_imap_config'])->name('imap.store');
     Route::name('forwardEmails.')->controller('ForwardEmailController')->group(function(){
         Route::get('forward-emails','index')->name('index');
     });
