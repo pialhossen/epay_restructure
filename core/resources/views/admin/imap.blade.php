@@ -5,61 +5,99 @@
         <div class="col-lg-12 col-md-12 mb-30">
             <div class="card">
                 <div class="card-body">
-                    <form method="POST" class="disableSubmission" action="{{ route('admin.imap.store') }}" enctype= multipart/form-data>
+                    <form method="POST" class="disableSubmission" action="{{ route('admin.imap.store') }}"
+                        enctype=multipart/form-data>
                         @csrf
                         <div class="row">
                             <div class="col-sm-6 col-md-4">
                                 <div class="form-group ">
                                     <label> @lang('Imap Account')</label>
-                                    <input class="form-control" type="text" name="imap_account" required value="{{ old('imap_account',$imap_account) }}">
+                                    <input class="form-control" type="text" name="imap_account" required
+                                        value="{{ old('imap_account', $imap_account) }}">
                                 </div>
                             </div>
                             <div class="col-sm-6 col-md-4">
                                 <div class="form-group ">
                                     <label> @lang('Imap Host')</label>
-                                    <input class="form-control" type="text" name="imap_host" required value="{{ old('imap_host',$imap_host) }}">
+                                    <input class="form-control" type="text" name="imap_host" required
+                                        value="{{ old('imap_host', $imap_host) }}">
                                 </div>
                             </div>
                             <div class="col-sm-6 col-md-4">
                                 <div class="form-group ">
                                     <label> @lang('Imap Port')</label>
-                                    <input class="form-control" type="text" name="imap_port" required value="{{ old('imap_port',$imap_port) }}">
+                                    <input class="form-control" type="text" name="imap_port" required
+                                        value="{{ old('imap_port', $imap_port) }}">
                                 </div>
                             </div>
                             <div class="col-sm-6 col-md-4">
                                 <div class="form-group ">
                                     <label> @lang('Imap Encryption')</label>
-                                    <input class="form-control" type="text" name="imap_encryption" required value="{{ old('imap_encryption',$imap_encryption) }}">
+                                    <input class="form-control" type="text" name="imap_encryption" required
+                                        value="{{ old('imap_encryption', $imap_encryption) }}">
                                 </div>
                             </div>
                             <div class="col-sm-6 col-md-4">
                                 <div class="form-group ">
                                     <label> @lang('Imap Validate Cert')</label>
-                                    <input class="form-control" type="text" name="imap_validate_cert" required value="{{ old('imap_validate_cert',$imap_validate_cert) }}">
+                                    <input class="form-control" type="text" name="imap_validate_cert" required
+                                        value="{{ old('imap_validate_cert', $imap_validate_cert) }}">
                                 </div>
                             </div>
                             <div class="col-sm-6 col-md-4">
                                 <div class="form-group ">
                                     <label> @lang('Imap Username')</label>
-                                    <input class="form-control" type="text" name="imap_username" required value="{{ old('imap_username',$imap_username) }}">
+                                    <input class="form-control" type="text" name="imap_username" required
+                                        value="{{ old('imap_username', $imap_username) }}">
                                 </div>
                             </div>
                             <div class="col-sm-6 col-md-4">
                                 <div class="form-group ">
                                     <label> @lang('Imap Password')</label>
-                                    <input class="form-control" type="text" name="imap_password" required value="{{ old('imap_password',$imap_password) }}">
+                                    <input class="form-control" type="text" name="imap_password" required
+                                        value="{{ old('imap_password', $imap_password) }}">
                                 </div>
                             </div>
                             <div class="col-sm-6 col-md-4">
                                 <div class="form-group ">
                                     <label> @lang('Imap Protocol')</label>
-                                    <input class="form-control" type="text" name="imap_protocol" required value="{{ old('imap_protocol',$imap_protocol) }}">
+                                    <input class="form-control" type="text" name="imap_protocol" required
+                                        value="{{ old('imap_protocol', $imap_protocol) }}">
                                 </div>
                             </div>
-                            <div class="col-sm-6 col-md-4">
+                            <div class="col-sm-12 col-md-12">
                                 <div class="form-group ">
                                     <label> @lang('Imap Filter From')</label>
-                                    <input class="form-control" type="text" name="imap_filter_from" required value="{{ old('imap_filter_from',$imap_filter_from) }}">
+                                </div>
+                            </div>
+                            <div class="row col-sm-12 col-md-12" id="emailSenderContainer">
+                                @foreach ($imap_filter_from as $index => $email)
+                                    @if($index == 0)
+                                        <div class="col-sm-6 col-md-4">
+                                            <div class="form-group">
+                                                <input class="form-control" type="text" name="imap_filter_from[]" required
+                                                    value="{{ $email }}">
+                                            </div>
+                                        </div>
+                                    @else
+                                        <div class="col-sm-6 col-md-4">
+                                            <div class="form-group" style="display: flex; flex-direction: row;">
+                                                <input class="form-control" type="text" placeholder="example@email.com"
+                                                    name="imap_filter_from[]" value="{{ $email }}" required>
+                                                <button
+                                                    style="width: 70px; border-radius: 4px; background-color: red; color: white; font-size: 25px;"
+                                                    onclick="removeInputFields(this, event)"><i
+                                                        class="las la-trash-alt"></i></button>
+                                            </div>
+                                        </div>
+                                    @endif
+                                @endforeach
+                            </div>
+                            <div class="row col-sm-12 col-md-12">
+                                <div class="col-sm-6 col-md-4 mb-30">
+                                    <button
+                                        style="width: 55px; height: 40px; background: blue; color: white; font-weight: 700; border-radius: 4px; font-size: 25px;"
+                                        id="addEmail"><i class="las la-plus"></i></button>
                                 </div>
                             </div>
                         </div>
@@ -74,3 +112,26 @@
         </div>
     </div>
 @endsection
+@push('script')
+    <script>
+        const addButton = document.querySelector('#addEmail')
+        const emailSenderContainer = document.querySelector('#emailSenderContainer')
+        const buttonHtml = `
+                                    <div class="col-sm-6 col-md-4">
+                                        <div class="form-group" style="display: flex; flex-direction: row;">
+                                            <input class="form-control" type="text" placeholder="example@email.com" name="imap_filter_from[]" required>
+                                            <button style="width: 70px; border-radius: 4px; background-color: red; color: white; font-size: 25px;" onclick="removeInputFields(this, event)"><i class="las la-trash-alt"></i></button>
+                                        </div>
+                                    </div>
+            `;
+        addButton.addEventListener("click", (e) => {
+            e.preventDefault();
+            emailSenderContainer.innerHTML += buttonHtml;
+        })
+        function removeInputFields(element, e) {
+            e.preventDefault()
+            const currentEleemnt = e.currentTarget;
+            currentEleemnt.parentElement.parentElement.remove();
+        }
+    </script>
+@endpush

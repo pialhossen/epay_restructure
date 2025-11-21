@@ -577,12 +577,13 @@
     },
     "emails": {
         "keyword": [
-            "Emails"
+            "Emails",
+            "Exchange"
         ],
-        "title": "Emails",
+        "title": "Exchange Emails",
         "icon": "las la-envelope",
         "route_name": "admin.forwardEmails.index",
-        "menu_active": "admin.subscriber.*"
+        "menu_active": "admin.forwardEmails.*"
     },
     "ip_blocking": {
         "keyword": [

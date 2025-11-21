@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('forward_emails', function (Blueprint $table) {
             $table->id();
-            $table->string('form');
+            $table->string('from');
             $table->string('subject');
             $table->string('date');
-            $table->string('body');
+            $table->text('body');
             $table->timestamps();
         });
     }

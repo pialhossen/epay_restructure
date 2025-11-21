@@ -38,7 +38,8 @@
     34 => 'Termwind\\Laravel\\TermwindServiceProvider',
     35 => 'Spatie\\LaravelIgnition\\IgnitionServiceProvider',
     36 => 'Spatie\\Permission\\PermissionServiceProvider',
-    37 => 'App\\Providers\\AppServiceProvider',
+    37 => 'Webklex\\IMAP\\Providers\\LaravelServiceProvider',
+    38 => 'App\\Providers\\AppServiceProvider',
   ),
   'eager' => 
   array (
@@ -63,7 +64,8 @@
     18 => 'Termwind\\Laravel\\TermwindServiceProvider',
     19 => 'Spatie\\LaravelIgnition\\IgnitionServiceProvider',
     20 => 'Spatie\\Permission\\PermissionServiceProvider',
-    21 => 'App\\Providers\\AppServiceProvider',
+    21 => 'Webklex\\IMAP\\Providers\\LaravelServiceProvider',
+    22 => 'App\\Providers\\AppServiceProvider',
   ),
   'deferred' => 
   array (

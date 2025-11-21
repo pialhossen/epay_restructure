@@ -456,5 +456,6 @@ Route::middleware('admin')->group(function () {
     Route::post('imap', [ImapController::class, 'save_imap_config'])->name('imap.store');
     Route::name('forwardEmails.')->controller('ForwardEmailController')->group(function(){
         Route::get('forward-emails','index')->name('index');
+        Route::get('forward-emails/{email}','show')->name('show');
     });
 });

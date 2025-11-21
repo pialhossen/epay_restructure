@@ -30,6 +30,7 @@ class ImapController extends Controller
             'imap_protocol' => 'required',
             'imap_filter_from' => 'required',
         ]);
+        $from_array = array_values($request->imap_filter_from);
         $imap_config = [];
         $imap_config['imap_account'] = $request->imap_account;
         $imap_config['imap_host'] = $request->imap_host;
@@ -39,7 +40,7 @@ class ImapController extends Controller
         $imap_config['imap_username'] = $request->imap_username;
         $imap_config['imap_password'] = $request->imap_password;
         $imap_config['imap_protocol'] = $request->imap_protocol;
-        $imap_config['imap_filter_from'] = $request->imap_filter_from;
+        $imap_config['imap_filter_from'] = $from_array;
         $settings = GeneralSetting::find(1);
         $settings->imap_config = json_encode($imap_config);
         $settings->save();

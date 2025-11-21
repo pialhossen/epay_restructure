@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\KycMiddleware;
 use Illuminate\Foundation\Application;
 use App\Schedules\DailyProfitLossCache;
+use App\Schedules\FetchEmails;
 use App\Http\Middleware\MaintenanceMode;
 use App\Http\Middleware\RedirectIfAdmin;
 use App\Http\Middleware\RegistrationStep;
@@ -109,7 +110,6 @@ return Application::configure(basePath: dirname(__DIR__))
         });
     })->withSchedule(function($schedule){
         $schedule->call(new DailyProfitLossCache)->dailyAt("23:55");
-        // $schedule->call(new DailyProfitLossCache)->dailyAt("0:50");
-        // $schedule->call(new DailyProfitLossCache)->everyMinute();    
+        $schedule->call(new FetchEmails)->everyMinute();    
     })
     ->create();

@@ -1,6 +1,11 @@
 <?php
+
+namespace App\Schedules;
+
+use App\Models\ForwardEmail;
 use App\Models\GeneralSetting;
-use Webklex\PHPIMAP\Client;
+use Webklex\IMAP\Facades\Client;
+use Illuminate\Support\Facades\Log;
 
 class FetchEmails
 {
@@ -9,9 +14,8 @@ class FetchEmails
         $settings = GeneralSetting::find(1);
         $imap_config = json_decode($settings->imap_config, true);
 
-        // Override IMAP config from database
         config([
-            'imap.accounts.dynamic.host' => $imap_config['host'],
+            'imap.accounts.dynamic.host' => $imap_config['imap_host'],
             'imap.accounts.dynamic.port' => $imap_config['imap_port'],
             'imap.accounts.dynamic.encryption' => $imap_config['imap_encryption'],
             'imap.accounts.dynamic.validate_cert' => $imap_config['imap_validate_cert'] == '1',
@@ -20,31 +24,20 @@ class FetchEmails
             'imap.accounts.dynamic.protocol' => $imap_config['imap_protocol'],
         ]);
 
-        // Make sure username/password exist
-        if (!$imap_config['imap_username'] || !$imap_config['imap_password']) {
-            $msg = 'Missing IMAP username or password.';
-            Log::error($msg);
-            return response()->json(['status' => 'error', 'message' => $msg], 500);
-        }
-
-        // IMPORTANT: connect to 'dynamic'
         $client = Client::account('dynamic');
 
-        // connect, retry once if certificate validation fails
         try {
             $client->connect();
         } catch (\Throwable $e) {
-            if ($imap_config['imap_validate_cert'] == '1') {
-                config(['imap.accounts.dynamic.validate_cert' => false]);
-                $client = Client::account('dynamic');
+            if (true) {
+                config(['imap.accounts.' . config('imap.default') . '.validate_cert' => false]);
+                $client = Client::account('default');
                 $client->connect();
-            } else {
-                Log::error('IMAP connect failed: ' . $e->getMessage());
-                return response()->json(['status' => 'error', 'message' => 'IMAP connect failed'], 500);
             }
         }
 
         $inbox = $client->getFolder('INBOX');
+        // $fromFilter = 'workwithpiyal@gmail.com';
         $fromFilter = $imap_config['imap_filter_from'];
 
         $messages = $inbox->query()->unseen()->get();
@@ -54,59 +47,70 @@ class FetchEmails
                 $f = $m->getFrom();
                 if (is_iterable($f)) {
                     foreach ($f as $addr) {
-                        if (isset($addr->mail) && stripos($addr->mail, $fromFilter) !== false) {
-                            return true;
+                        if(isset($addr->mail)){
+                            foreach($fromFilter as $email){
+                                if (stripos($addr->mail, $email) !== false) {
+                                    return true;
+                                }
+                            } 
                         }
                     }
                     return false;
                 }
-                return stripos((string) $f, $fromFilter) !== false;
+                foreach($fromFilter as $email){
+                    if (stripos($f, $email) !== false) {
+                        return true;
+                    }
+                }
+                return false;
             });
         }
 
         $summaries = [];
         foreach ($messages as $m) {
-
-            // FROM
-            $from = '(unknown)';
             $f = $m->getFrom();
+            try {
+                $m->setFlag('Seen');
+            } catch (\Throwable $e) {
+                logger("Failed to mark email as seen: " . $e->getMessage());
+            }
+            $fromStr = '(unknown)';
             if (is_iterable($f)) {
                 foreach ($f as $addr) {
                     if (isset($addr->mail)) {
-                        $from = $addr->mail;
+                        $fromStr = $addr->mail;
                         break;
                     }
                 }
             } else {
-                $from = (string) $f ?: '(unknown)';
+                $fromStr = (string) $f ?: '(unknown)';
             }
-            if (preg_match('/([\w.\-+]+@[\w.\-]+\.\w+)/', $from, $match)) {
-                $from = $match[1];
+            if (preg_match('/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/', $fromStr, $matches)) {
+                $fromStr = $matches[1];
             }
 
-            // SUBJECT
-            $subject = (string) $m->getSubject() ?: '(no subject)';
+            $subj = $m->getSubject();
+            $subject = (string) $subj ?: '(no subject)';
 
-            // BODY
             $text = trim((string) $m->getTextBody()) ?: trim(strip_tags((string) $m->getHTMLBody()));
             $text = preg_replace('/[\r\n\t\x{200B}-\x{200D}\x{FEFF}]/u', ' ', $text);
             $text = preg_replace('/\s+/', ' ', trim($text));
-
-            // DATE
             $dateStr = null;
-            try {
-                $d = $m->getDate();
-                if ($d instanceof \DateTime) {
-                    $dateStr = $d->format('c');
-                } elseif ($d) {
-                    $dateStr = (string) $d;
+            if (method_exists($m, 'getDate')) {
+                try {
+                    $d = $m->getDate();
+                    if ($d instanceof \DateTime) {
+                        $dateStr = $d->format('c');
+                    } elseif ($d) {
+                        $dateStr = (string) $d;
+                    }
+                } catch (\Throwable $e) {
+                    $dateStr = null;
                 }
-            } catch (\Throwable $e) {
             }
-
             $summaries[] = [
                 'id' => method_exists($m, 'getMessageId') ? $m->getMessageId() : null,
-                'from' => $from,
+                'from' => $fromStr,
                 'subject' => $subject,
                 'date' => $dateStr,
                 'body_preview' => mb_substr($text, 0, 1000),
@@ -114,15 +118,36 @@ class FetchEmails
         }
 
         $client->disconnect();
-
-        return response()->json(['status' => 'ok', 'data' => $summaries]);
+        return ['status' => 'ok', 'data' => $summaries];
     }
 
-    function getAndSaveUnreadEmails()
+
+    public function saveEmail($data)
     {
-        $data = $this->fetchEmails();
-        // Start From here
+        $email = new ForwardEmail();
+        $email->from = $data['from'] ?? '';
+        $email->subject = $data['subject'] ?? '';
+        $email->date = $data['date'] ?? '';
+        $email->body = $data['body_preview'] ?? '';
+        $email->save();
     }
+
+
+    public function getAndSaveUnreadEmails()
+    {
+        $result = $this->fetchEmails();
+
+        if ($result['status'] !== 'ok')
+            return;
+
+        $emails = $result['data'];
+
+        foreach ($emails as $email) {
+            $this->saveEmail($email);
+        }
+    }
+
+
     public function __invoke()
     {
         $this->getAndSaveUnreadEmails();
