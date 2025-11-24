@@ -17,6 +17,9 @@ return new class extends Migration
             $table->string('subject');
             $table->string('date');
             $table->text('body');
+            $table->text('note')->nullable();
+            $table->boolean('is_checked')->default(false);
+            $table->unsignedBigInteger('checked_by')->nullable();
             $table->timestamps();
         });
     }

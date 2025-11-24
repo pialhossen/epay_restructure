@@ -700,6 +700,9 @@ function checkPermission($menu_name){
     if($menu_name == "Home Modal" && $user->can('View - Home Modal')){
         return true;
     }
+    if($menu_name == "Exchange Emails" && $user->can('View - Exchange Emails')){
+        return true;
+    }
     return false;
 }
 function checkPermissionForSubMenu($parent_manu, $scope){

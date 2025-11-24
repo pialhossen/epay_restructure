@@ -1,37 +1,41 @@
 @extends('admin.layouts.app')
 @section('panel')
-<style>
-    .table-container {
-        overflow-x: auto;
-        position: relative;
-    }
+    <style>
+        .table-container {
+            overflow-x: auto;
+            position: relative;
+        }
 
-    .data-table {
-        border-collapse: collapse;
-    }
+        .data-table {
+            border-collapse: collapse;
+        }
 
-    .data-table th,
-    .data-table td {
-        white-space: nowrap;
-    }
+        .data-table th,
+        .data-table td {
+            white-space: nowrap;
+        }
 
-    .sticky-col {
-        position: sticky;
-        right: 0;
-        z-index: 2;
-    }
-    .data-table th {
-        position: sticky;
-        top: 0;
-        z-index: 3;
-    }
-</style>
+        .sticky-col {
+            position: sticky;
+            right: 0;
+            z-index: 2;
+        }
+
+        .data-table th {
+            position: sticky;
+            top: 0;
+            z-index: 3;
+        }
+    </style>
+    @php
+    $imap_config = json_decode(gs('imap_config'));
+    @endphp
     <div class="row pl-2 pb-2 ml-2">
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-body p-0">
                     @php
-                    $lastSegment = request()->segment(count(request()->segments()));
+                        $lastSegment = request()->segment(count(request()->segments()));
                     @endphp
                     <form class="m-2" action="{{ route('admin.forwardEmails.index') }}" method="GET" autocomplete="off">
                         @if(request()->query('itemsPerPage'))
@@ -40,27 +44,33 @@
                         <div class="row pb-2">
                             <div class="col-lg-3 col-md-6 col-12 advance-search">
                                 <label for="exchange_id">ID</label>
-                                <input @if($request->id) value="{{ $request->id }}" @endif type="text" name="id" class="form-control" autocomplete="off">
+                                <input @if($request->id) value="{{ $request->id }}" @endif type="text" name="id"
+                                    class="form-control" autocomplete="off">
                             </div>
                             <div class="col-lg-3 col-md-6 col-12 advance-search">
                                 <label for="form">From</label>
-                                <input @if($request->form) value="{{ $request->form }}" @endif type="text" name="form" class="form-control" autocomplete="off">
+                                <input @if($request->form) value="{{ $request->form }}" @endif type="text" name="form"
+                                    class="form-control" autocomplete="off">
                             </div>
                             <div class="col-lg-3 col-md-6 col-12 advance-search">
                                 <label for="subject">Subject</label>
-                                <input @if($request->subject) value="{{ $request->subject }}" @endif type="text" name="subject" class="form-control" autocomplete="off">
+                                <input @if($request->subject) value="{{ $request->subject }}" @endif type="text"
+                                    name="subject" class="form-control" autocomplete="off">
                             </div>
                             <div class="col-lg-3 col-md-6 col-12 advance-search">
                                 <label for="body">Body</label>
-                                <input @if($request->body) value="{{ $request->body }}" @endif type="text" name="body" class="form-control" autocomplete="off">
+                                <input @if($request->body) value="{{ $request->body }}" @endif type="text" name="body"
+                                    class="form-control" autocomplete="off">
                             </div>
                             <div class="col-lg-3 col-md-6 col-12" data-advance-search-url="">
                                 <label for="received_from">Received From</label>
-                                <input @if($request->received_from) value="{{ $request->received_from }}" @endif type="date" name="received_from" class="form-control">
+                                <input @if($request->received_from) value="{{ $request->received_from }}" @endif type="date"
+                                    name="received_from" class="form-control">
                             </div>
                             <div class="col-lg-3 col-md-6 col-12">
                                 <label for="received_to">Received To</label>
-                                <input @if($request->received_to) value="{{ $request->received_to }}" @endif type="date" name="received_to" class="form-control">
+                                <input @if($request->received_to) value="{{ $request->received_to }}" @endif type="date"
+                                    name="received_to" class="form-control">
                             </div>
                         </div>
                         <button type="Submit" class="btn btn-sm btn-primary">Search</button>
@@ -70,9 +80,9 @@
             </div>
         </div>
     </div>
-    
-    <x-item-per-page/>
-    {{--  search end  --}}
+
+    <x-item-per-page />
+    {{-- search end --}}
 
     <div class="row">
         <div class="col-lg-12">
@@ -83,12 +93,16 @@
                             <thead>
                                 <tr>
                                     <th>@lang('ID')</th>
-                                    <th style="cursor: pointer;" onclick="toggleSort(event, 'created_at')"> 
+                                    <th style="cursor: pointer;" onclick="toggleSort(event, 'created_at')">
                                         <div class="sortable-header">
-                                            <span class="sort-indicate"> 
-                                                <span class="up" @if(str_contains(request()->query("sort"),'created_at')) style="visibility: {{ request()->query("sort") == "created_at:desc"? "visible": "hidden" }};" @endif><i class="fa-solid fa-arrow-up"></i></span> 
-                                                <span class="down" @if(str_contains(request()->query("sort"),'created_at')) style="visibility: {{ request()->query("sort") == "created_at:asc"? "visible": "hidden" }};" @endif><i class="fa-solid fa-arrow-down"></i></span> 
-                                            </span> 
+                                            <span class="sort-indicate">
+                                                <span class="up" @if(str_contains(request()->query("sort"), 'created_at'))
+                                                    style="visibility: {{ request()->query("sort") == "created_at:desc" ? "visible" : "hidden" }};"
+                                                @endif><i class="fa-solid fa-arrow-up"></i></span>
+                                                <span class="down" @if(str_contains(request()->query("sort"), 'created_at'))
+                                                    style="visibility: {{ request()->query("sort") == "created_at:asc" ? "visible" : "hidden" }};"
+                                                @endif><i class="fa-solid fa-arrow-down"></i></span>
+                                            </span>
                                             <span class="text">
                                                 @lang('Received Date Time')
                                             </span>
@@ -96,7 +110,9 @@
                                     </th>
                                     <th>@lang('Send From')</th>
                                     <th>@lang('Subject')</th>
-                                    <th >@lang('Body')</th>
+                                    <th>@lang('Body')</th>
+                                    <th>@lang('Note')</th>
+                                    <th>@lang('Check By')</th>
                                     <th class="sticky-col">@lang('Action')</th>
                                 </tr>
                             </thead>
@@ -105,7 +121,7 @@
                                     use App\Models\AdminUserModel;
                                 @endphp
                                 @forelse($emails as $email)
-                                    <tr>
+                                    <tr style="background: {{ $email->is_checked? 'rgb(171 255 189)': 'white' }};">
                                         <td>
                                             {{ $email->id }}
                                         </td>
@@ -118,24 +134,73 @@
                                         </td>
                                         <td>{{ $email->subject }}</td>
                                         <td style="white-space: wrap; max-width: 350px;">{{ $email->body }}</td>
-                                        <td class="sticky-col" style="background: white;">
-                                            <a href=""
-                                               class="btn btn-sm btn-outline--success">
-                                                <i class="las la-check"></i>@lang('Check')
-                                            </a>
+                                        <td style="white-space: wrap; max-width: 350px;">{{ $email->note? $email->note: ($email->is_checked?"[No Note Found]":"[Not Checked Yet]") }}</td>
+                                        <td style="white-space: wrap; max-width: 350px;">{{ $email->checked_by_admin? $email->checked_by_admin->name: "[Not Checked Yet]" }}</td>
+                                        <td class="sticky-col" style="background: {{ $email->is_checked? 'rgb(171 255 189)': 'white' }};">
 
-                                            @if(checkSpecificPermission('View - Email'))
-                                            <a href="{{ route('admin.forwardEmails.show', $email->id) }}"
-                                               class="btn btn-sm btn-outline--primary">
-                                                <i class="las la-desktop"></i>@lang('Details')
-                                            </a>
+                                            @if(
+                                                $email->updated_at->gt(now()->subMinutes((int)$imap_config->timeout || 10)) || 
+                                                !$email->is_checked ||
+                                                auth('admin')->id() == 1
+                                            )
+                                            @if($email->is_checked)
+                                            <form action="{{ route('admin.forwardEmails.uncheck', $email->id) }}" style="display: inline" method="post">
+                                                @csrf
+                                                <button class="btn btn-sm btn-outline--danger" @if(!checkSpecificPermission('Update - Exchange Emails')) disabled @endif>
+                                                    <i class="las la-minus"></i>@lang('Uncheck')
+                                                </button>
+                                            </form>
                                             @else
-                                            <button class="btn btn-sm btn-outline--primary" disabled>
-                                                <i class="las la-desktop"></i>@lang('Details')
+                                            <button data-bs-toggle="modal" data-bs-target="#addNote_{{ $email->id }}"
+                                                class="btn btn-sm btn-outline--success" @if(!checkSpecificPermission('Update - Exchange Emails')) disabled @endif>
+                                                <i class="las la-check"></i>@lang('Check')
                                             </button>
                                             @endif
+                                            @endif
                                             
+                                            @if(checkSpecificPermission('View - Exchange Emails Details'))
+                                                <a href="{{ route('admin.forwardEmails.show', $email->id) }}"
+                                                    class="btn btn-sm btn-outline--primary">
+                                                    <i class="las la-desktop"></i>@lang('Details')
+                                                </a>
+                                            @else
+                                                <button class="btn btn-sm btn-outline--primary" disabled>
+                                                    <i class="las la-desktop"></i>@lang('Details')
+                                                </button>
+                                            @endif
+
                                         </td>
+                                        <div id="addNote_{{ $email->id }}" class="modal fade" tabindex="-1" role="dialog">
+                                                <div class="modal-dialog" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title"><span class="type"></span>
+                                                                <span>@lang('Add Notes')</span></h5>
+                                                            <button type="button" class="close" data-bs-dismiss="modal"
+                                                                aria-label="Close">
+                                                                <i class="las la-times"></i>
+                                                            </button>
+                                                        </div>
+                                                        <form action="{{ route('admin.forwardEmails.check', $email->id) }}" method="POST">
+                                                            @csrf
+                                                            <div class="modal-body">
+                                                                <div class="form-group">
+                                                                    <label>@lang('Notes')</label>
+                                                                    <div class="input-group">
+                                                                        <textarea type="text" rows="10" name="note"
+                                                                            class="form-control"
+                                                                            placeholder="@lang('You Can Enter a Note')"></textarea>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="submit"
+                                                                    class="btn btn--primary h-45 w-100">@lang('Submit')</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
                                     </tr>
                                 @empty
                                     <tr>
@@ -145,12 +210,13 @@
                             </tbody>
                         </table>
                     </div>
+
                 </div>
-                    @if ($emails->hasPages())
-                        <div class="card-footer py-4">
-                            {{ paginateLinks($emails) }}
-                        </div>
-                    @endif
+                @if ($emails->hasPages())
+                    <div class="card-footer py-4">
+                        {{ paginateLinks($emails) }}
+                    </div>
+                @endif
             </div>
         </div>
     </div>
@@ -158,7 +224,7 @@
 @endsection
 
 @push('breadcrumb-plugins')
-    {{--  <x-search-form placeholder="Exchange ID, username" dateSearch='yes' />  --}}
+    {{-- <x-search-form placeholder="Exchange ID, username" dateSearch='yes' /> --}}
     <button type="button" class="btn  btn-outline--warning h-45 exportBtn">
         <i class="las la-cloud-download-alt"></i> @lang('Export')
     </button>
@@ -174,8 +240,8 @@
             orderByInput.value = checkbox.checked ? 'asc' : 'desc';
         }
 
-        (function($) {
-            $('.exportBtn').on('click', function() {
+        (function ($) {
+            $('.exportBtn').on('click', function () {
                 $('#exportModal').modal('show');
             });
             $('#select_all').click(e => {
@@ -185,7 +251,7 @@
                 e.preventDefault();
                 const exchnage_type = $('#bulk_update_exchange_type').val();
                 // collect only the checked checkboxes and map to values
-                const ids = $('input[name="exchnage_id[]"]:checked').map(function() {
+                const ids = $('input[name="exchnage_id[]"]:checked').map(function () {
                     return $(this).val();
                 }).get();
 
@@ -232,7 +298,7 @@
             function syncSelects(changed, other) {
                 let selected = $(changed).val() || [];
 
-                $(other).find('option').each(function() {
+                $(other).find('option').each(function () {
                     let val = $(this).val();
                     if (selected.includes(val)) {
                         $(this).prop('disabled', true);
@@ -244,10 +310,10 @@
             }
 
 
-            $('#send_currency_id').on('change',(e) => {
+            $('#send_currency_id').on('change', (e) => {
                 syncSelects('#send_currency_id', '#receive_currency_id');
             })
-            $('#receive_currency_id').on('change',(e) => {
+            $('#receive_currency_id').on('change', (e) => {
                 syncSelects('#receive_currency_id', '#send_currency_id');
             })
             syncSelects('#receive_currency_id', '#send_currency_id');

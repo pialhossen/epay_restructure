@@ -10,5 +10,7 @@ class ForwardEmail extends Model
     protected $casts = [
         'created_at' => 'datetime',
     ];
-
+    public function checked_by_admin(){
+        return $this->belongsTo(Admin::class,'checked_by');
+    }
 }

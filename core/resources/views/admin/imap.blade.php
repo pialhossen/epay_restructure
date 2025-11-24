@@ -65,6 +65,13 @@
                                         value="{{ old('imap_protocol', $imap_protocol) }}">
                                 </div>
                             </div>
+                            <div class="col-sm-6 col-md-4">
+                                <div class="form-group ">
+                                    <label> @lang('Check Status Lockout (minute)')</label>
+                                    <input class="form-control" type="number" name="timeout" required
+                                        value="{{ old('timeout', $timeout) }}">
+                                </div>
+                            </div>
                             <div class="col-sm-12 col-md-12">
                                 <div class="form-group ">
                                     <label> @lang('Imap Filter From')</label>
@@ -117,13 +124,13 @@
         const addButton = document.querySelector('#addEmail')
         const emailSenderContainer = document.querySelector('#emailSenderContainer')
         const buttonHtml = `
-                                    <div class="col-sm-6 col-md-4">
-                                        <div class="form-group" style="display: flex; flex-direction: row;">
-                                            <input class="form-control" type="text" placeholder="example@email.com" name="imap_filter_from[]" required>
-                                            <button style="width: 70px; border-radius: 4px; background-color: red; color: white; font-size: 25px;" onclick="removeInputFields(this, event)"><i class="las la-trash-alt"></i></button>
+                                        <div class="col-sm-6 col-md-4">
+                                            <div class="form-group" style="display: flex; flex-direction: row;">
+                                                <input class="form-control" type="text" placeholder="example@email.com" name="imap_filter_from[]" required>
+                                                <button style="width: 70px; border-radius: 4px; background-color: red; color: white; font-size: 25px;" onclick="removeInputFields(this, event)"><i class="las la-trash-alt"></i></button>
+                                            </div>
                                         </div>
-                                    </div>
-            `;
+                `;
         addButton.addEventListener("click", (e) => {
             e.preventDefault();
             emailSenderContainer.innerHTML += buttonHtml;

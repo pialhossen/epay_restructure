@@ -40,6 +40,7 @@ class ImapController extends Controller
         $imap_config['imap_username'] = $request->imap_username;
         $imap_config['imap_password'] = $request->imap_password;
         $imap_config['imap_protocol'] = $request->imap_protocol;
+        $imap_config['timeout'] = $request->timeout;
         $imap_config['imap_filter_from'] = $from_array;
         $settings = GeneralSetting::find(1);
         $settings->imap_config = json_encode($imap_config);

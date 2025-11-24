@@ -457,5 +457,7 @@ Route::middleware('admin')->group(function () {
     Route::name('forwardEmails.')->controller('ForwardEmailController')->group(function(){
         Route::get('forward-emails','index')->name('index');
         Route::get('forward-emails/{email}','show')->name('show');
+        Route::post('forward-emails/{email}/check','check')->name('check');
+        Route::post('forward-emails/{email}/uncheck','uncheck')->name('uncheck');
     });
 });
