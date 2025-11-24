@@ -20,6 +20,7 @@ return new class extends Migration
             $table->text('note')->nullable();
             $table->boolean('is_checked')->default(false);
             $table->unsignedBigInteger('checked_by')->nullable();
+            $table->boolean('is_hidden')->default(false);
             $table->timestamps();
         });
     }

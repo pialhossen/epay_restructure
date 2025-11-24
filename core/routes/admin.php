@@ -459,5 +459,9 @@ Route::middleware('admin')->group(function () {
         Route::get('forward-emails/{email}','show')->name('show');
         Route::post('forward-emails/{email}/check','check')->name('check');
         Route::post('forward-emails/{email}/uncheck','uncheck')->name('uncheck');
+
+    });
+    Route::name('hiddenForwardEmails.')->controller('HiddenForwardEmailController')->group(function(){
+        Route::get('hidden-forward-emails','hidden_index')->name('index');
     });
 });

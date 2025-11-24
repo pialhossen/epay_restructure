@@ -137,7 +137,7 @@
                                         <td style="white-space: wrap; max-width: 350px;">{{ $email->note? $email->note: ($email->is_checked?"[No Note Found]":"[Not Checked Yet]") }}</td>
                                         <td style="white-space: wrap; max-width: 350px;">{{ $email->checked_by_admin? $email->checked_by_admin->name: "[Not Checked Yet]" }}</td>
                                         <td class="sticky-col" style="background: {{ $email->is_checked? 'rgb(171 255 189)': 'white' }};">
-
+                                            @if(checkSpecificPermission('View - Exchange Emails'))
                                             @if(
                                                 $email->updated_at->gt(now()->subMinutes((int)$imap_config->timeout || 10)) || 
                                                 !$email->is_checked ||
@@ -167,6 +167,7 @@
                                                 <button class="btn btn-sm btn-outline--primary" disabled>
                                                     <i class="las la-desktop"></i>@lang('Details')
                                                 </button>
+                                            @endif
                                             @endif
 
                                         </td>

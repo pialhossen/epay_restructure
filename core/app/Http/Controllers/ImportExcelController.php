@@ -416,4 +416,7 @@ class ImportExcelController extends Controller
         }
         return "Excel Data Uploaded To Database. DO NOT REFRESH";
     }
+    function fix_excel_import_data(){
+       Exchange::whereNull('transaction_type')->update(['transaction_type' => 'EXCHANGE']);
+    }
 }

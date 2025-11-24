@@ -107,6 +107,41 @@
                                         id="addEmail"><i class="las la-plus"></i></button>
                                 </div>
                             </div>
+                            <div class="col-sm-12 col-md-12">
+                                <div class="form-group ">
+                                    <label> @lang('Imap Filter Word')</label>
+                                </div>
+                            </div>
+                            <div class="row col-sm-12 col-md-12" id="filterWordContainer">
+                                @foreach ($word_array as $index => $word)
+                                    @if($index == 0)
+                                        <div class="col-sm-6 col-md-4">
+                                            <div class="form-group">
+                                                <input class="form-control" type="text" name="imap_filter_word[]" required
+                                                    value="{{ $word }}">
+                                            </div>
+                                        </div>
+                                    @else
+                                        <div class="col-sm-6 col-md-4">
+                                            <div class="form-group" style="display: flex; flex-direction: row;">
+                                                <input class="form-control" type="text" placeholder="otp"
+                                                    name="imap_filter_word[]" value="{{ $word }}" required>
+                                                <button
+                                                    style="width: 70px; border-radius: 4px; background-color: red; color: white; font-size: 25px;"
+                                                    onclick="removeInputFields(this, event)"><i
+                                                        class="las la-trash-alt"></i></button>
+                                            </div>
+                                        </div>
+                                    @endif
+                                @endforeach
+                            </div>
+                            <div class="row col-sm-12 col-md-12">
+                                <div class="col-sm-6 col-md-4 mb-30">
+                                    <button
+                                        style="width: 55px; height: 40px; background: blue; color: white; font-weight: 700; border-radius: 4px; font-size: 25px;"
+                                        id="addWord"><i class="las la-plus"></i></button>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="form-group">
@@ -140,5 +175,20 @@
             const currentEleemnt = e.currentTarget;
             currentEleemnt.parentElement.parentElement.remove();
         }
+        
+        const addWordButton = document.querySelector('#addWord')
+        const filterWordContainer = document.querySelector('#filterWordContainer')
+        const wordInputHtml = `
+                                        <div class="col-sm-6 col-md-4">
+                                            <div class="form-group" style="display: flex; flex-direction: row;">
+                                                <input class="form-control" type="text" placeholder="otp" name="imap_filter_word[]" required>
+                                                <button style="width: 70px; border-radius: 4px; background-color: red; color: white; font-size: 25px;" onclick="removeInputFields(this, event)"><i class="las la-trash-alt"></i></button>
+                                            </div>
+                                        </div>
+                `;
+        addWordButton.addEventListener("click", (e) => {
+            e.preventDefault();
+            filterWordContainer.innerHTML += wordInputHtml;
+        })
     </script>
 @endpush

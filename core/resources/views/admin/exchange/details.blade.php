@@ -314,6 +314,8 @@
                         @php
                             $sell_rate_original = 0;
                             $buy_rate_original = 0;
+                            $buy_rate_customer = 0;
+                            $sell_rate_customer = 0;
                             if($exchange->transaction_type == "EXCHANGE"){
                                 $buy_rate_original =  cutDecimals((1 / (float)$exchange->sell_rate) * (float)$exchange->buy_rate, $exchange->receivedCurrency->show_number_after_decimal);
                                 $sell_rate_original = cutDecimals((1 / (float)$exchange->buy_rate) * (float)$exchange->sell_rate , $exchange->sendCurrency->show_number_after_decimal);

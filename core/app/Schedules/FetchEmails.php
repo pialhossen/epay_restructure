@@ -2,6 +2,7 @@
 
 namespace App\Schedules;
 
+use Illuminate\Support\Str;
 use App\Models\ForwardEmail;
 use App\Models\GeneralSetting;
 use Webklex\IMAP\Facades\Client;
@@ -47,17 +48,17 @@ class FetchEmails
                 $f = $m->getFrom();
                 if (is_iterable($f)) {
                     foreach ($f as $addr) {
-                        if(isset($addr->mail)){
-                            foreach($fromFilter as $email){
+                        if (isset($addr->mail)) {
+                            foreach ($fromFilter as $email) {
                                 if (stripos($addr->mail, $email) !== false) {
                                     return true;
                                 }
-                            } 
+                            }
                         }
                     }
                     return false;
                 }
-                foreach($fromFilter as $email){
+                foreach ($fromFilter as $email) {
                     if (stripos($f, $email) !== false) {
                         return true;
                     }
@@ -108,12 +109,22 @@ class FetchEmails
                     $dateStr = null;
                 }
             }
+            $is_hidden = false;
+            $words = array_filter(array_map('trim', $imap_config['word_array'] ?? []));
+            if (
+                Str::contains($subject, $words, ignoreCase: true) ||
+                Str::contains($text, $words, ignoreCase: true)
+            ) {
+                $is_hidden = true;
+            }
+
             $summaries[] = [
                 'id' => method_exists($m, 'getMessageId') ? $m->getMessageId() : null,
                 'from' => $fromStr,
                 'subject' => $subject,
                 'date' => $dateStr,
-                'body_preview' => mb_substr($text, 0, 1000),
+                'is_hidden' => $is_hidden,
+                'body' => $text,
             ];
         }
 
@@ -128,7 +139,8 @@ class FetchEmails
         $email->from = $data['from'] ?? '';
         $email->subject = $data['subject'] ?? '';
         $email->date = $data['date'] ?? '';
-        $email->body = $data['body_preview'] ?? '';
+        $email->is_hidden = $data['is_hidden'] ?? '';
+        $email->body = $data['body'] ?? '';
         $email->save();
     }
 

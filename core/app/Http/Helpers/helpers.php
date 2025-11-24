@@ -703,6 +703,9 @@ function checkPermission($menu_name){
     if($menu_name == "Exchange Emails" && $user->can('View - Exchange Emails')){
         return true;
     }
+    if($menu_name == "Hidden Emails" && $user->can('View - Hidden Exchange Emails')){
+        return true;
+    }
     return false;
 }
 function checkPermissionForSubMenu($parent_manu, $scope){
