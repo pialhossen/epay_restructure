@@ -2,6 +2,7 @@
 
 namespace App\Schedules;
 
+use Carbon\Carbon;
 use Illuminate\Support\Str;
 use App\Models\ForwardEmail;
 use App\Models\GeneralSetting;
@@ -10,6 +11,24 @@ use Illuminate\Support\Facades\Log;
 
 class FetchEmails
 {
+    function stripQuotedReply($text)
+    {
+        // Remove common reply indicators
+        $patterns = [
+            "/On\s.*wrote:/i",
+            "/-----Original Message-----/i",
+            "/From:\s.*\n/i",
+        ];
+
+        foreach ($patterns as $pattern) {
+            if (preg_match($pattern, $text, $match, PREG_OFFSET_CAPTURE)) {
+                $pos = $match[0][1];
+                return trim(substr($text, 0, $pos));
+            }
+        }
+
+        return trim($text);
+    }
     public function fetchEmails()
     {
         $settings = GeneralSetting::find(1);
@@ -38,10 +57,15 @@ class FetchEmails
         }
 
         $inbox = $client->getFolder('INBOX');
-        // $fromFilter = 'workwithpiyal@gmail.com';
         $fromFilter = $imap_config['imap_filter_from'];
 
-        $messages = $inbox->query()->unseen()->get();
+        $sinceDate = Carbon::now()->subDays(1)->format('d-M-Y');
+
+        $messages = $inbox->query()
+            ->unseen()
+            ->since($sinceDate)   // Only emails since this date
+            // ->limit(10)          // Optional: limit to 20 emails
+            ->get();
 
         if ($fromFilter) {
             $messages = $messages->filter(function ($m) use ($fromFilter) {
@@ -96,6 +120,7 @@ class FetchEmails
             $text = trim((string) $m->getTextBody()) ?: trim(strip_tags((string) $m->getHTMLBody()));
             $text = preg_replace('/[\r\n\t\x{200B}-\x{200D}\x{FEFF}]/u', ' ', $text);
             $text = preg_replace('/\s+/', ' ', trim($text));
+            $text = $this->stripQuotedReply($text);
             $dateStr = null;
             if (method_exists($m, 'getDate')) {
                 try {
