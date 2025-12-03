@@ -1,3 +1,6 @@
+@php
+use Illuminate\Support\Str;
+@endphp
 @extends('admin.layouts.app')
 @section('panel')
     <style>
@@ -112,7 +115,8 @@
                                     <th>@lang('Subject')</th>
                                     <th>@lang('Body')</th>
                                     <th>@lang('Note')</th>
-                                    <th>@lang('Check By')</th>
+                                    <th>@lang('Checked By')</th>
+                                    <th>@lang('Checked At')</th>
                                     <th class="sticky-col">@lang('Action')</th>
                                 </tr>
                             </thead>
@@ -133,9 +137,10 @@
                                             {{ $email->from }}
                                         </td>
                                         <td>{{ $email->subject }}</td>
-                                        <td style="white-space: wrap; max-width: 350px;">{{ $email->body }}</td>
-                                        <td style="white-space: wrap; max-width: 350px;">{{ $email->note? $email->note: ($email->is_checked?"[No Note Found]":"[Not Checked Yet]") }}</td>
-                                        <td style="white-space: wrap; max-width: 350px;">{{ $email->checked_by_admin? $email->checked_by_admin->name: "[Not Checked Yet]" }}</td>
+                                        <td style="white-space: nowrap; width: 550px;"> <div style="white-space: wrap;width: 400px">{{ Str::limit($email->body, 400, '...') }}</div></td>
+                                        <td style="width: 350px;">{{ $email->note? $email->note: ($email->is_checked?"[No Note Found]":"[Not Checked Yet]") }}</td>
+                                        <td style="width: 350px;">{{ $email->checked_by_admin? $email->checked_by_admin->name: "[Not Checked Yet]" }}</td>
+                                        <td style="width: 350px;">{{ $email->checked_by_admin? $email->updated_at->format('d/m/Y h:i:s A'): "[Not Checked Yet]" }}</td>
                                         <td class="sticky-col" style="background: {{ $email->is_checked? 'rgb(171 255 189)': 'white' }};">
 
                                             @if(

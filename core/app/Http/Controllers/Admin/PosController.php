@@ -40,7 +40,7 @@ class PosController extends Controller
 
         try {
             $pageTitle = 'POS AVERAGE PROFIT RESULT';
-            $currencies = Currency::whereNotIn('name', ['A/C BALANCE'])->get();
+            $currencies = Currency::whereNotIn('currency_id', ['account_balance'])->get();
             $exchanges = [];
             $transactions = [];
             $totalProfitAll = 0;
@@ -60,7 +60,7 @@ class PosController extends Controller
                 if ($request->currency_id) {
                     $currencyQuery = $currencyQuery->whereIn('id', $request->currency_id);
                 }
-                $cs = $currencyQuery->whereNotIn('name', ['A/C BALANCE'])->get();
+                $cs = $currencyQuery->whereNotIn('currency_id', ['account_balance'])->get();
 
                 // Build query with filters
                 $exchangesQuery = Exchange::with(['user', 'sendCurrency', 'receivedCurrency']);
@@ -165,8 +165,8 @@ class PosController extends Controller
         $totalUserBalance = 0;
         $totalProfit = 0;
         $currencyProfit = 0;
-        $currencies_all = Currency::whereNotIn('name', ['A/C BALANCE'])->orderBy('created_at')->get();
-        $currencies_query = Currency::whereNotIn('name', ['A/C BALANCE'])->orderBy('created_at');
+        $currencies_all = Currency::whereNotIn('currency_id', ['account_balance'])->orderBy('created_at')->get();
+        $currencies_query = Currency::whereNotIn('currency_id', ['account_balance'])->orderBy('created_at');
         if($request->get('currency_id')){
             $currency_ids = $request->currency_id;
             $currencies_query = $currencies_query->whereIn('id', $currency_ids);
@@ -326,8 +326,8 @@ class PosController extends Controller
         $totalUserBalance = 0;
         $totalProfit = 0;
         $currencyProfit = 0;
-        $currencies_all = Currency::whereNotIn('name', ['A/C BALANCE'])->orderBy('created_at')->get();
-        $currencies_query = Currency::whereNotIn('name', ['A/C BALANCE'])->orderBy('created_at');
+        $currencies_all = Currency::whereNotIn('currency_id', ['account_balance'])->orderBy('created_at')->get();
+        $currencies_query = Currency::whereNotIn('currency_id', ['account_balance'])->orderBy('created_at');
         if($request->get('currency_id')){
             $currency_ids = $request->currency_id;
             $currencies_query = $currencies_query->whereIn('id', $currency_ids);

@@ -35,8 +35,8 @@ class DailyProfitExport implements FromView
         $totalUserBalance = 0;
         $totalProfit = 0;
         $currencyProfit = 0;
-        $currencies_all = Currency::whereNotIn('name', ['A/C BALANCE'])->orderBy('created_at')->get();
-        $currencies_query = Currency::whereNotIn('name', ['A/C BALANCE'])->orderBy('created_at');
+        $currencies_all = Currency::whereNotIn('currency_id', ['account_balance'])->orderBy('created_at')->get();
+        $currencies_query = Currency::whereNotIn('currency_id', ['account_balance'])->orderBy('created_at');
         if($this->request->get('currency_id')){
             $currency_ids = $this->request->currency_id;
             $currencies_query = $currencies_query->whereIn('id', $currency_ids);

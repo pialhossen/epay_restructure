@@ -22,7 +22,7 @@ class DailyProfitLossCache
     }
     private function finalProfitCache()
     {
-        $currencies = Currency::whereNotIn('name', ['A/C BALANCE'])->orderBy('created_at')->get();
+        $currencies = Currency::whereNotIn('currency_id', ['account_balance'])->orderBy('created_at')->get();
         $exchangesQuery = Exchange::where('status', 1)->with(['sendCurrency', 'receivedCurrency']);
         // Fetch once (no N+1 queries)
         $exchanges = $exchangesQuery->get();
@@ -100,7 +100,7 @@ class DailyProfitLossCache
     }
     private function dailyProfitCache()
     {
-        $currencies = Currency::whereNotIn('name', ['A/C BALANCE'])->orderBy('created_at')->get();
+        $currencies = Currency::whereNotIn('currency_id', ['account_balance'])->orderBy('created_at')->get();
         $exchangesQuery = Exchange::where('status', 1)->with(['sendCurrency', 'receivedCurrency']);
         // Fetch once (no N+1 queries)
         $exchanges = $exchangesQuery->get();

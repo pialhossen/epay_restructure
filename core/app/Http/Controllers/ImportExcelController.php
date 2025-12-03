@@ -203,7 +203,7 @@ class ImportExcelController extends Controller
         $currency = Currency::enabled()->availableForBuy()->where('id', $data['sending_currency'])->firstOrFail();
         $selling_amount = $data['sending_amount'];
 
-        $recv_currency = Currency::enabled()->availableForBuy()->where('name', 'A/C BALANCE')->first();
+        $recv_currency = Currency::enabled()->availableForBuy()->where('currency_id', 'account_balance')->first();
 
         $amount = $data['receiving_amount'];
 
@@ -278,7 +278,7 @@ class ImportExcelController extends Controller
 
         
         $recv_currency = Currency::enabled()->availableForSell()->where('id', $data['receiving_currency'])->firstOrFail();
-        $currency = Currency::enabled()->availableForSell()->where('name', 'A/C BALANCE')->firstOrFail();
+        $currency = Currency::enabled()->availableForSell()->where('currency_id', 'account_balance')->firstOrFail();
         
         $acc_charge = 0;
         $sell_charges = GpayCurrencyDiscountChargeModel::where('rules_for','sell')->where('currency_id',$currency->id)->whereJsonContains('apply_for','withdraw')->get();

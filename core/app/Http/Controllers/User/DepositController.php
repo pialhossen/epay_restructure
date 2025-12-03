@@ -23,7 +23,7 @@ class DepositController extends Controller
 
     public function depositMoney()
     {
-        $account_currency = Currency::where('name','A/C BALANCE')->first();
+        $account_currency = Currency::where('currency_id','account_balance')->first();
         $pageTitle = 'Deposit Money';
         $user = auth()->user();
         $currencies = Currency::enabled()
@@ -70,7 +70,7 @@ class DepositController extends Controller
             }
             return redirect()->back()->withNotify($notify);
         }
-        $recv_currency = Currency::enabled()->availableForBuy()->where('name', 'A/C BALANCE')->first();
+        $recv_currency = Currency::enabled()->availableForBuy()->where('currency_id', 'account_balance')->first();
         if(!$recv_currency){
             $notify[] = ['error', 'A/C BALANCE is not enabled or not Available for buy!'];
             return redirect()->back()->withNotify($notify);

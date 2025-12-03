@@ -24,7 +24,7 @@ class WithdrawController extends Controller
     {
         $pageTitle = 'Withdraw Money';
         $user = auth()->user();
-        $account_currency = Currency::where('name','A/C BALANCE')->first();
+        $account_currency = Currency::where('currency_id','account_balance')->first();
 
         $currencies = Currency::enabled()
                     ->where([
@@ -73,7 +73,7 @@ class WithdrawController extends Controller
 
         
         $recv_currency = Currency::enabled()->availableForSell()->where('id', $request->currency_id)->with('userDetailsData')->firstOrFail();
-        $currency = Currency::enabled()->availableForSell()->where('name', 'A/C BALANCE')->firstOrFail();
+        $currency = Currency::enabled()->availableForSell()->where('currency_id', 'account_balance')->firstOrFail();
         
         $acc_charge = 0;
         $sell_charges = GpayCurrencyDiscountChargeModel::where('rules_for','sell')->where('currency_id',$currency->id)->whereJsonContains('apply_for','withdraw')->get();

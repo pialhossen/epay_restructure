@@ -23,7 +23,7 @@ class ProfitExport implements FromView
         // Find the last day
         $lastDay = Carbon::parse($this->request->created_from)->subDay()->format('Ymd');
 
-        $currencyQuery = Currency::whereNotIn('name', ['A/C BALANCE'])->orderBy('created_at');
+        $currencyQuery = Currency::whereNotIn('currency_id', ['account_balance'])->orderBy('created_at');
         if ($this->request->currency_id) {
             $currencyQuery = $currencyQuery->whereIn('id', $this->request->currency_id);
         }

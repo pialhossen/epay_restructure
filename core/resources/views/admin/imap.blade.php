@@ -46,7 +46,7 @@
                             </div>
                             <div class="col-sm-6 col-md-4">
                                 <div class="form-group ">
-                                    <label> @lang('Imap Username')</label>
+                                    <label> @lang('Imap Email Address')</label>
                                     <input class="form-control" type="text" name="imap_username" required
                                         value="{{ old('imap_username', $imap_username) }}">
                                 </div>

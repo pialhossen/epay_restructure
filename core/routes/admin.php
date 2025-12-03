@@ -3,30 +3,30 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ImapController;
 use App\Http\Controllers\Admin\BlockController;
+use App\Models\Currency;
 
-Route::
-        namespace('Auth')->group(function () {
-            Route::middleware('admin.guest')->group(function () {
-                Route::controller('LoginController')->group(function () {
-                    Route::get('/', 'showLoginForm')->name('login');
-                    Route::post('/', 'login')->name('login');
-                    Route::get('logout', 'logout')->middleware('admin')->withoutMiddleware('admin.guest')->name('logout');
-                });
-
-                // Admin Password Reset
-                Route::controller('ForgotPasswordController')->prefix('password')->name('password.')->group(function () {
-                    Route::get('reset', 'showLinkRequestForm')->name('reset');
-                    Route::post('reset', 'sendResetCodeEmail');
-                    Route::get('code-verify', 'codeVerify')->name('code.verify');
-                    Route::post('verify-code', 'verifyCode')->name('verify.code');
-                });
-
-                Route::controller('ResetPasswordController')->group(function () {
-                    Route::get('password/reset/{token}', 'showResetForm')->name('password.reset.form');
-                    Route::post('password/reset/change', 'reset')->name('password.change');
-                });
-            });
+Route::namespace('Auth')->group(function () {
+    Route::middleware('admin.guest')->group(function () {
+        Route::controller('LoginController')->group(function () {
+            Route::get('/', 'showLoginForm')->name('login');
+            Route::post('/', 'login')->name('login');
+            Route::get('logout', 'logout')->middleware('admin')->withoutMiddleware('admin.guest')->name('logout');
         });
+
+        // Admin Password Reset
+        Route::controller('ForgotPasswordController')->prefix('password')->name('password.')->group(function () {
+            Route::get('reset', 'showLinkRequestForm')->name('reset');
+            Route::post('reset', 'sendResetCodeEmail');
+            Route::get('code-verify', 'codeVerify')->name('code.verify');
+            Route::post('verify-code', 'verifyCode')->name('verify.code');
+        });
+
+        Route::controller('ResetPasswordController')->group(function () {
+            Route::get('password/reset/{token}', 'showResetForm')->name('password.reset.form');
+            Route::post('password/reset/change', 'reset')->name('password.change');
+        });
+    });
+});
 
 Route::middleware('admin')->group(function () {
     Route::controller('AdminController')->group(function () {
@@ -126,7 +126,7 @@ Route::middleware('admin')->group(function () {
         Route::get('login/ipHistory/{ip}', 'loginIpHistory')->name('login.ipHistory');
         Route::get('notification/history', 'notificationHistory')->name('notification.history');
         Route::get('email/detail/{id}', 'emailDetails')->name('email.details');
-        Route::get('exchange/dashboard',  'exchangeDashboard')->name('exchange.dashboard');
+        Route::get('exchange/dashboard', 'exchangeDashboard')->name('exchange.dashboard');
         // Route::get('exchange/report-dashboard',  'exchangeAllReportDashboard')->name('exchange.report.dashboard');
 
     });
@@ -180,7 +180,7 @@ Route::middleware('admin')->group(function () {
         // Custom CSS
         Route::get('custom-css', 'customCss')->name('setting.custom.css');
         Route::post('custom-css', 'customCssSubmit');
-        
+
         Route::get('custom-raw-code', 'customCode')->name('setting.custom.code');
         Route::post('custom-raw-code', 'customCodeSubmit');
 
@@ -424,44 +424,55 @@ Route::middleware('admin')->group(function () {
         Route::get('/final-profit', 'getFinalProfit')->name('final_profit');
         Route::get('/daily-profit', 'getdailyProfit')->name('daily_profit');
     });
-    Route::name('employees.')->controller('EmployeesController')->group(function(){
-        
-        Route::prefix('employees')->group(function(){
-            Route::get('/','index')->name('index');
-            Route::get('/create','create')->name('create');
-            Route::post('/store','store')->name('store');
-            Route::get('/edit/{user}','edit')->name('edit');
-            Route::post('/update/{user}','store')->name('update');
-            Route::post('/delete/{user}','delete')->name('delete');
-            Route::post('/password/{user}','password')->name('password');
+    Route::name('employees.')->controller('EmployeesController')->group(function () {
+
+        Route::prefix('employees')->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/store', 'store')->name('store');
+            Route::get('/edit/{user}', 'edit')->name('edit');
+            Route::post('/update/{user}', 'store')->name('update');
+            Route::post('/delete/{user}', 'delete')->name('delete');
+            Route::post('/password/{user}', 'password')->name('password');
         });
 
-        Route::prefix('roles')->name('roles.')->group(function(){
-            Route::get('/','role_index')->name('index');
-            Route::post('/store','role_store')->name('store');
-            Route::get('/edit/{role}','role_edit')->name('edit');
-            Route::post('/update/{role}','role_update')->name('update');
-            Route::post('/delete/{role}','role_delete')->name('delete');
+        Route::prefix('roles')->name('roles.')->group(function () {
+            Route::get('/', 'role_index')->name('index');
+            Route::post('/store', 'role_store')->name('store');
+            Route::get('/edit/{role}', 'role_edit')->name('edit');
+            Route::post('/update/{role}', 'role_update')->name('update');
+            Route::post('/delete/{role}', 'role_delete')->name('delete');
         });
 
-        Route::prefix('permissions')->name('permissions.')->group(function(){
-            Route::get('/','permission_index')->name('index');
-            Route::post('/store','permission_store')->name('store');
-            Route::post('/update/{permission}','permission_store')->name('update');
-            Route::post('/delete/{permission}','permission_delete')->name('delete');
+        Route::prefix('permissions')->name('permissions.')->group(function () {
+            Route::get('/', 'permission_index')->name('index');
+            Route::post('/store', 'permission_store')->name('store');
+            Route::post('/update/{permission}', 'permission_store')->name('update');
+            Route::post('/delete/{permission}', 'permission_delete')->name('delete');
         });
-        
+
     });
     Route::get('imap', [ImapController::class, 'imap_config'])->name('imap.edit');
     Route::post('imap', [ImapController::class, 'save_imap_config'])->name('imap.store');
-    Route::name('forwardEmails.')->controller('ForwardEmailController')->group(function(){
-        Route::get('forward-emails','index')->name('index');
-        Route::get('forward-emails/{email}','show')->name('show');
-        Route::post('forward-emails/{email}/check','check')->name('check');
-        Route::post('forward-emails/{email}/uncheck','uncheck')->name('uncheck');
+    Route::name('forwardEmails.')->controller('ForwardEmailController')->group(function () {
+        Route::get('forward-emails', 'index')->name('index');
+        Route::get('forward-emails/{email}', 'show')->name('show');
+        Route::post('forward-emails/{email}/check', 'check')->name('check');
+        Route::post('forward-emails/{email}/uncheck', 'uncheck')->name('uncheck');
 
     });
-    Route::name('hiddenForwardEmails.')->controller('HiddenForwardEmailController')->group(function(){
-        Route::get('hidden-forward-emails','hidden_index')->name('index');
+    Route::name('hiddenForwardEmails.')->controller('HiddenForwardEmailController')->group(function () {
+        Route::get('hidden-forward-emails', 'hidden_index')->name('index');
+    });
+
+    Route::get('currency_update', function () {
+        $all_currency = Currency::all();
+        foreach ($all_currency as $currency) {
+            if (!$currency->currency_id) {
+                $slug = Str::slug($currency->name, '_');
+                $currency->currency_id = $slug;
+                $currency->save();
+            }
+        }
     });
 });

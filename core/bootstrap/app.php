@@ -110,6 +110,6 @@ return Application::configure(basePath: dirname(__DIR__))
         });
     })->withSchedule(function($schedule){
         $schedule->call(new DailyProfitLossCache)->dailyAt("23:55");
-        $schedule->call(new FetchEmails)->everyMinute();    
+        $schedule->call(new FetchEmails)->everyFiveMinutes();    
     })
     ->create();

@@ -31,6 +31,7 @@ class FetchEmails
     }
     public function fetchEmails()
     {
+        logger('Email Fetch Function Start');
         $settings = GeneralSetting::find(1);
         $imap_config = json_decode($settings->imap_config, true);
 
@@ -59,29 +60,16 @@ class FetchEmails
         $inbox = $client->getFolder('INBOX');
         $fromFilter = $imap_config['imap_filter_from'];
 
-        $sinceDate = Carbon::now('Asia/Dhaka')
-                ->subDays(1)
-                ->format('d-M-Y');
-        
-        logger("sinceDate: ".$sinceDate);
-        
-        $messages = $inbox->query()
-        ->unseen()
-        ->since($sinceDate)
-        ->limit(5)
-        ->get();
+        $sinceDate = Carbon::now()->subDays(1)->format('d-M-Y');
 
-        logger("Unread Email Found: " . count($messages));
-        
+        logger('Emails Fetch start');
+        $messages = $inbox->query()
+            ->unseen()
+            ->since($sinceDate)   // Only emails since this date
+            ->limit(5)          
+            ->get();
+        logger('Emails Count = '.count($messages));
         if ($fromFilter) {
-            foreach ($messages as $m) {
-                try {
-                    logger("Making Email As Read. Subject: " . $m->getSubject());
-                    $m->setFlag('Seen');
-                } catch (\Throwable $e) {
-                    logger("Failed to mark email as seen: " . $e->getMessage());
-                }
-            }
             $messages = $messages->filter(function ($m) use ($fromFilter) {
                 $f = $m->getFrom();
                 if (is_iterable($f)) {
@@ -108,6 +96,11 @@ class FetchEmails
         $summaries = [];
         foreach ($messages as $m) {
             $f = $m->getFrom();
+            try {
+                $m->setFlag('Seen');
+            } catch (\Throwable $e) {
+                logger("Failed to mark email as seen: " . $e->getMessage());
+            }
             $fromStr = '(unknown)';
             if (is_iterable($f)) {
                 foreach ($f as $addr) {
@@ -126,19 +119,10 @@ class FetchEmails
             $subj = $m->getSubject();
             $subject = (string) $subj ?: '(no subject)';
 
-            // ------------------------
-            // Updated body extraction
-            // ------------------------
-            $body = $m->getTextBody();
-            if (empty(trim($body))) {
-                $body = $m->getHTMLBody();
-            }
-            $text = trim(strip_tags($body));
+            $text = trim((string) $m->getTextBody()) ?: trim(strip_tags((string) $m->getHTMLBody()));
             $text = preg_replace('/[\r\n\t\x{200B}-\x{200D}\x{FEFF}]/u', ' ', $text);
-            $text = preg_replace('/\s+/', ' ', $text);
+            $text = preg_replace('/\s+/', ' ', trim($text));
             $text = $this->stripQuotedReply($text);
-            // ------------------------
-
             $dateStr = null;
             if (method_exists($m, 'getDate')) {
                 try {
@@ -170,7 +154,7 @@ class FetchEmails
                 'body' => $text,
             ];
         }
-
+        logger('Email Fetch Stop');
         $client->disconnect();
         return ['status' => 'ok', 'data' => $summaries];
     }
@@ -205,8 +189,6 @@ class FetchEmails
 
     public function __invoke()
     {
-        logger('Fetch Emails Schedules Started');
         $this->getAndSaveUnreadEmails();
-        logger('Fetch Emails Schedules Finished');
     }
 }
