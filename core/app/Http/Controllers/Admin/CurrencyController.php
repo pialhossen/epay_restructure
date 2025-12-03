@@ -7,6 +7,7 @@ use App\Models\Gateway;
 use App\Models\Currency;
 use App\Constants\Status;
 use App\Lib\FormProcessor;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\dailyprofitlog;
 use App\Models\GatewayCurrency;
@@ -108,6 +109,12 @@ class CurrencyController extends Controller
        
 
         $currency->name = $request->name;
+
+        if (!$id) {
+            $slug = Str::slug($currency->name, '_');
+            $currency->currency_id = $slug;
+        }
+
         $currency->cur_sym = $currencySymbol;
         $currency->conversion_rate = $request->conversion_rate;
         $currency->percent_decrease = $request->percent_decrease;
