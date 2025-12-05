@@ -29,6 +29,11 @@ use Illuminate\Support\Str;
             top: 0;
             z-index: 3;
         }
+        .email-body{
+            width: 100%;
+            display: flex;
+            justify-content: end;
+        }
     </style>
     @php
     $imap_config = json_decode(gs('imap_config'));
@@ -91,6 +96,7 @@ use Illuminate\Support\Str;
         <div class="col-lg-12">
             <div class="card b-radius--10 ">
                 <div class="card-body p-0">
+                   
                     <div class="table-responsive--md  table-responsive table-container">
                         <table class="table table--light style--two data-table">
                             <thead>
@@ -137,7 +143,13 @@ use Illuminate\Support\Str;
                                             {{ $email->from }}
                                         </td>
                                         <td>{{ $email->subject }}</td>
-                                        <td style="white-space: nowrap; width: 550px;"> <div style="white-space: wrap;width: 400px">{{ Str::limit($email->body, 400, '...') }}</div></td>
+                                        <td style="white-space: nowrap;">
+                                            <div style="white-space: wrap;" class="email-body">
+                                                <div style="width: 400px;">
+                                                    {{ Str::limit($email->body, 400, '...') }}
+                                                </div>
+                                            </div>
+                                        </td>
                                         <td style="width: 350px;">{{ $email->note? $email->note: ($email->is_checked?"[No Note Found]":"[Not Checked Yet]") }}</td>
                                         <td style="width: 350px;">{{ $email->checked_by_admin? $email->checked_by_admin->name: "[Not Checked Yet]" }}</td>
                                         <td style="width: 350px;">{{ $email->checked_by_admin? $email->updated_at->format('d/m/Y h:i:s A'): "[Not Checked Yet]" }}</td>

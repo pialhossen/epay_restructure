@@ -1,3 +1,6 @@
+@php
+use Illuminate\Support\Str;
+@endphp
 @extends('admin.layouts.app')
 @section('panel')
     <style>
@@ -25,6 +28,11 @@
             position: sticky;
             top: 0;
             z-index: 3;
+        }
+        .email-body{
+            width: 100%;
+            display: flex;
+            justify-content: end;
         }
     </style>
     @php
@@ -88,6 +96,7 @@
         <div class="col-lg-12">
             <div class="card b-radius--10 ">
                 <div class="card-body p-0">
+                   
                     <div class="table-responsive--md  table-responsive table-container">
                         <table class="table table--light style--two data-table">
                             <thead>
@@ -112,7 +121,8 @@
                                     <th>@lang('Subject')</th>
                                     <th>@lang('Body')</th>
                                     <th>@lang('Note')</th>
-                                    <th>@lang('Check By')</th>
+                                    <th>@lang('Checked By')</th>
+                                    <th>@lang('Checked At')</th>
                                     <th class="sticky-col">@lang('Action')</th>
                                 </tr>
                             </thead>
@@ -133,11 +143,18 @@
                                             {{ $email->from }}
                                         </td>
                                         <td>{{ $email->subject }}</td>
-                                        <td style="white-space: wrap; max-width: 350px;">{{ $email->body }}</td>
-                                        <td style="white-space: wrap; max-width: 350px;">{{ $email->note? $email->note: ($email->is_checked?"[No Note Found]":"[Not Checked Yet]") }}</td>
-                                        <td style="white-space: wrap; max-width: 350px;">{{ $email->checked_by_admin? $email->checked_by_admin->name: "[Not Checked Yet]" }}</td>
+                                        <td style="white-space: nowrap;">
+                                            <div style="white-space: wrap;" class="email-body">
+                                                <div style="width: 400px;">
+                                                    {{ Str::limit($email->body, 400, '...') }}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td style="width: 350px;">{{ $email->note? $email->note: ($email->is_checked?"[No Note Found]":"[Not Checked Yet]") }}</td>
+                                        <td style="width: 350px;">{{ $email->checked_by_admin? $email->checked_by_admin->name: "[Not Checked Yet]" }}</td>
+                                        <td style="width: 350px;">{{ $email->checked_by_admin? $email->updated_at->format('d/m/Y h:i:s A'): "[Not Checked Yet]" }}</td>
                                         <td class="sticky-col" style="background: {{ $email->is_checked? 'rgb(171 255 189)': 'white' }};">
-                                            @if(checkSpecificPermission('View - Exchange Emails'))
+
                                             @if(
                                                 $email->updated_at->gt(now()->subMinutes((int)$imap_config->timeout || 10)) || 
                                                 !$email->is_checked ||
@@ -167,7 +184,6 @@
                                                 <button class="btn btn-sm btn-outline--primary" disabled>
                                                     <i class="las la-desktop"></i>@lang('Details')
                                                 </button>
-                                            @endif
                                             @endif
 
                                         </td>
