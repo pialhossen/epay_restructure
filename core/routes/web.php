@@ -13,8 +13,8 @@ Broadcast::routes([
     'middleware' => ['web', 'auth'],
 ]);
 
-// Route::get('/import_lost_data_excel', [ImportExcelController::class, 'excel_to_exchange']);
-Route::get('/fix_excel_import_data', [ImportExcelController::class, 'fix_excel_import_data']);
+Route::get('/import_lost_data_excel', [ImportExcelController::class, 'excel_to_exchange']);
+Route::get('/fix_currency', [ImportExcelController::class, 'fix_currency']);
 
 Route::get('/clear', function () {
     \Illuminate\Support\Facades\Artisan::call('optimize:clear');

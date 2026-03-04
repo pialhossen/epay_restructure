@@ -178,6 +178,9 @@ class FetchEmails
 
     public function saveEmail($data)
     {
+        if(ForwardEmail::where('body', $data['body'])->exists()){
+            return;
+        }
         $email = new ForwardEmail();
         $email->from = $data['from'] ?? '';
         $email->subject = $data['subject'] ?? '';
