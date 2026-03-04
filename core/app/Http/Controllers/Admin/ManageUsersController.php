@@ -31,7 +31,7 @@ class ManageUsersController extends Controller
         if ($user->id == 1) {
             return true;
         }
-        if (($scope == 'index' || $scope == 'Manage Currencies') && $user->can('View - All Users')) {
+        if (($scope == 'index' || $scope == 'All Users') && $user->can('View - All Users')) {
             return true;
         }
         if (($scope == 'active' || $scope == 'Active Users') && $user->can('View - Active Users')) {

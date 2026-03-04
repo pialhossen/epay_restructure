@@ -90,6 +90,7 @@ class PosController extends Controller
                 }
 
                 // Fetch once (no N+1 queries)
+                $total_exchanges = $exchangesQuery->get();
                 $exchanges = $exchangesQuery->paginate(getPaginate());
 
                 // Prepare calculations
@@ -104,7 +105,7 @@ class PosController extends Controller
                     ])->first();
 
                     // Exchanges where this currency is the sending currency
-                    $sentExchanges = $exchanges->where('send_currency_id', $currency->id);
+                    $sentExchanges = $total_exchanges->where('send_currency_id', $currency->id);
 
                     $sentAmount = $sentExchanges->sum('sending_amount');
                     $lastDayReserved = $finalProfitData->currency_reserved ?? 0;
@@ -117,7 +118,7 @@ class PosController extends Controller
                     $avgSentRate = $sentProfit > 0 ? $receivedProfit / $sentProfit : 0;
 
                     // Exchanges where this currency is the receiving currency
-                    $receivedExchanges = $exchanges->where('receive_currency_id', $currency->id);
+                    $receivedExchanges = $total_exchanges->where('receive_currency_id', $currency->id);
                     $hiddenChargeAmount = 0;
                     foreach($receivedExchanges as $receivedExchange){
                         $hidden_charge_percentage_amount = ($receivedExchange->hidden_charge_percent / 100) * $receivedExchange->receiving_amount;
