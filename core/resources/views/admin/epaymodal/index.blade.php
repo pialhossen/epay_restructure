@@ -20,6 +20,7 @@
                                 <th>@lang('Title')</th>
                                 <th>@lang('Description')</th>
                                 <th>@lang('Button Name')</th>
+                                <th>@lang('Button Link')</th>
                                 <th>@lang('Image')</th>
                                 <th>@lang('Status')</th>
                                 <th>@lang('Created Date')</th>
@@ -31,8 +32,9 @@
                             <tr>
                                 <td>{{ $item->id }}</td>
                                 <td>{{ __($item->title) }}</td>
-                                <td>{{ __($item->description) }}</td>
+                                <td style="min-width: 350px; white-space: wrap;">{{ __($item->description) }}</td>
                                 <td>{{ __($item->button_name) }}</td>
+                                <td style="min-width: 350px; white-space: wrap;">{{ __($item->button_link) }}</td>
                                 <td>
                                     @if ($item->image)
                                     <img src="{{ asset($item->image) }}" alt="Image" class="img-thumbnail" style="width: 80px; height: 80px; object-fit: cover;">

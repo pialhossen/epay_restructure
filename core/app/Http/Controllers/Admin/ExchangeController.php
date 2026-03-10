@@ -1088,7 +1088,7 @@ class ExchangeController extends Controller
 
         $me = User::find($usr);
         $refer = User::find($me->ref_by);
-        if ($refer == '') {
+        if (!$refer) {
             return 1;
         }
 
@@ -1097,9 +1097,6 @@ class ExchangeController extends Controller
             return 1;
         }
         $i = $commission->level;
-        if ($commission == null) {
-            return 1;
-        }
 
         $com = ($amount * $commission->percent) / 100;
         $newBal = getAmount($refer->balance + $com);

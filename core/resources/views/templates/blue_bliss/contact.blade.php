@@ -83,9 +83,15 @@
                                     <textarea name="message" wrap="off" class="form--control bg-white" required>{{ old('message') }}</textarea>
                                 </div>
                                 <x-captcha />
+                                @if(auth()->check())
                                 <div class="form-group col-sm-12">
                                     <button type="submit" class="btn btn--base">@lang('Submit')</button>
                                 </div>
+                                @else
+                                <div class="form-group col-sm-12">
+                                    Login To Submit Contact Message
+                                </div>
+                                @endif
                             </div>
                         </form>
                     </div>

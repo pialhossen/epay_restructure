@@ -3,7 +3,32 @@
 @php
     $site_path = '/'.APP_PUBLIC_FOLDER;
 @endphp
+<style>
+    .table-container {
+        overflow-x: auto;
+        position: relative;
+    }
 
+    .data-table {
+        border-collapse: collapse;
+    }
+
+    .data-table th,
+    .data-table td {
+        white-space: nowrap;
+    }
+
+    .sticky-col {
+        position: sticky;
+        right: 0;
+        z-index: 2;
+    }
+    .data-table th {
+        position: sticky;
+        top: 0;
+        z-index: 3;
+    }
+</style>
 @section('panel')
     <div class="row">
         <div class="col-lg-12">
@@ -13,8 +38,8 @@
                         <h6 class="mb-0">@lang('Customer Reviews')</h6>
                     </div>
 
-                    <div class="table-responsive--md">
-                        <table class="table table--light style--two">
+                    <div class="table-responsive--md table-container">
+                        <table class="table table--light style--two data-table">
                             <thead>
                                 <tr>
                                     <th>@lang('ID')</th>

@@ -93,7 +93,11 @@
         @endif
         <h2 class="text-xl font-bold mb-2">{{ $modalDetails->title ?? '' }}</h2>
         <p class="text-gray-700">{!! $modalDetails->description ?? '' !!}</p>
-        <button class="modal-btn" id="gotItBtn">{{ $modalDetails->button_name ?? 'Got It!' }}</button>
+        @if($modalDetails->button_link)
+        <a class="modal-btn" href="{{ $modalDetails->button_link }}" target="_blank" id="gotItBtn">{{ $modalDetails->button_name ?? 'Got It!' }}</a>
+        @else
+        <buton class="modal-btn" id="gotItBtn">{{ $modalDetails->button_name ?? 'Got It!' }}</>
+        @endif
     </div>
 </div>
 @endif

@@ -17,6 +17,7 @@ class EpayHomePageModalModel extends Model
         'title',
         'description',
         'button_name',
+        'button_link',
         'image',
         'status',
         // 'remarks',

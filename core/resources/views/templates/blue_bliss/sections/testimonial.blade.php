@@ -14,19 +14,34 @@
         </div>
         <div class="client-slider">
             <div class="swiper-wrapper">
-                @foreach ($testimonialElements as $testimonialElement)
-                    <div class="swiper-slide">
+                @foreach ($testimonialElements->chunk(2) as $testimonialElement)
+                    <div class="swiper-slide" style="display: flex; gap: 20px;">
+                        @if(isset($testimonialElement[0]))
                         <div class="client-item">
                             <div class="client-thumb">
                                 <div class="content">
-                                    <h6 class="title">{{ __(@$testimonialElement->data_values->name) }}</h6>
-                                    <span>{{ __(@$testimonialElement->data_values->designation) }}</span>
+                                    <h6 class="title">{{ __(@$testimonialElement[0]->data_values->name) }}</h6>
+                                    <span>{{ __(@$testimonialElement[0]->data_values->designation) }}</span>
                                 </div>
                             </div>
                             <div class="client-content">
-                                <blockquote> {{ __(@$testimonialElement->data_values->description) }}</blockquote>
+                                <blockquote> {{ __(@$testimonialElement[0]->data_values->description) }}</blockquote>
                             </div>
                         </div>
+                        @endif
+                        @if(isset($testimonialElement[1]))
+                        <div class="client-item">
+                            <div class="client-thumb">
+                                <div class="content">
+                                    <h6 class="title">{{ __(@$testimonialElement[1]->data_values->name) }}</h6>
+                                    <span>{{ __(@$testimonialElement[1]->data_values->designation) }}</span>
+                                </div>
+                            </div>
+                            <div class="client-content">
+                                <blockquote> {{ __(@$testimonialElement[1]->data_values->description) }}</blockquote>
+                            </div>
+                        </div>
+                        @endif
                     </div>
                 @endforeach
             </div>

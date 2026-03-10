@@ -47,6 +47,11 @@
                         </div>
 
                         <div class="form-group mb-3">
+                            <label>@lang('Button Link')</label>
+                            <input type="text" name="button_link" class="form-control" value="{{ old('button_link', $item->button_link ?? '') }}" maxlength="255" />
+                        </div>
+
+                        <div class="form-group mb-3">
                             <label>@lang('Image')</label><br>
                             @if ($isEdit && $item->image_link)
                                 <img src="{{ asset('storage/' . $item->image_link) }}" alt="Current Image" width="100"

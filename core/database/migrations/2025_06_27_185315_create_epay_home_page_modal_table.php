@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -16,6 +17,7 @@ return new class extends Migration
             $table->string('title')->nullable();
             $table->text('description')->nullable();
             $table->string('button_name')->nullable();
+            $table->string('button_link')->nullable();
             $table->text('image_link')->nullable();
             $table->integer('status')->default(1);
             $table->text('remarks')->nullable();
