@@ -401,6 +401,7 @@ Route::middleware('admin')->group(function () {
         Route::post('refund/{id}', 'refund')->name('refund');
         Route::get('download/{id}', 'download')->name('download');
         Route::post('export/exchanges', 'exportExchanges')->name('export');
+        Route::post('import/exchanges', 'excel_to_exchange')->name('import');
         Route::post('exchanges-bulk-update', 'exchanges_bulk_update')->name('bulk.update');
     });
 
@@ -459,6 +460,10 @@ Route::middleware('admin')->group(function () {
         Route::get('forward-emails/{email}', 'show')->name('show');
         Route::post('forward-emails/{email}/check', 'check')->name('check');
         Route::post('forward-emails/{email}/uncheck', 'uncheck')->name('uncheck');
+
+        Route::get('forward-archive-emails', 'archive_index')->name('archive_index');
+        Route::post('forward-emails/{email}/archive', 'archive')->name('archive');
+        Route::post('forward-emails/{email}/unarchive', 'unarchive')->name('unarchive');
 
     });
     Route::name('hiddenForwardEmails.')->controller('HiddenForwardEmailController')->group(function () {

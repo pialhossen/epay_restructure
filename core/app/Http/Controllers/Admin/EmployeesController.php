@@ -94,6 +94,7 @@ class EmployeesController extends Controller
         $user->username = $request->username;
         $user->email = $request->email;
         $user->is_active = $request->is_active == '1'? 1: 0;
+        $user->is_superadmin = $request->is_superadmin == '1'? 1: 0;
         $user->save();
         
         if($user_creating){

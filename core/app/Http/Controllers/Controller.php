@@ -44,7 +44,7 @@ abstract class Controller
         return ['status' => 'success', 'message' => 'Alert Stop Event Broadcasted'];
     }
     public function check_permission($ability){
-        if(auth()->guard('admin')->user()->cannot($ability) && auth()->guard('admin')->user()->id != 1){
+        if(auth()->guard('admin')->user()->cannot($ability) && auth()->guard('admin')->user()->id != 1 && !auth()->guard('admin')->user()->is_superadmin){
             abort(403);
         }
         return 0;

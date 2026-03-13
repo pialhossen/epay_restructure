@@ -655,7 +655,7 @@ function setEnvValue($key, $value)
 }
 function checkPermission($menu_name){
     $user = auth()->guard('admin')->user();
-    if($user->id == 1){
+    if($user->id == 1 || $user->is_superadmin ){
         return 1;
     }
     if($menu_name == "Dashboard"){
@@ -740,7 +740,7 @@ function checkPermissionForSubMenu($parent_manu, $scope){
     return false;
 }
 function checkSpecificPermission($ability){
-    if(auth()->guard('admin')->user()->can($ability) || auth()->guard('admin')->user()->id == 1){
+    if(auth()->guard('admin')->user()->can($ability) || auth()->guard('admin')->user()->id == 1 || auth()->guard('admin')->user()->is_superadmin){
         return true;
     }
     return false;

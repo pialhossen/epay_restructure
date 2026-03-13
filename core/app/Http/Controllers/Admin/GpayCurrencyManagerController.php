@@ -17,7 +17,7 @@ class GpayCurrencyManagerController extends Controller
         $this->check_permission("View - Currency");
     }
     public static function checkPermission($user, $scope){
-        if($user->id == 1){
+        if($user->id == 1 || $user->is_superadmin){
             return true;
         }
         if($scope == 'index' && $user->can('View - Currency Exchange')){

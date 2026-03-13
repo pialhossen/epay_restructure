@@ -77,6 +77,16 @@
                             <div class="col-md-12 mb-2">
                                 <div class="row">
                                     <div class="col-md-2">
+                                        <label class="form-control-label">@lang('Super Admin')</label>
+                                        <input type="checkbox" data-width="100%" data-height="50" data-onstyle="-success"
+                                        data-offstyle="-danger" data-bs-toggle="toggle" data-on="@lang('Activated')"
+                                        data-off="@lang('Deactivated')" name="is_superadmin" value="1" class="child-permission" @checked(isset($user)? $user->is_superadmin : '')>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12 mb-2">
+                                <div class="row">
+                                    <div class="col-md-2">
                                         <label class="form-control-label">@lang('Activate')</label>
                                         <input type="checkbox" data-width="100%" data-height="50" data-onstyle="-success"
                                         data-offstyle="-danger" data-bs-toggle="toggle" data-on="@lang('Activated')"

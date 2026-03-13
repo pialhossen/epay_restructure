@@ -28,7 +28,7 @@ class ManageUsersController extends Controller
 
     public static function checkPermission($user, $scope)
     {
-        if ($user->id == 1) {
+        if ($user->id == 1 || $user->is_superadmin) {
             return true;
         }
         if (($scope == 'index' || $scope == 'All Users') && $user->can('View - All Users')) {

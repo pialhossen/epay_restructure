@@ -18,7 +18,6 @@ class BlockIpMiddleware
     {
         $blockedIps = BlockedIp::pluck('ip_address')->toArray();
         $clientIp = $request->ip();
-        logger("Client IP = $clientIp");
 
         if (in_array($clientIp, $blockedIps)) {
             return response('Your have been blocked.', Response::HTTP_FORBIDDEN);

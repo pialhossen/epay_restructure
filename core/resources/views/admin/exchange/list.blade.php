@@ -37,7 +37,7 @@
                         @if(request()->query('itemsPerPage'))
                             <input type="hidden" name="itemsPerPage" value="{{ request('itemsPerPage') }}">
                         @endif
-                        <div class="row pb-2">
+                        <div class="mb-3">
                             <div class="col-lg-3 col-md-6 col-12 advance-search" data-advance-search-url="{{ route('admin.exchange.advance.search') }}">
                                 <label for="exchange_id">Exchange ID</label>
                                 <input @if($request->exchange_id) value="{{ $request->exchange_id }}" @endif type="text" name="exchange_id" class="form-control" autocomplete="off">
@@ -60,35 +60,43 @@
                                     <option value="WITHDRAW" @if(is_array($request->transaction_type) && in_array('WITHDRAW',$request->transaction_type)) selected @endif>WITHDRAW</option>
                                 </select>
                             </div>
-                            <div class="col-lg-3 col-md-6 col-12">
-                                @php
-                                    $send_old = isset(request()->query()['send_currency_id'])? request()->query()['send_currency_id']: [];
-                                @endphp
-                                <label for="send_currency_id">Send Method</label>
-                                <select name="send_currency_id[]" id="send_currency_id" class="form-control select2" multiple="multiple">
-                                    @foreach($currencies as $currency)
-                                    <option value="{{ $currency->id }}" @selected(in_array($currency->id,$send_old ))>{{ $currency->name }}</option>
-                                    @endforeach
-                                </select>
+                            <div class="d-flex gap-3">
+                                <div class="col-lg-3 col-md-6 col-12">
+                                    @php
+                                        $send_old = isset(request()->query()['send_currency_id'])? request()->query()['send_currency_id']: [];
+                                    @endphp
+                                    <label for="send_currency_id">Send Method</label>
+                                    <select name="send_currency_id[]" id="send_currency_id" class="form-control select2" multiple="multiple">
+                                        @foreach($currencies as $currency)
+                                        <option value="{{ $currency->id }}" @selected(in_array($currency->id,$send_old ))>{{ $currency->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-lg-3 col-md-6 col-12">
+                                    @php
+                                        $receive_old = isset(request()->query()['receive_currency_id'])? request()->query()['receive_currency_id']: [];
+                                    @endphp
+                                    <label for="receive_currency_id">Receive Method</label>
+                                    <select name="receive_currency_id[]" id="receive_currency_id" class="form-control select2" multiple="multiple">
+                                        @foreach($currencies as $currency)
+                                        <option value="{{ $currency->id }}" @selected(in_array($currency->id,$receive_old ))>{{ $currency->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-3">
+                                <div class="col-lg-3 col-md-6 col-12" data-advance-search-url="">
+                                    <label for="created_from">Created From</label>
+                                    <input @if($request->created_from) value="{{ $request->created_from }}" @endif type="date" name="created_from" class="form-control">
+                                </div>
+                                <div class="col-lg-3 col-md-6 col-12">
+                                    <label for="created_to">Created To</label>
+                                    <input @if($request->created_to) value="{{ $request->created_to }}" @endif type="date" name="created_to" class="form-control">
+                                </div>
                             </div>
                             <div class="col-lg-3 col-md-6 col-12">
-                                @php
-                                    $receive_old = isset(request()->query()['receive_currency_id'])? request()->query()['receive_currency_id']: [];
-                                @endphp
-                                <label for="receive_currency_id">Receive Method</label>
-                                <select name="receive_currency_id[]" id="receive_currency_id" class="form-control select2" multiple="multiple">
-                                    @foreach($currencies as $currency)
-                                    <option value="{{ $currency->id }}" @selected(in_array($currency->id,$receive_old ))>{{ $currency->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-lg-3 col-md-6 col-12" data-advance-search-url="">
-                                <label for="created_from">Created From</label>
-                                <input @if($request->created_from) value="{{ $request->created_from }}" @endif type="date" name="created_from" class="form-control">
-                            </div>
-                            <div class="col-lg-3 col-md-6 col-12">
-                                <label for="created_to">Created To</label>
-                                <input @if($request->created_to) value="{{ $request->created_to }}" @endif type="date" name="created_to" class="form-control">
+                                <label for="created_to">Note</label>
+                                <input @if($request->note) value="{{ $request->note }}" @endif type="text" name="note" class="form-control">
                             </div>
                         </div>
                         <button type="Submit" class="btn btn-sm btn-primary">Search</button>
@@ -110,7 +118,7 @@
                         <table class="table table--light style--two data-table">
                             <thead>
                                 <tr>
-                                    @if(auth()->id() == 1) <th><input type="checkbox" name="" id="select_all" style="width: 25px; height: 25px; cursor: pointer;"></th>@endif
+                                    <th><input type="checkbox" name="" id="select_all" style="width: 25px; height: 25px; cursor: pointer;"></th>
                                     <th>@lang('Exchange ID')</th>
                                     <th>@lang('User')</th>
                                     <th>@lang('Transaction Type')</th>
@@ -173,11 +181,10 @@
                                 @endphp
                                 @forelse($exchanges as $exchange)
                                     <tr>
-                                        @if(auth()->id() == 1)
+                                        
                                         <td>
                                             <input type="checkbox" name="exchnage_id[]" id="" style="width: 25px; height: 25px; cursor: pointer;" value="{{ $exchange->id }}">
                                         </td>
-                                        @endif
                                         <td>
                                             <span class="fw-bold">{{ $exchange->exchange_id }}</span>
                                             <br>
@@ -276,19 +283,23 @@
                         </table>
                     </div>
                 </div>
-                @if(auth()->id() == 1)
+
                 <div class="card-footer py-4" style="display: flex; place-items: center; gap: 5px;">
                     <select name="" id="bulk_update_exchange_type">
+                        @if(auth()->id() == 1 && auth()->user()->is_superadmin)
                         <option value=1>Approve</option>
                         <option value=2>Pending</option>
                         <option value=3>Refund</option>
                         <option value=4>Hold</option>
                         <option value=5>Proccessing</option>
                         <option value=9>Cancel</option>
+                        @else
+                        <option value=1>Approve</option>
+                        <option value=5>Proccessing</option>
+                        @endif
                     </select>
                     <button class="btn btn-sm btn-primary" style="height: 36px;" id="bulk_update_button">Bulk Update</button>
                 </div>
-                @endif
                 @if ($exchanges->hasPages())
                     <div class="card-footer py-4">
                         {{ paginateLinks($exchanges) }}
@@ -449,10 +460,33 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="importModal">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">@lang('Import Excel Files')</h4>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="la la-close" aria-hidden="true"></i>
+                    </button>
+                </div>
+                <form method="post" action="{{ route('admin.exchange.import') }}" id="exportForm" enctype="multipart/form-data">
+                    @csrf
+                    <input type="file" name="file" id="">
+                    <div class="modal-footer">
+                        <input type="hidden" name="scope" value="{{ $scope }}">
+                        <button type="submit" class="btn btn--success w-100 h-45">@lang('Import')</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('breadcrumb-plugins')
     {{--  <x-search-form placeholder="Exchange ID, username" dateSearch='yes' />  --}}
+    <button type="button" class="btn  btn-outline--success h-45 importBtn">
+        <i class="las la-cloud-upload-alt"></i> @lang('Import')
+    </button>
     <button type="button" class="btn  btn-outline--warning h-45 exportBtn">
         <i class="las la-cloud-download-alt"></i> @lang('Export')
     </button>
@@ -471,6 +505,9 @@
         (function($) {
             $('.exportBtn').on('click', function() {
                 $('#exportModal').modal('show');
+            });
+            $('.importBtn').on('click', function() {
+                $('#importModal').modal('show');
             });
             $('#select_all').click(e => {
                 $('input[name="exchnage_id[]"]').prop('checked', e.target.checked);

@@ -21,6 +21,9 @@ class SupportTicketController extends Controller
     }
 
     public static function checkPermission($user, $scope){
+        if($user->id == 1 || $user->is_superadmin){
+            return true;
+        }
         if( $scope == 'Pending Ticket' && $user->can("View - Pending Ticket")){
             return true;
         }

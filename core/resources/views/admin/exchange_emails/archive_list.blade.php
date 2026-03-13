@@ -45,7 +45,7 @@ use Illuminate\Support\Str;
                     @php
                         $lastSegment = request()->segment(count(request()->segments()));
                     @endphp
-                    <form class="m-2" action="{{ route('admin.forwardEmails.index') }}" method="GET" autocomplete="off">
+                    <form class="m-2" action="{{ route('admin.forwardEmails.archive_index') }}" method="GET" autocomplete="off">
                         @if(request()->query('itemsPerPage'))
                             <input type="hidden" name="itemsPerPage" value="{{ request('itemsPerPage') }}">
                         @endif
@@ -262,10 +262,6 @@ use Illuminate\Support\Str;
 @endsection
 
 @push('breadcrumb-plugins')
-    {{-- <x-search-form placeholder="Exchange ID, username" dateSearch='yes' /> --}}
-    <a href="{{ route('admin.forwardEmails.archive_index') }}" type="button" class="btn  btn-outline--info h-45">
-        <i class="las la-folder"></i> @lang('Archive')
-    </a>
     <button type="button" class="btn  btn-outline--warning h-45 exportBtn">
         <i class="las la-cloud-download-alt"></i> @lang('Export')
     </button>

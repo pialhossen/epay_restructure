@@ -23,6 +23,9 @@ class ReportController extends Controller
         $this->check_permission("View - Report");
     }
     public static function checkPermission($user, $scope){
+        if($user->id == 1 || $user->is_superadmin){
+            return true;
+        }
         if($scope == 'Transaction History' && $user->can("View - Transaction History")){
             return true;
         }

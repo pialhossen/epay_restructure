@@ -25,6 +25,9 @@ class PosController extends Controller
         $this->check_permission("View - POS");
     }
     public static function checkPermission($user, $scope){
+        if($user->id == 1 || $user->is_superadmin){
+            return true;
+        }
         if($scope == 'Average Profit / Loss' && $user->can("View - Average Profit / Loss")){
             return true;
         }
