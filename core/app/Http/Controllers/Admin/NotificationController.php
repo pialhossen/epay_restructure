@@ -223,6 +223,7 @@ class NotificationController extends Controller
         }
 
         if (session('mail_error')) {
+            dd(session('mail_error'));
             $notify[] = ['error', session('mail_error')];
         } else {
             $notify[] = ['success', 'Email sent to '.$request->email.' successfully'];

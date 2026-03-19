@@ -490,7 +490,6 @@ class ManageUsersController extends Controller
             'subject' => 'required_if:via,email,push',
             'image' => ['nullable', 'image', new FileTypeValidate(['jpg', 'jpeg', 'png'])],
         ]);
-
         if (!gs('en') && !gs('sn') && !gs('pn')) {
             $notify[] = ['warning', 'Notification options are disabled currently'];
 

@@ -128,7 +128,7 @@ class Notify
         $methods = [
             'email' => Email::class,
             'sms' => Sms::class,
-            // 'push' => Push::class,
+            'push' => Push::class,
         ];
         
         if ($sendVia) {
