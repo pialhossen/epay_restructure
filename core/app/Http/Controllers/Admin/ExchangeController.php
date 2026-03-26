@@ -132,7 +132,11 @@ class ExchangeController extends Controller
             } else {
                 $exchanges = $exchanges->orderBy('created_at', 'desc');
             }
-            $exchanges = $exchanges->paginate(getPaginate($request->itemsPerPage ? $request->itemsPerPage : null));
+            $exchanges = $exchanges->paginate(getPaginate($request->itemsPerPage ? $request->itemsPerPage : null))
+                    ->through(function ($exchange) {
+                        $exchange->is_locked = $this->check_exchnage_updated_at($exchange);
+                        return $exchange;
+                    });
             $pageTitle = formateScope($scope) . ' Exchange';
         } catch (Exception $ex) {
             $notify[] = ['error', $ex];
@@ -142,7 +146,37 @@ class ExchangeController extends Controller
         $columns = ['exchange_id', 'user_id', 'receive_currency_id', 'receiving_amount', 'send_currency_id', 'sending_amount', 'status'];
 
         $currencies = Currency::all();
-        return view('admin.exchange.list', compact('pageTitle', 'exchanges', 'columns', 'scope', 'currencies', 'request'));
+        // dump($scope);
+        $showMultiSelect = ($scope == 'pending' || $scope == 'processing') || auth('admin')->id() == 1 || auth('admin')->user()->is_superadmin;
+        return view('admin.exchange.list', compact('pageTitle', 'exchanges', 'columns', 'scope', 'currencies', 'request','showMultiSelect'));
+    }
+
+    public function details($id)
+    {
+        $this->check_permission('View - Exchange');
+        $exchange = Exchange::where('id', $id)->firstOrFail();
+        $exchange->is_locked = $this->check_exchnage_updated_at($exchange);
+        $pageTitle = 'Exchange Details: ' . $exchange->exchange_id;
+        $exchangeLog = GpayExchangeLogModel::where('exchange_id', $id)
+            ->with(['adminUser:id,name'])
+            ->orderBy('id', 'desc')
+            ->get();
+
+        $kyc_form = Form::where('act', 'kyc')->first();
+        $user = $exchange->user;
+        $user_kyc_data = [];
+        if ($user->kyc_data) {
+            foreach ($user->kyc_data as $kyc_data) {
+                $user_kyc_data[$kyc_data->name] = $kyc_data;
+            }
+        }
+        $userDetails = UsersModel::find($exchange->user_id);
+        $charges = json_decode($exchange->charge, true);
+
+        $userBlocked = $this->checkBlockMatch($exchange, $userDetails);
+
+
+        return view('admin.exchange.details', compact('pageTitle', 'exchange', 'exchangeLog', 'userBlocked', 'charges', 'user_kyc_data'));
     }
 
     public function exportExchanges(Request $request)
@@ -293,34 +327,6 @@ class ExchangeController extends Controller
             }
             fclose($handle);
         }, 'exchange_export.csv');
-    }
-
-    public function details($id)
-    {
-        $this->check_permission('View - Exchange');
-        $exchange = Exchange::where('id', $id)->firstOrFail();
-        $exchange->is_locked = $this->check_exchnage_updated_at($exchange);
-        $pageTitle = 'Exchange Details: ' . $exchange->exchange_id;
-        $exchangeLog = GpayExchangeLogModel::where('exchange_id', $id)
-            ->with(['adminUser:id,name'])
-            ->orderBy('id', 'desc')
-            ->get();
-
-        $kyc_form = Form::where('act', 'kyc')->first();
-        $user = $exchange->user;
-        $user_kyc_data = [];
-        if ($user->kyc_data) {
-            foreach ($user->kyc_data as $kyc_data) {
-                $user_kyc_data[$kyc_data->name] = $kyc_data;
-            }
-        }
-        $userDetails = UsersModel::find($exchange->user_id);
-        $charges = json_decode($exchange->charge, true);
-
-        $userBlocked = $this->checkBlockMatch($exchange, $userDetails);
-
-
-        return view('admin.exchange.details', compact('pageTitle', 'exchange', 'exchangeLog', 'userBlocked', 'charges', 'user_kyc_data'));
     }
 
     // User Block List

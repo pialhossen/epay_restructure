@@ -38,27 +38,29 @@
                             <input type="hidden" name="itemsPerPage" value="{{ request('itemsPerPage') }}">
                         @endif
                         <div class="mb-3">
-                            <div class="col-lg-3 col-md-6 col-12 advance-search" data-advance-search-url="{{ route('admin.exchange.advance.search') }}">
-                                <label for="exchange_id">Exchange ID</label>
-                                <input @if($request->exchange_id) value="{{ $request->exchange_id }}" @endif type="text" name="exchange_id" class="form-control" autocomplete="off">
-                                <div class="suggestion-box">
-                                    Input Search Text
+                            <div class="d-flex gap-3">
+                                <div class="col-lg-3 col-md-6 col-12 advance-search" data-advance-search-url="{{ route('admin.exchange.advance.search') }}">
+                                    <label for="exchange_id">Exchange ID</label>
+                                    <input @if($request->exchange_id) value="{{ $request->exchange_id }}" @endif type="text" name="exchange_id" class="form-control" autocomplete="off">
+                                    <div class="suggestion-box">
+                                        Input Search Text
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-lg-3 col-md-6 col-12 advance-search" data-advance-search-url="{{ route('admin.exchange.advance.search') }}">
-                                <label for="email">Email / Username</label>
-                                <input @if($request->email) value="{{ $request->email }}" @endif type="text" name="email" class="form-control" autocomplete="off">
-                                <div class="suggestion-box">
-                                    Input Search Text
+                                <div class="col-lg-3 col-md-6 col-12 advance-search" data-advance-search-url="{{ route('admin.exchange.advance.search') }}">
+                                    <label for="email">Email / Username</label>
+                                    <input @if($request->email) value="{{ $request->email }}" @endif type="text" name="email" class="form-control" autocomplete="off">
+                                    <div class="suggestion-box">
+                                        Input Search Text
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-lg-3 col-md-6 col-12">
-                                <label for="transaction_type">Transaction Type</label>
-                                <select name="transaction_type[]" id="transaction_type" class="form-control select2" multiple="multiple">
-                                    <option value="EXCHANGE" @if(is_array($request->transaction_type) && in_array('EXCHANGE',$request->transaction_type)) selected @endif>EXCHANGE</option>
-                                    <option value="DEPOSIT" @if(is_array($request->transaction_type) && in_array('DEPOSIT',$request->transaction_type)) selected @endif>DEPOSIT</option>
-                                    <option value="WITHDRAW" @if(is_array($request->transaction_type) && in_array('WITHDRAW',$request->transaction_type)) selected @endif>WITHDRAW</option>
-                                </select>
+                                <div class="col-lg-3 col-md-6 col-12">
+                                    <label for="transaction_type">Transaction Type</label>
+                                    <select name="transaction_type[]" id="transaction_type" class="form-control select2" multiple="multiple">
+                                        <option value="EXCHANGE" @if(is_array($request->transaction_type) && in_array('EXCHANGE',$request->transaction_type)) selected @endif>EXCHANGE</option>
+                                        <option value="DEPOSIT" @if(is_array($request->transaction_type) && in_array('DEPOSIT',$request->transaction_type)) selected @endif>DEPOSIT</option>
+                                        <option value="WITHDRAW" @if(is_array($request->transaction_type) && in_array('WITHDRAW',$request->transaction_type)) selected @endif>WITHDRAW</option>
+                                    </select>
+                                </div>
                             </div>
                             <div class="d-flex gap-3">
                                 <div class="col-lg-3 col-md-6 col-12">
@@ -118,7 +120,9 @@
                         <table class="table table--light style--two data-table">
                             <thead>
                                 <tr>
+                                    @if($showMultiSelect)
                                     <th><input type="checkbox" name="" id="select_all" style="width: 25px; height: 25px; cursor: pointer;"></th>
+                                    @endif
                                     <th>@lang('Exchange ID')</th>
                                     <th>@lang('User')</th>
                                     <th>@lang('Transaction Type')</th>
@@ -181,10 +185,11 @@
                                 @endphp
                                 @forelse($exchanges as $exchange)
                                     <tr>
-                                        
+                                        @if($showMultiSelect && $exchange->is_locked == false)
                                         <td>
                                             <input type="checkbox" name="exchnage_id[]" id="" style="width: 25px; height: 25px; cursor: pointer;" value="{{ $exchange->id }}">
                                         </td>
+                                        @endif
                                         <td>
                                             <span class="fw-bold">{{ $exchange->exchange_id }}</span>
                                             <br>
@@ -283,10 +288,10 @@
                         </table>
                     </div>
                 </div>
-
+                @if($showMultiSelect)
                 <div class="card-footer py-4" style="display: flex; place-items: center; gap: 5px;">
                     <select name="" id="bulk_update_exchange_type">
-                        @if(auth()->id() == 1 && auth()->user()->is_superadmin)
+                        @if(auth()->id() == 1 || auth()->user()->is_superadmin)
                         <option value=1>Approve</option>
                         <option value=2>Pending</option>
                         <option value=3>Refund</option>
@@ -294,12 +299,17 @@
                         <option value=5>Proccessing</option>
                         <option value=9>Cancel</option>
                         @else
+                        @if($scope == 'processing')
+                        <option value=1>Approve</option>
+                        @else
                         <option value=1>Approve</option>
                         <option value=5>Proccessing</option>
+                        @endif
                         @endif
                     </select>
                     <button class="btn btn-sm btn-primary" style="height: 36px;" id="bulk_update_button">Bulk Update</button>
                 </div>
+                @endif
                 @if ($exchanges->hasPages())
                     <div class="card-footer py-4">
                         {{ paginateLinks($exchanges) }}
@@ -484,6 +494,9 @@
 
 @push('breadcrumb-plugins')
     {{--  <x-search-form placeholder="Exchange ID, username" dateSearch='yes' />  --}}
+    <a href="{{ asset('Excel_demo.xls') }}" class="btn btn-outline--primary h-45" download="Excel_demo.xls">
+        <i class="las la-cloud-download-alt"></i> @lang('Demo')
+    </a>
     <button type="button" class="btn  btn-outline--success h-45 importBtn">
         <i class="las la-cloud-upload-alt"></i> @lang('Import')
     </button>

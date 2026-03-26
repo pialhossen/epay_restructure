@@ -23,6 +23,7 @@ class CurrencyController extends Controller
     {
         $this->user = auth()->guard('admin')->user();
         $this->check_permission('View - Currency');
+        config(['auth.defaults.guard' => 'admin']);
     }
     public static function checkPermission($user, $scope){
         if($user->id == 1){
@@ -204,7 +205,7 @@ class CurrencyController extends Controller
                     'currency_form' => $newCurrencyId,
                     'currency_to' => $toId,
                     'status' => 1,
-                    'created_by' => auth()->user()->id,
+                    'created_by' => auth('admin')->user()->id,
                     'created_date' => $now,
                 ];
             }
