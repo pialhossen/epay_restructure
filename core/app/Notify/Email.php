@@ -90,8 +90,6 @@ class Email extends NotifyProcess implements Notifiable
     protected function sendSmtpMail()
     {
 
-
-
         $mail = new PHPMailer(true);
         $config = gs('mail_config');
         // Server settings

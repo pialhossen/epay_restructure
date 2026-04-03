@@ -92,7 +92,7 @@
             <img src="{{ asset('assets/admin/images/login.jpg') }}" alt="" class="modal-image" >
         @endif
         <h2 class="text-xl font-bold mb-2">{{ $modalDetails->title ?? '' }}</h2>
-        <p class="text-gray-700">{!! $modalDetails->description ?? '' !!}</p>
+        <p class="text-gray-700">{!! linkify($modalDetails->description) ?? '' !!}</p>
         @if($modalDetails->button_link)
         <a class="modal-btn" href="{{ $modalDetails->button_link }}" target="_blank" id="gotItBtn">{{ $modalDetails->button_name ?? 'Got It!' }}</a>
         @else

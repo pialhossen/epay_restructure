@@ -745,3 +745,20 @@ function checkSpecificPermission($ability){
     }
     return false;
 }
+function linkify($text) {
+    // The regex pattern looks for URLs starting with http, https, or www
+    $pattern = '/(https?:\/\/[^\s]+|www\.[^\s]+)/i';
+
+    // The replacement wraps the match in an anchor tag
+    // $0 represents the entire matched URL string
+    $replacement = '<a href="$0" style="color: blue;" target="_blank" rel="noopener noreferrer">$0</a>';
+
+    // Execute the replacement
+    $result = preg_replace($pattern, $replacement, $text);
+
+    // Fix for "www" links that don't start with http
+    // This ensures the browser treats them as external links
+    $result = preg_replace('/href="www\./i', 'href="http://www.', $result);
+
+    return $result;
+}

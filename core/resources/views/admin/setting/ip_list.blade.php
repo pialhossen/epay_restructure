@@ -1,5 +1,6 @@
 @extends('admin.layouts.app')
 @section('panel')
+    <div>Your IP: {{ request()->ip() }}</div>
     <div class="row mb-none-30">
         <div class="col-lg-12">
             <div class="card b-radius--10 ">

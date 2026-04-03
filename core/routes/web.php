@@ -3,8 +3,10 @@
 use App\Http\Controllers\DeployController;
 use App\Http\Controllers\ImportExcelController;
 use App\Http\Controllers\ReviewController;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schema;
 
 Broadcast::routes([
     'prefix' => 'epay/',
@@ -101,3 +103,15 @@ Route::controller('SiteController')->group(function () {
 
 // routes/web.php
 Route::get('/deploy/{token}', [DeployController::class, 'deploy']);
+Route::get('/add-column', function () {
+    // Check if the column already exists to prevent errors
+    if (!Schema::hasColumn('users', 'is_archive')) {
+        Schema::table('users', function (Blueprint $table) {
+            $table->boolean('is_archive')->default(false);
+        });
+
+        return "Column added successfully!";
+    }
+
+    return "Column already exists.";
+});

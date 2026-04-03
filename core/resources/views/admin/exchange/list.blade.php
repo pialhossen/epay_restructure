@@ -38,22 +38,33 @@
                             <input type="hidden" name="itemsPerPage" value="{{ request('itemsPerPage') }}">
                         @endif
                         <div class="mb-3">
-                            <div class="d-flex gap-3">
-                                <div class="col-lg-3 col-md-6 col-12 advance-search" data-advance-search-url="{{ route('admin.exchange.advance.search') }}">
+                            <div class="d-flex gap-3 flex-wrap">
+                                <div class="col-lg-3 col-md-6 col-12" data-advance-search-url="">
+                                    <label for="created_from">Created From</label>
+                                    <input @if($request->created_from) value="{{ $request->created_from }}" @endif type="date" name="created_from" class="form-control">
+                                </div>
+                                <div class="col-lg-3 col-md-6 col-12">
+                                    <label for="created_to">Created To</label>
+                                    <input @if($request->created_to) value="{{ $request->created_to }}" @endif type="date" name="created_to" class="form-control">
+                                </div>
+                                
+                            </div>
+                            <div class="d-flex gap-3 flex-wrap">
+                                <div class="col-lg-2 col-md-6 col-12 advance-search" data-advance-search-url="{{ route('admin.exchange.advance.search') }}">
                                     <label for="exchange_id">Exchange ID</label>
                                     <input @if($request->exchange_id) value="{{ $request->exchange_id }}" @endif type="text" name="exchange_id" class="form-control" autocomplete="off">
                                     <div class="suggestion-box">
                                         Input Search Text
                                     </div>
                                 </div>
-                                <div class="col-lg-3 col-md-6 col-12 advance-search" data-advance-search-url="{{ route('admin.exchange.advance.search') }}">
+                                <div class="col-lg-2 col-md-6 col-12 advance-search" data-advance-search-url="{{ route('admin.exchange.advance.search') }}">
                                     <label for="email">Email / Username</label>
                                     <input @if($request->email) value="{{ $request->email }}" @endif type="text" name="email" class="form-control" autocomplete="off">
                                     <div class="suggestion-box">
                                         Input Search Text
                                     </div>
                                 </div>
-                                <div class="col-lg-3 col-md-6 col-12">
+                                <div class="col-lg-2 col-md-6 col-12">
                                     <label for="transaction_type">Transaction Type</label>
                                     <select name="transaction_type[]" id="transaction_type" class="form-control select2" multiple="multiple">
                                         <option value="EXCHANGE" @if(is_array($request->transaction_type) && in_array('EXCHANGE',$request->transaction_type)) selected @endif>EXCHANGE</option>
@@ -61,9 +72,7 @@
                                         <option value="WITHDRAW" @if(is_array($request->transaction_type) && in_array('WITHDRAW',$request->transaction_type)) selected @endif>WITHDRAW</option>
                                     </select>
                                 </div>
-                            </div>
-                            <div class="d-flex gap-3">
-                                <div class="col-lg-3 col-md-6 col-12">
+                                <div class="col-lg-2 col-md-6 col-12">
                                     @php
                                         $send_old = isset(request()->query()['send_currency_id'])? request()->query()['send_currency_id']: [];
                                     @endphp
@@ -74,7 +83,7 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="col-lg-3 col-md-6 col-12">
+                                <div class="col-lg-2 col-md-6 col-12">
                                     @php
                                         $receive_old = isset(request()->query()['receive_currency_id'])? request()->query()['receive_currency_id']: [];
                                     @endphp
@@ -84,16 +93,6 @@
                                         <option value="{{ $currency->id }}" @selected(in_array($currency->id,$receive_old ))>{{ $currency->name }}</option>
                                         @endforeach
                                     </select>
-                                </div>
-                            </div>
-                            <div class="d-flex gap-3">
-                                <div class="col-lg-3 col-md-6 col-12" data-advance-search-url="">
-                                    <label for="created_from">Created From</label>
-                                    <input @if($request->created_from) value="{{ $request->created_from }}" @endif type="date" name="created_from" class="form-control">
-                                </div>
-                                <div class="col-lg-3 col-md-6 col-12">
-                                    <label for="created_to">Created To</label>
-                                    <input @if($request->created_to) value="{{ $request->created_to }}" @endif type="date" name="created_to" class="form-control">
                                 </div>
                             </div>
                             <div class="col-lg-3 col-md-6 col-12">

@@ -42,6 +42,7 @@
                             @if (isset($charges['sell']['percent']))
                                 @foreach ($charges['sell']['percent'] as $charge)
                                     @php
+                                        
                                         $charge_amount =  (float)number_format(( ($charge['charge_percent'] / 100) * $exchange->sending_amount) ?? 0, $exchange->sendCurrency->show_number_after_decimal);
                                     @endphp
                                     <li class="list-group-item d-flex justify-content-between flex-wrap flex-column">
@@ -163,6 +164,7 @@
                         @if (isset($charges['buy']))
                             @if (isset($charges['buy']['percent']))
                                 @foreach ($charges['buy']['percent'] as $charge)
+                                    @if(is_array($charge))
                                     @php
                                         $charge_amount = (($charge['charge_percent'] / 100) * $exchange->receiving_amount) ?? 0;
                                     @endphp
@@ -172,6 +174,7 @@
                                         </h5>
                                         <small class="text-muted"> @lang($charge['title'])</small>
                                     </li>
+                                    @endif
                                 @endforeach
                             @endif
                             @if (isset($charges['buy']['fixed']))

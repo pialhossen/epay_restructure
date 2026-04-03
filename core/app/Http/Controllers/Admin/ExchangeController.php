@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Excel as ExcelType;
 
 class ExchangeController extends Controller
 {
@@ -112,10 +113,28 @@ class ExchangeController extends Controller
                 $exchanges = $exchanges->whereIn('transaction_type', $request->transaction_type);
             }
             if ($request->note) {
-                $exchanges = $exchanges->where('transaction_proof_data','like' ,"%$request->note%");
+                $exchanges = $exchanges->where('transaction_proof_data', 'like', "%$request->note%");
             }
             if ($request->send_currency_id) {
                 $exchanges = $exchanges->whereIn('send_currency_id', $request->send_currency_id);
+            }
+            if ($request->receive_currency_id) {
+                $exchanges = $exchanges->whereIn('receive_currency_id', $request->receive_currency_id);
+            }
+            if ($request->updated_by_id) {
+                $exchanges = $exchanges->whereIn('updated_by', $request->updated_by_id);
+            }
+            if ($request->placed_by_id) {
+                $ids = $request->placed_by_id; // Capture for use in closure
+
+                $exchanges = $exchanges->where(function ($query) use ($ids) {
+                    // Filter by the selected Admin IDs
+                    $query->whereIn('order_place_admin_id', $ids);
+
+                    if (in_array("user", $ids)) {
+                        $query->orWhereNull("order_place_admin_id");
+                    }
+                });
             }
             if ($request->receive_currency_id) {
                 $exchanges = $exchanges->whereIn('receive_currency_id', $request->receive_currency_id);
@@ -133,10 +152,10 @@ class ExchangeController extends Controller
                 $exchanges = $exchanges->orderBy('created_at', 'desc');
             }
             $exchanges = $exchanges->paginate(getPaginate($request->itemsPerPage ? $request->itemsPerPage : null))
-                    ->through(function ($exchange) {
-                        $exchange->is_locked = $this->check_exchnage_updated_at($exchange);
-                        return $exchange;
-                    });
+                ->through(function ($exchange) {
+                    $exchange->is_locked = $this->check_exchnage_updated_at($exchange);
+                    return $exchange;
+                });
             $pageTitle = formateScope($scope) . ' Exchange';
         } catch (Exception $ex) {
             $notify[] = ['error', $ex];
@@ -146,9 +165,9 @@ class ExchangeController extends Controller
         $columns = ['exchange_id', 'user_id', 'receive_currency_id', 'receiving_amount', 'send_currency_id', 'sending_amount', 'status'];
 
         $currencies = Currency::all();
-        // dump($scope);
+        $admins = Admin::all();
         $showMultiSelect = ($scope == 'pending' || $scope == 'processing') || auth('admin')->id() == 1 || auth('admin')->user()->is_superadmin;
-        return view('admin.exchange.list', compact('pageTitle', 'exchanges', 'columns', 'scope', 'currencies', 'request','showMultiSelect'));
+        return view('admin.exchange.list', compact('pageTitle', 'exchanges', 'columns', 'scope', 'currencies', 'request', 'showMultiSelect','admins'));
     }
 
     public function details($id)
@@ -508,7 +527,10 @@ class ExchangeController extends Controller
                 $newExchangeLog->updated_by = auth()->user()->id;
                 $newExchangeLog->updated_date = now();
 
-                try {$newExchangeLog->save();} catch (\Throwable $th) {}
+                try {
+                    $newExchangeLog->save();
+                } catch (\Throwable $th) {
+                }
 
                 notify($exchange->user, 'PENDING_EXCHANGE', [
                     'exchange' => $exchange->exchange_id,
@@ -616,7 +638,10 @@ class ExchangeController extends Controller
                 $newExchangeLog->exchange_status = 'Cancel';
                 $newExchangeLog->updated_by = auth()->user()->id;
                 $newExchangeLog->updated_date = now();
-                try {$newExchangeLog->save();} catch (\Throwable $th) {}
+                try {
+                    $newExchangeLog->save();
+                } catch (\Throwable $th) {
+                }
 
                 notify($exchange->user, 'CANCEL_EXCHANGE', [
                     'exchange' => $exchange->exchange_id,
@@ -707,7 +732,10 @@ class ExchangeController extends Controller
                 $newExchangeLog->exchange_status = 'Refund';
                 $newExchangeLog->updated_by = auth()->user()->id;
                 $newExchangeLog->updated_date = Carbon::now();
-                try {$newExchangeLog->save();} catch (\Throwable $th) {}
+                try {
+                    $newExchangeLog->save();
+                } catch (\Throwable $th) {
+                }
 
                 notify($exchange->user, 'EXCHANGE_REFUND', [
                     'exchange' => $exchange->exchange_id,
@@ -791,7 +819,10 @@ class ExchangeController extends Controller
                 $newExchangeLog->exchange_status = 'Hold';
                 $newExchangeLog->updated_by = auth()->user()->id;
                 $newExchangeLog->updated_date = Carbon::now();
-                try {$newExchangeLog->save();} catch (\Throwable $th) {}
+                try {
+                    $newExchangeLog->save();
+                } catch (\Throwable $th) {
+                }
 
                 $notify[] = ['success', 'Exchange marked as hold'];
 
@@ -868,7 +899,10 @@ class ExchangeController extends Controller
                 $newExchangeLog->exchange_status = 'Processing';
                 $newExchangeLog->updated_by = auth()->user()->id;
                 $newExchangeLog->updated_date = Carbon::now();
-                try {$newExchangeLog->save();} catch (\Throwable $th) {}
+                try {
+                    $newExchangeLog->save();
+                } catch (\Throwable $th) {
+                }
 
                 $notify[] = ['success', 'Exchange marked as processing'];
 
@@ -1071,7 +1105,10 @@ class ExchangeController extends Controller
                     $newExchangeLog->exchange_status = 'Approved';
                     $newExchangeLog->updated_by = auth()->user()->id;
                     $newExchangeLog->updated_date = now();
-                    try {$newExchangeLog->save();} catch (\Throwable $th) {}
+                    try {
+                        $newExchangeLog->save();
+                    } catch (\Throwable $th) {
+                    }
 
                     DB::commit();
 
@@ -1298,7 +1335,7 @@ class ExchangeController extends Controller
     }
     public function exchanges_bulk_update(Request $request)
     {
-        $lockKey = "exchange_update_lock_".implode('_', $request->ids)  ;
+        $lockKey = "exchange_update_lock_" . implode('_', $request->ids);
         $lock = Cache::lock($lockKey, 5); // 5 seconds lock
 
         try {
@@ -1672,7 +1709,10 @@ class ExchangeController extends Controller
 
                         $newExchangeLog->updated_by = auth()->user()->id;
                         $newExchangeLog->updated_date = Carbon::now();
-                        try {$newExchangeLog->save();} catch (\Throwable $th) {}
+                        try {
+                            $newExchangeLog->save();
+                        } catch (\Throwable $th) {
+                        }
 
                         $exchange->status = $exchange_status;
                         $exchange->save();
@@ -1830,8 +1870,8 @@ class ExchangeController extends Controller
         $charges = [];
 
         foreach ($sellCharges as $sellCharge) {
-            $from   = (float) $sellCharge->from;
-            $to     = (float) $sellCharge->to;
+            $from = (float) $sellCharge->from;
+            $to = (float) $sellCharge->to;
             $amount = (float) $finalSendingAmount;
 
             if ($amount < $from || $amount > $to) {
@@ -1840,7 +1880,7 @@ class ExchangeController extends Controller
 
             if (!empty($sellCharge->charge_percent)) {
                 $sell_charge_percent += (float) $sellCharge->charge_percent;
-                if($cacheCharges){
+                if ($cacheCharges) {
                     $charges['sell']['percent'][] = $sellCharge;
                 } else {
                     $charges['sell']['percent'][] = $sellCharge->id;
@@ -1849,16 +1889,16 @@ class ExchangeController extends Controller
 
             if (!empty($sellCharge->charge_fixed)) {
                 $sell_charge_fixed += (float) $sellCharge->charge_fixed;
-                if($cacheCharges){
+                if ($cacheCharges) {
                     $charges['sell']['fixed'][] = $sellCharge;
-                }else{
+                } else {
                     $charges['sell']['fixed'][] = $sellCharge->id;
                 }
             }
         }
 
         $sell_charge_percent_amount = ((float) $finalSendingAmount * $sell_charge_percent) / 100;
-        $sell_charge_fixed_amount   = (float) $sell_charge_fixed;
+        $sell_charge_fixed_amount = (float) $sell_charge_fixed;
         $sendingCharge = $sell_charge_percent_amount + $sell_charge_fixed_amount;
 
         // dump($sell_charge_percent);
@@ -1884,9 +1924,9 @@ class ExchangeController extends Controller
                 continue;
             }
 
-            if (!empty($buyCharge->charge_percent)){
+            if (!empty($buyCharge->charge_percent)) {
                 $buy_charge_percent += $buyCharge->charge_percent;
-                if($cacheCharges){
+                if ($cacheCharges) {
                     $charges['buy']['percent'][] = $buyCharge;
                 } else {
                     $charges['buy']['percent'][] = $buyCharge->id;
@@ -1894,16 +1934,16 @@ class ExchangeController extends Controller
             }
             if (!empty($buyCharge->charge_fixed)) {
                 $buy_charge_fixed += $buyCharge->charge_fixed;
-                if($cacheCharges){
+                if ($cacheCharges) {
                     $charges['buy']['fixed'][] = $buyCharge;
                 } else {
                     $charges['buy']['fixed'][] = $buyCharge->id;
                 }
             }
 
-            
+
         }
-        $buy_charge_percent_amount = ((float) $finalReceivingAmount * (float) $buy_charge_percent) / 100; 
+        $buy_charge_percent_amount = ((float) $finalReceivingAmount * (float) $buy_charge_percent) / 100;
         $buy_charge_fixed_amount = (float) $buy_charge_fixed;
         $receivingCharge = $buy_charge_percent_amount + $buy_charge_fixed_amount;
 
@@ -1922,12 +1962,13 @@ class ExchangeController extends Controller
         $exchange->customer_buying_rate = $data['buying_rate'];
 
         $exchange->charge = json_encode($charges);
-        
+
         $exchange->save();
 
         return $exchange;
     }
-    public function createDeposit($data, $user_id){
+    public function createDeposit($data, $user_id)
+    {
         // $data = [
         //     "sending_currency" => null,
         //     "receiving_currency" => null,
@@ -1949,7 +1990,7 @@ class ExchangeController extends Controller
         $randomDate = Carbon::create(2025, 11, $randomDay, $randomHour, $randomMinute, $randomSecond);
 
         $requestedCurrencyRate = $data['buying_rate'];
-        
+
         $currency = Currency::enabled()->availableForBuy()->where('id', $data['sending_currency'])->firstOrFail();
         $selling_amount = $data['sending_amount'];
 
@@ -1958,12 +1999,12 @@ class ExchangeController extends Controller
         $amount = $data['receiving_amount'];
 
         $totalSellChargeAmount = 0;
-        $sell_charges = GpayCurrencyDiscountChargeModel::where('rules_for','sell')->where('currency_id',$currency->id)->whereJsonContains('apply_for','deposit')->get();
+        $sell_charges = GpayCurrencyDiscountChargeModel::where('rules_for', 'sell')->where('currency_id', $currency->id)->whereJsonContains('apply_for', 'deposit')->get();
 
-        foreach($sell_charges as $charge){
-            if($amount >= $charge->from && $amount <= $charge->to){
-                $charge_fixed = $charge->charge_fixed? $charge->charge_fixed: 0;
-                $charge_percent = $charge->charge_percent? $charge->charge_percent: 0;
+        foreach ($sell_charges as $charge) {
+            if ($amount >= $charge->from && $amount <= $charge->to) {
+                $charge_fixed = $charge->charge_fixed ? $charge->charge_fixed : 0;
+                $charge_percent = $charge->charge_percent ? $charge->charge_percent : 0;
                 $charge_fixed_amount = $charge_fixed;
                 $charge_percent_amount = ($charge_percent / 100) * $amount;
                 $totalSellChargeAmount += $charge_fixed_amount + $charge_percent_amount;
@@ -1971,14 +2012,14 @@ class ExchangeController extends Controller
         }
 
         $totalBuyChargeAmount = 0;
-        $buy_charges = GpayCurrencyDiscountChargeModel::where('rules_for','buy')->where('currency_id',$recv_currency->id)->whereJsonContains('apply_for','deposit')->get();
+        $buy_charges = GpayCurrencyDiscountChargeModel::where('rules_for', 'buy')->where('currency_id', $recv_currency->id)->whereJsonContains('apply_for', 'deposit')->get();
 
         $buying_amount = $amount;
 
-        foreach($buy_charges as $charge){
-            if($buying_amount >= $charge->from && $buying_amount <= $charge->to){
-                $charge_fixed = $charge->charge_fixed? $charge->charge_fixed: 0;
-                $charge_percent = $charge->charge_percent? $charge->charge_percent: 0;
+        foreach ($buy_charges as $charge) {
+            if ($buying_amount >= $charge->from && $buying_amount <= $charge->to) {
+                $charge_fixed = $charge->charge_fixed ? $charge->charge_fixed : 0;
+                $charge_percent = $charge->charge_percent ? $charge->charge_percent : 0;
                 $charge_fixed_amount = $charge_fixed;
                 $charge_percent_amount = ($charge_percent / 100) * $buying_amount;
                 $totalBuyChargeAmount += $charge_fixed_amount + $charge_percent_amount;
@@ -2000,7 +2041,7 @@ class ExchangeController extends Controller
         $deposit->status = Status::WITHDRAW_PENDING;
         $deposit->admin_trx_no = getTrx();
         $deposit->buy_rate = $requestedCurrencyRate ? $requestedCurrencyRate : $currency->buy_at;
-        $deposit->custom_rate = $requestedCurrencyRate ? $requestedCurrencyRate: $currency->buy_at;
+        $deposit->custom_rate = $requestedCurrencyRate ? $requestedCurrencyRate : $currency->buy_at;
         $deposit->transaction_type = 'DEPOSIT';
 
         $deposit->created_at = $this->excelToDateTime($data['placed_at']);
@@ -2020,32 +2061,32 @@ class ExchangeController extends Controller
 
         $recv_currency = Currency::enabled()->availableForSell()->where('id', $data['receiving_currency'])->firstOrFail();
         $currency = Currency::enabled()->availableForSell()->where('currency_id', 'account_balance')->firstOrFail();
-        
-        $acc_charge = 0;
-        $sell_charges = GpayCurrencyDiscountChargeModel::where('rules_for','sell')->where('currency_id',$currency->id)->whereJsonContains('apply_for','withdraw')->get();
 
-        foreach($sell_charges as $charge){
-            if($amount >= $charge->from && $amount <= $charge->to){
-                $charge_fixed = $charge->charge_fixed? $charge->charge_fixed: 0;
-                $charge_percent = $charge->charge_percent? $charge->charge_percent: 0;
+        $acc_charge = 0;
+        $sell_charges = GpayCurrencyDiscountChargeModel::where('rules_for', 'sell')->where('currency_id', $currency->id)->whereJsonContains('apply_for', 'withdraw')->get();
+
+        foreach ($sell_charges as $charge) {
+            if ($amount >= $charge->from && $amount <= $charge->to) {
+                $charge_fixed = $charge->charge_fixed ? $charge->charge_fixed : 0;
+                $charge_percent = $charge->charge_percent ? $charge->charge_percent : 0;
                 $charge_fixed_amount = $charge_fixed;
                 $charge_percent_amount = ($charge_percent / 100) * $amount;
                 $acc_charge += $charge_fixed_amount + $charge_percent_amount;
             }
         }
 
-        
+
         $getAmount = $data['receiving_amount'];
 
 
         $buyingCharge = 0;
-        $buy_charges = GpayCurrencyDiscountChargeModel::where('rules_for','buy')->where('currency_id',$recv_currency->id)->whereJsonContains('apply_for','withdraw')->get();
-        
+        $buy_charges = GpayCurrencyDiscountChargeModel::where('rules_for', 'buy')->where('currency_id', $recv_currency->id)->whereJsonContains('apply_for', 'withdraw')->get();
 
-        foreach($buy_charges as $charge){
-            if($getAmount >= $charge->from && $getAmount <= $charge->to){
-                $charge_fixed = $charge->charge_fixed? $charge->charge_fixed: 0;
-                $charge_percent = $charge->charge_percent? $charge->charge_percent: 0;
+
+        foreach ($buy_charges as $charge) {
+            if ($getAmount >= $charge->from && $getAmount <= $charge->to) {
+                $charge_fixed = $charge->charge_fixed ? $charge->charge_fixed : 0;
+                $charge_percent = $charge->charge_percent ? $charge->charge_percent : 0;
                 $charge_fixed_amount = $charge_fixed;
                 $charge_percent_amount = ($charge_percent / 100) * $getAmount;
                 $buyingCharge += $charge_fixed_amount + $charge_percent_amount;
@@ -2055,7 +2096,7 @@ class ExchangeController extends Controller
 
         $withdraw = new Exchange();
         $withdraw->exchange_id = $data['exchange_id'];
-        $withdraw->send_currency_id =  $currency->id;
+        $withdraw->send_currency_id = $currency->id;
         $withdraw->receive_currency_id = $recv_currency->id;
         $withdraw->sending_amount = $amount;
         $withdraw->receiving_amount = $getAmount;
@@ -2065,12 +2106,12 @@ class ExchangeController extends Controller
         $withdraw->buy_rate = $requestedCurrencyRate ? $requestedCurrencyRate : $recv_currency->sell_at;
         $withdraw->sell_rate = $currency->buy_at;
 
-        
+
         $hiddenCharges = GpayHiddenChargeModel::where('currency_id', $recv_currency->id)->get();
         foreach ($hiddenCharges as $hidden) {
             if ($hidden->charge_percent && $hidden->charge_percent > 0) {
                 $withdraw->hidden_charge_percent += $hidden->charge_percent;
-            } 
+            }
             if ($hidden->charge_fixed && $hidden->charge_fixed > 0) {
                 $withdraw->hidden_charge_fixed += $hidden->charge_fixed;
             }
@@ -2085,12 +2126,12 @@ class ExchangeController extends Controller
 
         $withdraw->created_at = $this->excelToDateTime($data['placed_at']);
         $withdraw->updated_at = $this->excelToDateTime($data['updated_at']);
-        
+
         $withdraw->transaction_proof_data = $data['aditional_field_payment_prove'];
         $withdraw->order_place_admin_id = $data['placed_by'];
 
         $withdraw->save();
-        
+
         $user->balance -= $withdraw->refund_amount;
         $user->save();
         $user->balanceStatement()->create([
@@ -2103,7 +2144,8 @@ class ExchangeController extends Controller
 
         return $withdraw;
     }
-    function excelToDateTime($excelSerial) {
+    function excelToDateTime($excelSerial)
+    {
         $unixTime = ($excelSerial - 25569) * 86400;
         return Carbon::createFromTimestamp($unixTime);
     }
@@ -2111,12 +2153,27 @@ class ExchangeController extends Controller
     {
         try {
             DB::beginTransaction();
-            $data = Excel::toArray([], public_path('Excel4th.xls'));
+
+            // 1. Get the file directly from the request
+            $uploadedFile = $request->file('file'); // Ensure 'file' matches your input name
+
+            if (!$uploadedFile) {
+                throw new \Exception("No file was uploaded.");
+            }
+
+            // 2. Pass the UploadedFile object. Laravel Excel handles the temp path automatically.
+            $data = Excel::toArray([], $uploadedFile);
+
             $rows = $data[0];
-    
+
+            // Your constraint check: The array length must be exactly 12
+            // if (count($rows) !== 12) {
+            //     throw new \Exception("The data must contain exactly 12 rows.");
+            // }
+
             $keys = array_shift($rows); // First row = column headers
             $exchanges = [];
-    
+
             foreach ($rows as $row) {
                 $exchanges[] = array_combine($keys, $row);
             }
@@ -2130,7 +2187,8 @@ class ExchangeController extends Controller
 
                 foreach ($lines as $line) {
                     // Skip empty lines
-                    if (trim($line) === '') continue;
+                    if (trim($line) === '')
+                        continue;
 
                     // Split by the first colon
                     $parts = explode(":", $line, 2);
@@ -2143,27 +2201,28 @@ class ExchangeController extends Controller
                 }
 
                 $json = [];
-                foreach($result as $index => $result_item){
+                foreach ($result as $index => $result_item) {
                     $json[] = [
                         'name' => $result_item[0],
                         'type' => 'text',
                         'value' => $result_item[1],
                     ];
-                };
+                }
+                ;
 
 
                 $sending_currency = Currency::where('name', $exchange['Send Currency'])->first();
                 $receiving_currency = Currency::where('name', $exchange['Received Currency'])->first();
 
-                $placed_by = $exchange['placed_by'] == 'User'? null: Admin::where('username', $exchange['placed_by'])->first()->id ?? null; 
-                if(!$sending_currency){
+                $placed_by = $exchange['placed_by'] == 'User' ? null : Admin::where('username', $exchange['placed_by'])->first()->id ?? null;
+                if (!$sending_currency) {
                     continue;
                 }
-                $user = User::where('username',$exchange['User Username'])->first();
-                if(!$user){
+                $user = User::where('username', $exchange['User Username'])->first();
+                if (!$user) {
                     continue;
                 }
-                $data= [
+                $data = [
                     "exchange_id" => $exchange['Exchange Id'],
                     "sending_currency" => $sending_currency?->id ?? 1,
                     "receiving_currency" => $receiving_currency?->id ?? 1,
@@ -2179,11 +2238,11 @@ class ExchangeController extends Controller
                     "updated_at" => $exchange['updated_at']
                 ];
                 if (str_starts_with($exchange['Exchange Id'], 'WD-')) {
-                    $this->createWithdraw($data,$user->id);
+                    $this->createWithdraw($data, $user->id);
                 } elseif (str_starts_with($exchange['Exchange Id'], 'DP-')) {
                     $this->createDeposit($data, $user->id);
                 } else {
-                    $this->createExchange($data,$user->id);
+                    $this->createExchange($data, $user->id);
                 }
             }
             DB::commit();
@@ -2194,9 +2253,10 @@ class ExchangeController extends Controller
         $notify[] = ['success', 'Excel Data Uploaded To Database'];
         return back()->withNotify($notify);
     }
-    function fix_currency(){
+    function fix_currency()
+    {
         $currencies = Currency::all();
-        foreach($currencies as $currency){
+        foreach ($currencies as $currency) {
             $currency->currency_id = Str::snake($currency->name);
             $currency->save();
         }
