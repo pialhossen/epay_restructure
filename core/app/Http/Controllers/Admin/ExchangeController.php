@@ -124,6 +124,9 @@ class ExchangeController extends Controller
             if ($request->updated_by_id) {
                 $exchanges = $exchanges->whereIn('updated_by', $request->updated_by_id);
             }
+            if ($request->status) {
+                $exchanges = $exchanges->where('status', $request->status);
+            }
             if ($request->placed_by_id) {
                 $ids = $request->placed_by_id; // Capture for use in closure
 

@@ -2,6 +2,19 @@
 @push('topBar')
   @include('admin.notification.top_bar')
 @endpush
+
+@push('script')
+<script>
+    // Ensure nicEdit content is saved to textarea before form submit
+    $(function() {
+        $('form').on('submit', function() {
+            if (typeof nicEditors !== 'undefined' && nicEditors.findEditor('nicEditor0')) {
+                nicEditors.findEditor('nicEditor0').saveContent();
+            }
+        });
+    });
+</script>
+@endpush
 @section('panel')
     @include('admin.notification.template.nav')
     @include('admin.notification.template.shortcodes')

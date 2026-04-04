@@ -73,6 +73,18 @@
                                     </select>
                                 </div>
                                 <div class="col-lg-2 col-md-6 col-12">
+                                    <label for="status">Exchange Status</label>
+                                    <select name="status" id="status" class="form-control select2" multiple="multiple">
+                                        <option value="0" @if($request->status == "0") selected @endif>INITIAL</option>
+                                        <option value="1" @if($request->status == "1") selected @endif>APPROVED</option>
+                                        <option value="2" @if($request->status == "2") selected @endif>PENDING</option>
+                                        <option value="3" @if($request->status == "3") selected @endif>REFUND</option>
+                                        <option value="4" @if($request->status == "4") selected @endif>HOLD</option>
+                                        <option value="5" @if($request->status == "5") selected @endif>PROCESSING</option>
+                                        <option value="9" @if($request->status == "9") selected @endif>CANCEL</option>
+                                    </select>
+                                </div>
+                                <div class="col-lg-2 col-md-6 col-12">
                                     @php
                                         $send_old = isset(request()->query()['send_currency_id'])? request()->query()['send_currency_id']: [];
                                     @endphp
@@ -91,6 +103,29 @@
                                     <select name="receive_currency_id[]" id="receive_currency_id" class="form-control select2" multiple="multiple">
                                         @foreach($currencies as $currency)
                                         <option value="{{ $currency->id }}" @selected(in_array($currency->id,$receive_old ))>{{ $currency->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-lg-2 col-md-6 col-12">
+                                    @php
+                                        $updated_by_id_old = isset(request()->query()['updated_by_id'])? request()->query()['updated_by_id']: [];
+                                    @endphp
+                                    <label for="updated_by_id">Updated By</label>
+                                    <select name="updated_by_id[]" id="updated_by_id" class="form-control select2" multiple="multiple">
+                                        @foreach($admins as $admin)
+                                        <option value="{{ $admin->id }}" @selected(in_array($admin->id, $updated_by_id_old ))>{{ $admin->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-lg-2 col-md-6 col-12">
+                                    @php
+                                        $placed_by_id_old = isset(request()->query()['placed_by_id'])? request()->query()['placed_by_id']: [];
+                                    @endphp
+                                    <label for="placed_by_id">Placed By</label>
+                                    <select name="placed_by_id[]" id="placed_by_id" class="form-control select2" multiple="multiple">
+                                        <option value="user" @selected(in_array("user", $placed_by_id_old ))>User</option>
+                                        @foreach($admins as $admin)
+                                        <option value="{{ $admin->id }}" @selected(in_array($admin->id, $placed_by_id_old ))>{{ $admin->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>

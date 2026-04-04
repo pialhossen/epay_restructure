@@ -53,6 +53,10 @@ class CurrencyController extends Controller
         } else {
             $currencies_query = $currencies_query->orderBy('order', 'asc'); 
         }
+        if($request->search){
+            $q = $request->search;
+            $currencies_query = $currencies_query->where('name','like',"%$q%")->orWhere('currency_id','like',"%$q%");
+        }
         $currencies = $currencies_query->paginate(getPaginate($request->itemsPerPage? $request->itemsPerPage: null ));
         $pageTitle = 'Manage Currency';
 
