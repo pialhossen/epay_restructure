@@ -45,7 +45,7 @@ use Illuminate\Support\Str;
                     @php
                         $lastSegment = request()->segment(count(request()->segments()));
                     @endphp
-                    <form class="m-2" action="{{ route('admin.forwardEmails.index') }}" method="GET" autocomplete="off">
+                    <form class="m-2" action="{{ route('admin.hiddenForwardEmails.index') }}" method="GET" autocomplete="off">
                         @if(request()->query('itemsPerPage'))
                             <input type="hidden" name="itemsPerPage" value="{{ request('itemsPerPage') }}">
                         @endif
@@ -82,7 +82,7 @@ use Illuminate\Support\Str;
                             </div>
                         </div>
                         <button type="Submit" class="btn btn-sm btn-primary">Search</button>
-                        <a href="{{ route('admin.forwardEmails.index') }}" class="btn btn-sm btn-info">Reset</a>
+                        <a href="{{ route('admin.hiddenForwardEmails.index') }}" class="btn btn-sm btn-info">Reset</a>
                     </form>
                 </div>
             </div>

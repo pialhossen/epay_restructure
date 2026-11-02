@@ -230,47 +230,53 @@ class ExchangeController extends Controller
     public function list(Request $request, $scope = 'list')
     {
         try {
-            $exchanges = Exchange::query();
-            if($scope == "initiated"){
-                $exchanges = $exchanges->where('status', Status::EXCHANGE_INITIAL);
-            }
-            else if($scope == "approved"){
-                $exchanges = $exchanges->where('status', Status::EXCHANGE_APPROVED);
-            }
-            else if($scope == "pending"){
-                $exchanges = $exchanges->where('status', Status::EXCHANGE_PENDING);
-            }
-            else if($scope == "refunded"){
-                $exchanges = $exchanges->where('status', Status::EXCHANGE_REFUND);
-            }
-            else if($scope == "canceled"){
-                $exchanges = $exchanges->where('status', Status::EXCHANGE_CANCEL);
+            $allowedScopes = ['list', 'initiated', 'pending', 'approved', 'canceled', 'refunded', 'hold', 'processing'];
+            if (!in_array($scope, $allowedScopes)) {
+                $scope = 'list';
             }
 
-            if($request->exchange_id){
+            $exchanges = Exchange::$scope()->where('user_id', auth()->id());
+
+            if ($request->exchange_id) {
                 $exchanges = $exchanges->where('exchange_id', $request->exchange_id);
             }
-            if($request->transaction_type){
-                $exchanges = $exchanges->where('transaction_type', $request->transaction_type);
+            if ($request->transaction_type) {
+                $types = array_filter((array) $request->transaction_type);
+                if (!empty($types)) {
+                    $exchanges = $exchanges->whereIn('transaction_type', $types);
+                }
             }
-            if($request->send_currency_id){
-                $exchanges = $exchanges->whereIn('send_currency_id', $request->send_currency_id);
+            if ($request->send_currency_id) {
+                $sendIds = array_filter((array) $request->send_currency_id);
+                if (!empty($sendIds)) {
+                    $exchanges = $exchanges->whereIn('send_currency_id', $sendIds);
+                }
             }
-            if($request->receive_currency_id){
-                $exchanges = $exchanges->whereIn('receive_currency_id', $request->receive_currency_id);
+            if ($request->receive_currency_id) {
+                $receiveIds = array_filter((array) $request->receive_currency_id);
+                if (!empty($receiveIds)) {
+                    $exchanges = $exchanges->whereIn('receive_currency_id', $receiveIds);
+                }
             }
             if ($request->created_from && $request->created_to) {
                 $exchanges = $exchanges->whereBetween('created_at', [
                     date('Y-m-d 00:00:00', strtotime($request->created_from)),
                     date('Y-m-d 23:59:59', strtotime($request->created_to))
                 ]);
+            } elseif ($request->created_from) {
+                $exchanges = $exchanges->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($request->created_from)));
+            } elseif ($request->created_to) {
+                $exchanges = $exchanges->where('created_at', '<=', date('Y-m-d 23:59:59', strtotime($request->created_to)));
             }
 
-            if(request()->query('sort')){
-                [$column, $direction] = explode(':', request()->query('sort'));
-                $exchanges = $exchanges->orderBy($column, $direction); 
+            if ($request->query('sort')) {
+                [$column, $direction] = explode(':', $request->query('sort'));
+                $exchanges = $exchanges->orderBy($column, $direction);
+            } else {
+                $exchanges = $exchanges->orderBy('created_at', 'desc');
             }
-            $exchanges = $exchanges->$scope()->where('user_id', auth()->id())->with(['sendCurrency', 'receivedCurrency'])->orderBy('created_at','desc')->paginate(getPaginate(request()->itemsPerPage));
+
+            $exchanges = $exchanges->with(['sendCurrency', 'receivedCurrency'])->paginate(getPaginate($request->itemsPerPage));
             $pageTitle = formateScope($scope).' Exchange';
         } catch (Exception $ex) {
             $notify[] = ['error', 'Invalid URL.'];
@@ -281,11 +287,11 @@ class ExchangeController extends Controller
         return view('Template::user.exchange.list', compact('pageTitle', 'exchanges', 'scope','request','currencies'));
     }
 
-    public function download_report($scope = 'list')
+    public function download_report(Request $request, $scope = 'list')
     {
         try {
             $title = Carbon::now()->format('Ymd').'_'.$scope.'_report.xlsx';
-            return Excel::download(new UserTransactionExport($scope), $title);
+            return Excel::download(new UserTransactionExport($scope, $request), $title);
         } catch (Exception $ex) {
             $notify[] = ['error', 'Invalid URL.'];
             return back()->withNotify($notify);

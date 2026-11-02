@@ -207,6 +207,9 @@ class ExchangeController extends Controller
         $query = Exchange::with(['user', 'sendCurrency', 'receivedCurrency', 'updatedBy', 'orderPlaceAdmin']);
         if ($request->has('scope')) {
             switch ($request->scope) {
+                case 'initiated':
+                    $query->where('status', Status::EXCHANGE_INITIAL);
+                    break;
                 case 'pending':
                     $query->where('status', Status::EXCHANGE_PENDING);
                     break;
@@ -225,6 +228,9 @@ class ExchangeController extends Controller
                 case 'canceled':
                     $query->where('status', Status::EXCHANGE_CANCEL);
                     break;
+                case 'list':
+                    $query->whereIn('status', Status::EXCHANGE_ALL_STATUS);
+                    break;
                 default:
                     break;
             }
@@ -242,19 +248,61 @@ class ExchangeController extends Controller
             });
         }
         if ($request->transaction_type) {
-            $query = $query->whereIn('transaction_type', $request->transaction_type);
+            $types = array_filter((array) $request->transaction_type);
+            if (!empty($types)) {
+                $query = $query->whereIn('transaction_type', $types);
+            }
+        }
+        if ($request->status) {
+            $query = $query->where('status', $request->status);
+        }
+        if ($request->note) {
+            $query = $query->where(function ($q) use ($request) {
+                $q->where('transaction_proof_data', 'LIKE', "%$request->note%")
+                    ->orWhere('note', 'LIKE', "%$request->note%");
+            });
+        }
+        if ($request->updated_by_id) {
+            $updatedByIds = array_filter((array) $request->updated_by_id);
+            if (!empty($updatedByIds)) {
+                $query = $query->whereIn('updated_by', $updatedByIds);
+            }
+        }
+        if ($request->placed_by_id) {
+            $ids = array_filter((array) $request->placed_by_id);
+            if (!empty($ids)) {
+                $query = $query->where(function ($q) use ($ids) {
+                    if (in_array('user', $ids)) {
+                        $q->orWhereNull('order_place_admin_id');
+                    }
+                    $adminIds = array_filter($ids, fn($v) => $v !== 'user');
+                    if ($adminIds) {
+                        $q->orWhereIn('order_place_admin_id', $adminIds);
+                    }
+                });
+            }
         }
         if ($request->send_currency_id) {
-            $query = $query->whereIn('send_currency_id', $request->send_currency_id);
+            $sendIds = array_filter((array) $request->send_currency_id);
+            if (!empty($sendIds)) {
+                $query = $query->whereIn('send_currency_id', $sendIds);
+            }
         }
         if ($request->receive_currency_id) {
-            $query = $query->whereIn('receive_currency_id', $request->receive_currency_id);
+            $receiveIds = array_filter((array) $request->receive_currency_id);
+            if (!empty($receiveIds)) {
+                $query = $query->whereIn('receive_currency_id', $receiveIds);
+            }
         }
         if ($request->created_from && $request->created_to) {
             $query = $query->whereBetween('created_at', [
                 date('Y-m-d 00:00:00', strtotime($request->created_from)),
                 date('Y-m-d 23:59:59', strtotime($request->created_to))
             ]);
+        } elseif ($request->created_from) {
+            $query = $query->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($request->created_from)));
+        } elseif ($request->created_to) {
+            $query = $query->where('created_at', '<=', date('Y-m-d 23:59:59', strtotime($request->created_to)));
         }
         if (request()->query('sort')) {
             [$column, $direction] = explode(':', request()->query('sort'));

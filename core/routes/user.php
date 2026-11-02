@@ -117,8 +117,8 @@ Route::middleware('auth')->name('user.')->group(function () {
                 Route::post('manual', 'manualConfirm');
                 Route::get('invoice/{id}/{type}', 'invoice')->name('invoice');
                 Route::get('details/{trx?}', 'details')->name('details');
+                Route::get('report-download/{scope?}', 'download_report')->name('download_report');
                 Route::get('{scope?}', 'list')->name('list');
-                Route::get('/report-download/{scope?}', 'download_report')->name('download_report');
             });
             Route::controller('BalanceController')->name('statement.')->prefix('statement')->group(function (){
                 Route::get('balance', 'balanceStatement')->name('balance');

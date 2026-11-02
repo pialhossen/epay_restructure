@@ -233,7 +233,7 @@
 
             function getUserCount(methodName) {
                 var methodNameUpper = methodName.toUpperCase();
-                if (methodNameUpper == 'SELECTEDUSERS' || methodNameUpper == 'ALLUSERS' || methodNameUpper == 'TOPDEPOSITEDUSERS' ||
+                if (methodNameUpper == 'SELECTEDUSERS' || methodNameUpper == 'TOPDEPOSITEDUSERS' ||
                     methodNameUpper == 'NOTLOGINUSERS') {
                     $('.userCount').text(0);
                     $('.userCountText').addClass('d-none');

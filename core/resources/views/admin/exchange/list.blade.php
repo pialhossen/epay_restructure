@@ -39,17 +39,6 @@
                         @endif
                         <div class="mb-3">
                             <div class="d-flex gap-3 flex-wrap">
-                                <div class="col-lg-3 col-md-6 col-12" data-advance-search-url="">
-                                    <label for="created_from">Created From</label>
-                                    <input @if($request->created_from) value="{{ $request->created_from }}" @endif type="date" name="created_from" class="form-control">
-                                </div>
-                                <div class="col-lg-3 col-md-6 col-12">
-                                    <label for="created_to">Created To</label>
-                                    <input @if($request->created_to) value="{{ $request->created_to }}" @endif type="date" name="created_to" class="form-control">
-                                </div>
-                                
-                            </div>
-                            <div class="d-flex gap-3 flex-wrap">
                                 <div class="col-lg-2 col-md-6 col-12 advance-search" data-advance-search-url="{{ route('admin.exchange.advance.search') }}">
                                     <label for="exchange_id">Exchange ID</label>
                                     <input @if($request->exchange_id) value="{{ $request->exchange_id }}" @endif type="text" name="exchange_id" class="form-control" autocomplete="off">
@@ -129,10 +118,18 @@
                                         @endforeach
                                     </select>
                                 </div>
-                            </div>
-                            <div class="col-lg-3 col-md-6 col-12">
-                                <label for="created_to">Note</label>
-                                <input @if($request->note) value="{{ $request->note }}" @endif type="text" name="note" class="form-control">
+                                <div class="col-lg-2 col-md-6 col-12">
+                                    <label for="note">Note</label>
+                                    <input @if($request->note) value="{{ $request->note }}" @endif type="text" name="note" class="form-control">
+                                </div>
+                                <div class="col-lg-2 col-md-6 col-12">
+                                    <label for="created_from">Created From</label>
+                                    <input @if($request->created_from) value="{{ $request->created_from }}" @endif type="date" name="created_from" class="form-control">
+                                </div>
+                                <div class="col-lg-2 col-md-6 col-12">
+                                    <label for="created_to">Created To</label>
+                                    <input @if($request->created_to) value="{{ $request->created_to }}" @endif type="date" name="created_to" class="form-control">
+                                </div>
                             </div>
                         </div>
                         <button type="Submit" class="btn btn-sm btn-primary">Search</button>
@@ -364,6 +361,7 @@
                 </div>
                 <form method="post" action="{{ route('admin.exchange.export') }}" id="exportForm">
                     @csrf
+                    <input type="hidden" name="scope" value="{{ $scope }}">
                     @foreach(request()->all() as $key => $value)
                         @if(is_array($value))
                             @foreach($value as $subKey => $subValue)
